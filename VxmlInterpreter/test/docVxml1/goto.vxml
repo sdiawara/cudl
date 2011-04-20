@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+    <form>
+        <block>
+    	    <log>LOG Hello</log>
+    	    <goto nextitem="b_1"/>
+        </block>
+         
+        <block name="b2">
+      		<log>LOG Hello 2</log>
+      	</block>
+        
+        <block name="b_1">
+        	<log>LOG Hello 1</log>
+        </block>
+        
+    </form>
+</vxml>  
