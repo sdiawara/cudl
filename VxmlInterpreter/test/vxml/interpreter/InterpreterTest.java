@@ -6,37 +6,32 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import vxml.interpreter.execption.InterpreterExecption;
+import vxml.interpreter.execption.InterpreterException;
+import vxml.utils.Prompt;
 
 public class InterpreterTest {
-	private List<VariableVxml> varExcepted;
-	private Interpreter interpreter;
+	private Map<String, String> varExcepted = new TreeMap<String, String>();
 	private InterpreterContext interpreterContext;
-
-	@Before
-	public void setUp() throws Exception {
-		varExcepted = new ArrayList<VariableVxml>();
-	}
 
 	@Test
 	public void variableDeclarationTest() throws SAXException, IOException,
-			InterpreterExecption {
-		varExcepted.add(new VariableVxml("un", "1"));
-		varExcepted.add(new VariableVxml("deux", "un+1"));
-		varExcepted.add(new VariableVxml("trois", "deux+1"));
-		varExcepted.add(new VariableVxml("continuer", "undefined"));
+			InterpreterException {
+		varExcepted.put("un", "1.0");
+		varExcepted.put("deux", "2.0");
+		varExcepted.put("trois", "3.0");
+		varExcepted.put("continuer", "oui");
 
 		interpreterContext = new InterpreterContext("variable.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertEquals(varExcepted,
-				interpreterContext.interpreter.currentNodeVariables);
+		assertEquals(varExcepted, interpreterContext.interpreter.getVar());
 	}
 
 	@Test
@@ -46,20 +41,22 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello 1");
 		traceLog.add("LOG Hello 2");
 		traceLog.add("LOG Hello 3");
+
 		List<String> traceStat = new ArrayList<String>();
 		traceStat.add("[label:stats] LOG Hello");
 
 		interpreterContext = new InterpreterContext("shello2.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
+		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
 	@Test
 	public void testLogTraceWithExit() throws SAXException, IOException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
+		traceLog.add("LOG Hello 1");
 
 		List<String> traceStat = new ArrayList<String>();
 		traceStat.add("[label:stats] LOG Hello");
@@ -82,21 +79,21 @@ public class InterpreterTest {
 		List<String> traceStat = new ArrayList<String>();
 		traceStat.add("[label:stats] LOG Hello");
 
-		List<VariableVxml> varExecpeted = new ArrayList<VariableVxml>();
-		varExecpeted.add(new VariableVxml("block_0", "undefined"));
-		varExecpeted.add(new VariableVxml("block_1", "undefined"));
-		varExecpeted.add(new VariableVxml("block_2", "undefined"));
-		varExecpeted.add(new VariableVxml("block_3", "undefined"));
-		varExecpeted.add(new VariableVxml("telephone", "+689 123456"));
-		varExecpeted.add(new VariableVxml("telephone1", "+356 689999"));
+		varExcepted = new TreeMap<String, String>();
+		varExcepted.put("block_0", "defined");
+		varExcepted.put("block_1", "defined");
+		varExcepted.put("block_2", "defined");
+		varExcepted.put("block_3", "defined");
+		varExcepted.put("telephone", "+689 123456");
+		varExcepted.put("telephone1", "+356 689999");
 
 		interpreterContext = new InterpreterContext("shelloVar.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
-		assertEquals(varExecpeted,
-				interpreterContext.interpreter.currentNodeVariables);
+		assertEquals(varExcepted, interpreterContext.interpreter.getVar());
+
+		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
 	@Test
@@ -111,21 +108,22 @@ public class InterpreterTest {
 		List<String> traceStat = new ArrayList<String>();
 		traceStat.add("[label:stats] LOG Hello");
 
-		List<VariableVxml> varExecpeted = new ArrayList<VariableVxml>();
-		varExecpeted.add(new VariableVxml("block_0", "undefined"));
-		varExecpeted.add(new VariableVxml("block_1", "undefined"));
-		varExecpeted.add(new VariableVxml("block_2", "undefined"));
-		varExecpeted.add(new VariableVxml("block_3", "undefined"));
-		varExecpeted.add(new VariableVxml("telephone", "undefined"));
-		varExecpeted.add(new VariableVxml("telephone1", "undefined"));
+		varExcepted = new TreeMap<String, String>();
+		varExcepted.put("block_0", "defined");
+		varExcepted.put("block_1", "defined");
+		varExcepted.put("block_2", "defined");
+		varExcepted.put("block_3", "defined");
+		varExcepted.put("telephone", "undefined");
+		varExcepted.put("telephone1", "undefined");
 
 		interpreterContext = new InterpreterContext("shelloVarClear.vxml");
 		interpreterContext.launchInterpreter();
 
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
-		assertEquals(varExecpeted,
-				interpreterContext.interpreter.currentNodeVariables);
+		System.err.println(varExcepted);
+		System.err.println(interpreterContext.interpreter.getVar());
+		assertEquals(varExcepted, interpreterContext.interpreter.getVar());
 	}
 
 	@Test
@@ -169,6 +167,8 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
 		traceLog.add("LOG Hello 2");
+		traceLog.add("LOG Hello 3");
+		traceLog.add("LOG Hello 4");
 
 		interpreterContext = new InterpreterContext("goto.vxml");
 		interpreterContext.launchInterpreter();
@@ -230,4 +230,16 @@ public class InterpreterTest {
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
 
+	@Test
+	@Ignore
+	public void testReprompt() throws SAXException, IOException {
+		List<Prompt> prompts = new ArrayList<Prompt>();
+
+		interpreterContext = new InterpreterContext("reprompt.vxml");
+		interpreterContext.launchInterpreter();
+
+		assertTrue(interpreterContext.interpreter.getPrompts().isEmpty());
+		assertTrue(false);
+		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
+	}
 }

@@ -1,5 +1,5 @@
 package vxml.interpreter.execption;
 
-public class ExitException extends InterpreterExecption {
+public class ExitException extends InterpreterException {
 
 }

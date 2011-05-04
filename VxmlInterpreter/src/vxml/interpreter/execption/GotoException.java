@@ -1,10 +1,9 @@
 package vxml.interpreter.execption;
 
+public class GotoException extends InterpreterException {
+	public String next;
 
-public class GotoException extends InterpreterExecption {
-//	public Node node;
-//
-//	public GotoException(Node node) {
-//		this.node = node;
-//	}
+	public GotoException(String string) {
+		this.next = string;
+	}
 }

@@ -1,5 +1,5 @@
 package vxml.interpreter.execption;
 
-public class DisconnectException extends InterpreterExecption {
+public class DisconnectException extends InterpreterException {
 
 }

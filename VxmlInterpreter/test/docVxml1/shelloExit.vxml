@@ -3,8 +3,9 @@
   <form>
    <block>
         <log label="stats">LOG Hello</log>
+              <log>LOG Hello 1</log>
         <exit/>
-         <log>LOG Hello 1</log>
+         <log>LOG Hello 1 affter exit</log>
       </block>
     
      <block>
