@@ -9,6 +9,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -100,6 +101,7 @@ public class InterpreterTest extends TestCase {
 	}
 
 	@Test
+
 	public void testTalkNavigatesUntilNextInteraction()
 			throws XPathExpressionException, IOException, SAXException,
 			TransformerException {
