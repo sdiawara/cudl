@@ -1,0 +1,82 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+<vxml xml:lang="fr" xmlns="http://www.w3.org/2001/vxml" version="2.0">
+  <form>
+    <block>
+      <log>LOG PHASE interaction</log>
+    </block>
+    <!-- properties management -->
+    <property name="confidencelevel" value="0.50"/>
+	<property name="speedvsaccuracy" value="0.43"/>
+	<property name="completetimeout" value="400ms"/>
+	<property name="incompletetimeout" value="600ms"/>
+	<property name="bargeintype" value="hotword"/>
+        
+	<!-- events management -->
+	<catch event="connection.disconnect.hangup">
+          <var name="currentState"  expr="'AccueilQTarif'"></var>
+          <var name="toState"  expr="'AccueilQTarif'"></var>
+          <var name="callReason"  expr="'catchedEvent'"></var>
+          <var name="event"  expr="'connection.disconnect.hangup'"></var>
+          <submit next="PhaseRaccrocher" namelist="currentState toState callReason event" />
+        </catch>
+	
+        <catch event="error.*">
+            <var name="currentState"  expr="'AccueilQTarif'"></var>
+            <var name="toState"  expr="'error'"></var>
+            <var name="callReason"  expr="'catchedEvent'"></var>
+            <var name="event"  expr="'error.*'"></var>
+            <submit next="VxmlSS3900AccueilQTarifOnGrammarResult" namelist="currentState toState callReason event" />
+        </catch>
+	
+	<!-- Add object tag -->
+	
+	<field name="grammarResult">
+
+	  <!-- ajout des prompts -->
+          <prompt timeout="200ms"  bargein="true">
+            <audio src="/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav">Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».</audio>
+          </prompt>
+	  
+	  <!-- grammars add -->
+	  <grammar mode="voice" src="/data/modeles/TARIF.srg"/>
+	  
+	  <!-- noinput management-->
+          <noinput> 
+            <var name="currentState"  expr="'AccueilQTarif'"></var>
+            <var name="toState"  expr="''"></var>
+            <var name="callReason"  expr="'noInputEvent'"></var>
+	    
+            <submit next="PhaseSilence" namelist="currentState toState callReason"/>                    
+          </noinput>
+
+          <!-- gestion of no match -->
+          <nomatch> 
+            <var name="currentState"  expr="'AccueilQTarif'"></var>
+                    <var name="toState"  expr="''"></var>
+                    <var name="callReason"  expr="'noMatchEvent'"></var>
+					
+                    <submit next="VxmlSS3900AccueilQTarifSV1" namelist="currentState toState callReason" method="post"/>
+          </nomatch>
+          
+          <filled> 
+	    <assign name="grammarResult" expr="application.lastresult$[0].utterance"/>
+            <var name="grammarResultInputMode" expr="application.lastresult$[0].inputmode"/>
+	    <if cond="grammarResultInputMode == 'dtmf'">
+	    </if>
+	    
+	    <var name="currentState"  expr="'AccueilQTarif'"></var>
+	    <var name="toState"  expr="''"></var>
+	    <var name="callReason"  expr="'recoEvent'"></var>
+	    <var name="nBestResult" expr="dialog.getResultString()"/>
+	    <submit next="PhaseTalk" namelist="currentState toState callReason grammarResult nBestResult" method="post" />
+          </filled>
+	</field>
+	
+	<block>
+	  <var name="currentState"  expr="'AccueilQTarif'"></var>
+	  <var name="toState"  expr="''"></var>
+	  <var name="callReason"  expr="'normal'"></var>
+	  <submit next="VxmlSS3900AccueilQTarifOnGrammarResult" namelist="currentState toState callReason" method="post" />
+	</block>
+  </form>
+</vxml>

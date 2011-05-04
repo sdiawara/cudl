@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.0">
+  <menu>
+    <prompt>Voulez-vous une glace pour le dessert ?</prompt> 
+    <prompt count="2" > 
+      Si vous voulez une glace, tapez 1. 
+      Si vous ne voulez pas de glace, tapez 2.
+    </prompt> 
+    <prompt count="3" > 
+      Tapez étoile à tout instant pour finir l'appel.
+    </prompt> 
+    <choice dtmf="1" next="#veut_un_dessert"/> 
+    <choice dtmf="2" next="#ne-veut_pas_de_dessert"/>
+    <choice dtmf="*" next="#finir"/>
+  </menu>
+  <form id="veut_un_dessert">
+    <prompt>
+      Vous avez choisi de prendre un dessert
+    </prompt>
+  </form>
+  <form id="ne-veut_pas_de_dessert">
+    <prompt>
+      Vous ne voulez pas de dessert.
+    </prompt>
+  </form>
+  <form id="finir">
+    <exit/>
+  </form>
+  
+  <noinput>
+    J'ai rien entendu.
+    <reprompt/>
+  </noinput>
+</vxml>

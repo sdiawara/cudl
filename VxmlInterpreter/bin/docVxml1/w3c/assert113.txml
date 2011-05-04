@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+      xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+<!--
+    FIA ends when it encounters a <exit>.
+
+  Note: This is a manual test!  If it does not fail, it
+      is a success.  We can't have it say it succeeded
+          in ending, but we can have it say if failed by
+          continuing.  Make sure that it exits, not
+          disconnects, and that subsequent interaction
+          is possible.
+-->
+
+  <catch>
+    <conf:comment>
+      Toplevel caught event <value expr="_event"/>
+    </conf:comment>
+    <conf:fail expr="_event"/>
+  </catch>
+
+
+  <form>
+    <block>
+    	<exit/>
+        <conf:fail reason="FIA did not end!"/>
+    </block>
+    <block>
+        <conf:fail reason="FIA did not end!"/>
+    </block>
+  </form>
+
+</vxml>
