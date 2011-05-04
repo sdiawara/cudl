@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+      xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+<!--
+    Using the goto nextitem will force the FIA to immediately
+    transition to the chosen form item.
+-->
+
+  <catch>
+    <conf:comment>
+      Toplevel caught event <value expr="_event"/>
+    </conf:comment>
+    <conf:fail expr="_event"/>
+  </catch>
+
+
+  <form id="first">
+
+    <catch event="org.w3c.exiting">
+      <goto nextitem="block_end"/>
+      <conf:fail reason="Hit mine number one."/>
+    </catch>
+
+    <block>
+      <goto nextitem="f1"/>
+      <conf:fail reason="Hit mine number two."/>
+    </block>
+
+    <block>
+      <conf:fail reason="Hit mine number three."/>
+    </block>
+
+    <block name="block_end">
+      <conf:pass/>
+    </block>
+
+    <block name="f1">
+      <goto nextitem="block_next"/>
+      	 <conf:fail reason="Hit mine number four."/>
+    </block>
+
+    <block>
+      <conf:fail reason="Hit mine number five."/>
+    </block>
+
+    <block name="block_next">
+       <goto nextitem="block_end"/>
+       <throw event="org.w3c.exiting"/>
+      <conf:fail reason="Hit mine number six."/>
+    </block>
+
+    <block>
+      <conf:fail reason="Hit mine number seven."/>
+    </block>
+    
+  </form>
+
+</vxml>
