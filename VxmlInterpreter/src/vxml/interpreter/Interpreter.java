@@ -39,7 +39,7 @@ public class Interpreter {
 	private boolean nextItemSelectGuard = false;
 	public List<String> w3cNodeConfSuite = new ArrayList<String>();
 	private Map<String, String> currentDialogProprety = new Hashtable<String, String>();
-	
+
 	private Hashtable<String, NodeExecutor> nodeExecution = new Hashtable<String, NodeExecutor>() {
 		{
 			// TODO: implement interpretation of: reprompt,
@@ -81,7 +81,7 @@ public class Interpreter {
 			});
 			put("reprompt", new NodeExecutor() {
 				public void execute(Node node) {
-					reprompt();
+					System.out.println("TODO: implemente reprompt");
 				}
 			});
 			put("return", new NodeExecutor() {
@@ -96,7 +96,7 @@ public class Interpreter {
 			});
 			put("script", new NodeExecutor() {
 				public void execute(Node node) {
-					System.err.println("TODO: implement script interpretation");
+
 				}
 			});
 			put("var", new NodeExecutor() {
@@ -120,6 +120,7 @@ public class Interpreter {
 					assignVariableValue(node);
 				}
 			});
+
 			put("clear", new NodeExecutor() {
 				public void execute(Node node) {
 					clearVariable(node);
@@ -188,9 +189,11 @@ public class Interpreter {
 
 			// Exécuter l'élément de formulaire.
 
-			variableVxml.setValue(nodeItemVariablesName.get(selectedItem), "'defined'");
-			allVariable.put(nodeItemVariablesName.get(selectedItem), variableVxml
-					.getValue(nodeItemVariablesName.get(selectedItem)));
+			variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
+					"'defined'");
+			allVariable.put(nodeItemVariablesName.get(selectedItem),
+					variableVxml.getValue(nodeItemVariablesName
+							.get(selectedItem)));
 
 			String nodeName = selectedItem.getNodeName();
 			if (nodeName.equals("field")) {
@@ -202,6 +205,7 @@ public class Interpreter {
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
 				execute(selectedItem);
+				variableVxml.resetScope(selectedItem);
 			}
 
 			// System.out.println("After selection ["+
@@ -218,9 +222,8 @@ public class Interpreter {
 			if (node.getNodeName().equals("var")
 					|| VxmlElementType.isFormItem(node)) {
 				String declareVariable = variableVxml.declareVariable(node);
-				allVariable
-						.put(declareVariable, variableVxml
-								.getValue(declareVariable));
+				allVariable.put(declareVariable, variableVxml
+						.getValue(declareVariable));
 				if (VxmlElementType.isFormItem(node)) {
 					nodeItemVariablesName.put(node, declareVariable);
 					// FIXME: add prompt counter
@@ -230,7 +233,7 @@ public class Interpreter {
 			}
 		}
 	}
-	
+
 	private void collectDialogProperty(NodeList nodeList) {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
@@ -258,7 +261,8 @@ public class Interpreter {
 
 			if (VxmlElementType.isFormItem(node)) {
 				if (nodeItemVariablesName.get(node) != null
-						&& variableVxml.getValue(nodeItemVariablesName.get(node)).equals(
+						&& variableVxml.getValue(
+								nodeItemVariablesName.get(node)).equals(
 								"undefined") && checkCond(node)) {
 					return node;
 				}
@@ -283,7 +287,7 @@ public class Interpreter {
 			}
 		}
 	}
-
+	
 	private void collectPrompt(Node node) {
 		Prompt p = new Prompt();
 		if (node.getNodeName().equals("prompt")) {
@@ -321,7 +325,17 @@ public class Interpreter {
 						p.tts += child.getChildNodes().item(0).getNodeValue()
 								+ " ";
 				} else if (child.getNodeName().equals("#text")) {
-					setPromtTextToSpeech(child, p);
+					addPromtTextToSpeech(child, p);
+				} else if (child.getNodeName().equals("value")) {
+					try {
+						addPromptWithValue(child, p);
+					} catch (DOMException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ScriptException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -331,22 +345,24 @@ public class Interpreter {
 
 	private void collectSimpleSpeechPrompt(Node node) {
 		Prompt p = new Prompt();
-		setPromtTextToSpeech(node, p);
+		addPromtTextToSpeech(node, p);
 		if (p.tts != "")
 			prompts.add(p);
 
 	}
 
-	private void reprompt() {
-		System.err.println("TODO: reprompt");
-	}
-
-	private void setPromtTextToSpeech(Node node, Prompt p) {
+	private void addPromtTextToSpeech(Node node, Prompt p) {
 		String nodeValue = node.getNodeValue().trim();
 		if (nodeValue != null && !nodeValue.equals(" ")
 				&& nodeValue.length() > 0) {
 			p.tts += nodeValue.replaceAll("@", " ") + " ";
 		}
+	}
+
+	private void addPromptWithValue(Node value, Prompt p) throws DOMException, ScriptException {
+		assert (value.getNodeName().endsWith("value"));
+			p.tts += variableVxml.getValue(value.getAttributes().item(0)
+					.getNodeValue());
 	}
 
 	private void clearVariable(Node node1) {
@@ -383,11 +399,6 @@ public class Interpreter {
 			// TODO Auto-generated catch block
 			throw new RuntimeException(e);
 		}
-
-		// if (variableVxml != null) {
-		// variableVxml.value = node1.getAttributes().getNamedItem("expr")
-		// .getNodeValue().replace("'", "");
-		// }
 	}
 
 	private Node selectDialogNextItemTovisit(Node node) {

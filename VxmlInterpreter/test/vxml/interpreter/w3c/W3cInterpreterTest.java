@@ -84,16 +84,30 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3cManualTest() throws SAXException, IOException,
+	public void w3cManual1() throws SAXException, IOException,
 			InterpreterException {
 		// If the last main FIA loop did not result in a goto nextitem
 		// and there is no form item which is eligible to be visited
 		// then an implicit exit is generated.
-		
+
 		// Read file
 		interpreterContext = new InterpreterContext("w3c/assert165.txml");
 		interpreterContext.launchInterpreter();
-		
+
+		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());
+	}
+
+	@Test
+	public void w3cVariableScope() throws SAXException, IOException,
+			InterpreterException {
+		// If the last main FIA loop did not result in a goto nextitem
+		// and there is no form item which is eligible to be visited
+		// then an implicit exit is generated.
+
+		// Read file
+		interpreterContext = new InterpreterContext("w3c/assert165.txml");
+		interpreterContext.launchInterpreter();
+
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());
 	}
 }

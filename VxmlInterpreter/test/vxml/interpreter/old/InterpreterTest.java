@@ -96,50 +96,28 @@ public class InterpreterTest extends TestCase {
 		interpreterContext.launchInterpreter();
 		interpreterContext.noInput();
 		interpreterContext.noMatch();
-		
+
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 	}
 
-	@Test
 
-	public void testTalkNavigatesUntilNextInteraction()
+	@Test
+	public void testDisconnectCallsTheCorrespondingEventManager()
 			throws XPathExpressionException, IOException, SAXException,
 			TransformerException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
-		expectedLogs.add("new call");
 		expectedLogs.add("LOG PHASE relai");
 		expectedLogs.add("info:+@_relai.enter");
 		expectedLogs.add("LOG PHASE interaction");
-		expectedLogs.add("LOG PHASE talk");
-		expectedLogs.add("LOG PHASE interaction");
-
-		interpreterContext = new InterpreterContext(
-				"oldtestfile/VxmlGlobalServletService");
-		interpreterContext.launchInterpreter();
-		//interpreterContext.talk();
-		
-		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
-
+		expectedLogs.add("LOG PHASE raccrocher");
+		//	
+		// vxml3900Browser.call3900();
+		// vxml3900Browser.disconnect();
+		//	
+		// assertFalse(vxml3900Browser.navigationTracesLogs.isEmpty());
+		// assertEquals(expectedLogs, vxml3900Browser.navigationTracesLogs);
 	}
-
-	// @Test
-	// public void testDisconnectCallsTheCorrespondingEventManager()
-	// throws XPathExpressionException, IOException, SAXException,
-	// TransformerException {
-	// List<String> expectedLogs = new ArrayList<String>();
-	// expectedLogs.add("LOG PHASE init");
-	// expectedLogs.add("LOG PHASE relai");
-	// expectedLogs.add("info:+@_relai.enter");
-	// expectedLogs.add("LOG PHASE interaction");
-	// expectedLogs.add("LOG PHASE raccrocher");
-	//
-	// vxml3900Browser.call3900();
-	// vxml3900Browser.disconnect();
-	//
-	// assertFalse(vxml3900Browser.navigationTracesLogs.isEmpty());
-	// assertEquals(expectedLogs, vxml3900Browser.navigationTracesLogs);
-	// }
 	//
 	// @Test
 	// public void

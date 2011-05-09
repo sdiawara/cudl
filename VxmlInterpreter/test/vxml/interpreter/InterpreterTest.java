@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -121,8 +120,6 @@ public class InterpreterTest {
 
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
-		System.err.println(varExcepted);
-		System.err.println(interpreterContext.interpreter.getVar());
 		assertEquals(varExcepted, interpreterContext.interpreter.getVar());
 	}
 
@@ -230,16 +227,37 @@ public class InterpreterTest {
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
 
-	@Test
-	@Ignore
-	public void testReprompt() throws SAXException, IOException {
-		List<Prompt> prompts = new ArrayList<Prompt>();
+	@Test()
+	public void testNodeValue() throws SAXException, IOException {
+		varExcepted = new TreeMap<String, String>();
+		varExcepted.put("block_0", "defined");
+		varExcepted.put("appli_scope_var",
+				"cette variable est defini partout dans le formulaire");
 
-		interpreterContext = new InterpreterContext("reprompt.vxml");
+		List<Prompt> prompts = new ArrayList<Prompt>();
+		Prompt promptExecepeted;
+
+		promptExecepeted = new Prompt();
+		promptExecepeted.tts = "cette variable est defini partout dans le formulaire";
+		prompts.add(promptExecepeted);
+
+		promptExecepeted = new Prompt();
+		promptExecepeted.tts = "ha ok: cette variable est defini partout dans le formulaire. c'est compris ";
+		prompts.add(promptExecepeted);
+
+		interpreterContext = new InterpreterContext("root.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertTrue(interpreterContext.interpreter.getPrompts().isEmpty());
-		assertTrue(false);
+		assertEquals(varExcepted, interpreterContext.interpreter.getVar());
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void anonymeScopeVariable() throws SAXException, IOException {
+		interpreterContext = new InterpreterContext("anonymeScopeVariable.vxml");
+		interpreterContext.launchInterpreter();
+	}
+
+	// System.out.println(prompts);
+	// System.out.println(varExcepted);
 }

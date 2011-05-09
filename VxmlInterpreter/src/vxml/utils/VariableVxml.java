@@ -3,9 +3,13 @@ package vxml.utils;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
+import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import javax.script.SimpleScriptContext;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
@@ -14,22 +18,39 @@ import org.w3c.dom.Node;
 public final class VariableVxml {
 	private ScriptEngineManager manager = new ScriptEngineManager();
 	private ScriptEngine engine = manager.getEngineByName("js");
+
 	private int anonymeNameCount = 0;
+	private ScriptContext context = new SimpleScriptContext();
 
 	public String declareVariable(Node node) throws DOMException,
 			ScriptException {
+
+		String name = null;
+
 		NamedNodeMap attributes = node.getAttributes();
 		Node namedItem = attributes.getNamedItem("name");
-		String name = (namedItem == null) ? node.getNodeName() + "_"
-				+ anonymeNameCount++ : (namedItem == null) ? node
-				.getParentNode().getNodeName()
-				+ anonymeNameCount : namedItem.getNodeValue();
+		name = (namedItem == null) ? node.getNodeName() + "_"
+				+ anonymeNameCount++ : namedItem.getNodeValue();
 		Node expr = attributes.getNamedItem("expr");
 
-		engine.put(name, (expr == null) ? "undefined" : engine.eval(expr
-				.getNodeValue()));
+		if (hasAnAnonymeContext(node)) {
+			Bindings anonymeScope = context
+					.getBindings(ScriptContext.ENGINE_SCOPE);
+			anonymeScope.put(name, (expr == null) ? "undefined" : engine
+					.eval(expr.getNodeValue()));
+		} else {
+			engine.put(name, (expr == null) ? "undefined" : engine.eval(expr
+					.getNodeValue()));
+		}
 
 		return name;
+	}
+
+	private boolean hasAnAnonymeContext(Node node) {
+		System.err.println(node + " "
+				+ VxmlElementType.isFormItem(node.getParentNode()));
+
+		return VxmlElementType.isFormItem(node.getParentNode());
 	}
 
 	public String evaluateScript(Node node) throws FileNotFoundException,
@@ -50,8 +71,28 @@ public final class VariableVxml {
 		return value;
 	}
 
+	public void resetScope(Node node) {
+		context.setBindings(new SimpleBindings(), ScriptContext.ENGINE_SCOPE);
+	}
+
+	public void setContext(Node node) {
+		if (VxmlElementType.isFormItem(node)) {
+			context = new SimpleScriptContext();
+		}
+	}
+
 	public String getValue(String declareVariable) {
-		return engine.get(declareVariable).toString();
+		if (context.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
+				declareVariable)) {
+			return context.getBindings(ScriptContext.ENGINE_SCOPE).get(
+					declareVariable)
+					+ "";
+		} else if (engine.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
+				declareVariable))
+			return engine.get(declareVariable) + "";
+
+		throw new IllegalArgumentException(declareVariable
+				+ " is not derclared in this scope");
 	}
 
 	public void setValue(String declareVariable, String expr)
