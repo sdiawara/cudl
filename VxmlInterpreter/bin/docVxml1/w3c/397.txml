@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" application="appRootDoc.vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+  <var name="docScopeVar" expr="'initValue'"/>
+  <form id="firstForm">
+    <var name="dialogScopeVar" expr="'hallo'"/>
+    <catch event="myEvent">
+      <var name="catchScopeVar" expr=" 'catchDetected'"/>
+      <if cond="typeof(catchScopeVar) == 'undefined' 
+          ||  typeof(appRootVar) == 'undefined' 
+          ||  typeof(docScopeVar) == 'undefined'
+          ||  typeof(dialogScopeVar) == 'undefined'">
+        <conf:fail reason="Failed in catch: Variable at higher scope are not accessible by all more local scopes"/>
+      <else/>
+        <reprompt/>
+        
+      </if>
+    </catch>
+    <block>
+      <var name="blockScopeVar" expr="'blockVisited'"/>
+      <if cond="typeof(appRootVar) != 'undefined' 
+          &amp;&amp; typeof(docScopeVar) != 'undefined' 
+          &amp;&amp; typeof(dialogScopeVar) != 'undefined'
+          &amp;&amp; typeof(blockScopeVar) != 'undefined' ">
+        <throw event="myEvent"/>
+        <else/>
+        <conf:fail reason="Failed in block: Variable at higher scope are not accessible by all more local scopes"/>
+      </if>
+    </block>
+    <field name="toBeFilled">
+      <conf:grammar utterance="alpha"/>
+      <conf:speech value="alpha"/>
+      <filled>
+        <var name="filledScopeVar" expr="'filledVisited'"/>
+        <if cond="typeof(filledScopeVar) != 'undefined'  &amp;&amp;typeof(appRootVar) != 'undefined'  &amp;&amp;typeof(docScopeVar) != 'undefined' &amp;&amp;typeof(dialogScopeVar) != 'undefined'  ">
+          <goto next="#secForm"/>
+          <else/>
+          <conf:fail reason="Failed in filled: variable at higher scope are not accessible by all more local scopes"/>
+        </if>
+      </filled>
+    </field>
+  </form>
+  <form id="secForm">
+    <var name="dialogSecScopeVar" expr="'bye'"/>
+    <block>
+      <if cond="typeof(appRootVar) != 'undefined'  &amp;&amp;typeof(docScopeVar) != 'undefined' &amp;&amp;
+      typeof(dialogScopeVar) == 'undefined'  &amp;&amp; typeof(dialogSecScopeVar) != 'undefined'">
+        <conf:pass/>
+        <else/>
+        <conf:fail reason="Fail in another dialog: Error on scope accessibility "/>
+      </if>
+    </block>
+  </form>
+</vxml>

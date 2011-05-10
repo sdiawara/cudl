@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.0">
+<form>
+	<block> 
+	<var name="block_0_scope_var" expr="toto='variable de global'; 'variable de block'"/>
+	<log>bla bla</log>
+   </block>
+   <block> 
+ 		<log>un exemple de <value expr="toto"/> avec effet de bord</log>
+   </block>
+</form>
+</vxml>

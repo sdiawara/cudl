@@ -46,13 +46,6 @@ public final class VariableVxml {
 		return name;
 	}
 
-	private boolean hasAnAnonymeContext(Node node) {
-		System.err.println(node + " "
-				+ VxmlElementType.isFormItem(node.getParentNode()));
-
-		return VxmlElementType.isFormItem(node.getParentNode());
-	}
-
 	public String evaluateScript(Node node) throws FileNotFoundException,
 			DOMException, ScriptException {
 		assert (node.getNodeName().equals("script"));
@@ -75,12 +68,6 @@ public final class VariableVxml {
 		context.setBindings(new SimpleBindings(), ScriptContext.ENGINE_SCOPE);
 	}
 
-	public void setContext(Node node) {
-		if (VxmlElementType.isFormItem(node)) {
-			context = new SimpleScriptContext();
-		}
-	}
-
 	public String getValue(String declareVariable) {
 		if (context.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
 				declareVariable)) {
@@ -98,5 +85,9 @@ public final class VariableVxml {
 	public void setValue(String declareVariable, String expr)
 			throws ScriptException {
 		engine.put(declareVariable, engine.eval(expr));
+	}
+
+	private boolean hasAnAnonymeContext(Node node) {
+		return VxmlElementType.isFormItem(node.getParentNode());
 	}
 }

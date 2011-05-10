@@ -46,7 +46,7 @@ public class InterpreterContext {
 			throw new RuntimeException(e);
 		} catch (ScriptException e) {
 			// TODO Auto-generated catch block
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
 	}
 

@@ -205,8 +205,9 @@ public class Interpreter {
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
 				execute(selectedItem);
-				variableVxml.resetScope(selectedItem);
+
 			}
+			variableVxml.resetScope(selectedItem);
 
 			// System.out.println("After selection ["+
 			// variables.get(selectedItem)+"]"+" n°"
@@ -287,7 +288,7 @@ public class Interpreter {
 			}
 		}
 	}
-	
+
 	private void collectPrompt(Node node) {
 		Prompt p = new Prompt();
 		if (node.getNodeName().equals("prompt")) {
@@ -359,10 +360,11 @@ public class Interpreter {
 		}
 	}
 
-	private void addPromptWithValue(Node value, Prompt p) throws DOMException, ScriptException {
+	private void addPromptWithValue(Node value, Prompt p) throws DOMException,
+			ScriptException {
 		assert (value.getNodeName().endsWith("value"));
-			p.tts += variableVxml.getValue(value.getAttributes().item(0)
-					.getNodeValue());
+		p.tts += variableVxml.getValue(value.getAttributes().item(0)
+				.getNodeValue());
 	}
 
 	private void clearVariable(Node node1) {
@@ -425,12 +427,28 @@ public class Interpreter {
 	}
 
 	private void collectTrace(Node node) {
-		traceLog.add(node.getTextContent());
+		String value = getNodeValue(node);
+		traceLog.add(value);
 		for (int j = 0; j < node.getAttributes().getLength(); j++) {
 			traceStat.add("[" + node.getAttributes().item(j).getNodeName()
 					+ ":" + node.getAttributes().item(j).getNodeValue() + "] "
 					+ node.getTextContent());
 		}
+	}
+
+	private String getNodeValue(Node node) {
+		NodeList childs = node.getChildNodes();
+		String value = "";
+
+		for (int i = 0; i < childs.getLength(); i++) {
+			Node child = childs.item(i);
+			if ("value".equals(child.getNodeName()))
+				value += variableVxml.getValue(child.getAttributes()
+						.getNamedItem("expr").getNodeValue());
+			else
+				value += child.getNodeValue();
+		}
+		return value;
 	}
 
 	private void checkConditionAndExecute(Node node)

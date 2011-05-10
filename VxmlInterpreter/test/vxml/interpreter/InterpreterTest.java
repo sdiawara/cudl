@@ -256,8 +256,22 @@ public class InterpreterTest {
 	public void anonymeScopeVariable() throws SAXException, IOException {
 		interpreterContext = new InterpreterContext("anonymeScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
+	
 	}
+	
+	@Test
+	public void sideEffectInScript() throws SAXException, IOException {
+		List<String> traceLog = new ArrayList<String>();
+		traceLog.add("bla bla");
+		traceLog.add("un exemple de variable de global avec effet de bord");
+		
+		interpreterContext = new InterpreterContext("sideEffectInScope.vxml");
 
+		System.out.println("side effect");
+		interpreterContext.launchInterpreter();
+			
+		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());	
+	}
 	// System.out.println(prompts);
 	// System.out.println(varExcepted);
 }
