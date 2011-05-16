@@ -23,11 +23,12 @@ public class InterpreterTest {
 	@Test
 	public void variableDeclarationTest() throws SAXException, IOException,
 			InterpreterException {
-	
-		interpreterContext = new InterpreterContext("variable.vxml");
-		//interpreterContext.launchInterpreter();
 
-		//assertEquals("3.0", interpreterContext.interpreter.variableVxml.getValue("trois"));
+		interpreterContext = new InterpreterContext("variable.vxml");
+		// interpreterContext.launchInterpreter();
+
+		// assertEquals("3.0",
+		// interpreterContext.interpreter.variableVxml.getValue("trois"));
 	}
 
 	@Test
@@ -87,38 +88,38 @@ public class InterpreterTest {
 		interpreterContext.launchInterpreter();
 
 		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
-		//sertEquals(varExcepted, interpreterContext.interpreter.getVar());
+		// sertEquals(varExcepted, interpreterContext.interpreter.getVar());
 
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
-//	@Test
-//	public void testLogTraceWhithVariableWithClear() throws SAXException,
-//			IOException {
-//		List<String> traceLog = new ArrayList<String>();
-//		traceLog.add("LOG Hello");
-//		traceLog.add("LOG Hello 1");
-//		traceLog.add("LOG Hello 2");
-//		traceLog.add("LOG Hello 3");
-//
-//		List<String> traceStat = new ArrayList<String>();
-//		traceStat.add("[label:stats] LOG Hello");
-//
-//		varExcepted = new TreeMap<String, String>();
-//		varExcepted.put("block_0", "defined");
-//		varExcepted.put("block_1", "defined");
-//		varExcepted.put("block_2", "defined");
-//		varExcepted.put("block_3", "defined");
-//		varExcepted.put("telephone", "undefined");
-//		varExcepted.put("telephone1", "undefined");
-//
-//		interpreterContext = new InterpreterContext("shelloVarClear.vxml");
-//		interpreterContext.launchInterpreter();
-//
-//		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
-//		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
-//		assertEquals(varExcepted, interpreterContext.interpreter.getVar());
-//	}
+	// @Test
+	// public void testLogTraceWhithVariableWithClear() throws SAXException,
+	// IOException {
+	// List<String> traceLog = new ArrayList<String>();
+	// traceLog.add("LOG Hello");
+	// traceLog.add("LOG Hello 1");
+	// traceLog.add("LOG Hello 2");
+	// traceLog.add("LOG Hello 3");
+	//
+	// List<String> traceStat = new ArrayList<String>();
+	// traceStat.add("[label:stats] LOG Hello");
+	//
+	// varExcepted = new TreeMap<String, String>();
+	// varExcepted.put("block_0", "defined");
+	// varExcepted.put("block_1", "defined");
+	// varExcepted.put("block_2", "defined");
+	// varExcepted.put("block_3", "defined");
+	// varExcepted.put("telephone", "undefined");
+	// varExcepted.put("telephone1", "undefined");
+	//
+	// interpreterContext = new InterpreterContext("shelloVarClear.vxml");
+	// interpreterContext.launchInterpreter();
+	//
+	// assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
+	// assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
+	// assertEquals(varExcepted, interpreterContext.interpreter.getVar());
+	// }
 
 	@Test
 	public void testLogTraceWithIfElseifAndElse() throws SAXException,
@@ -180,22 +181,22 @@ public class InterpreterTest {
 		promptExecepeted.timeout = "200ms";
 		promptExecepeted.bargein = "true";
 		promptExecepeted.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav ";
-		promptExecepeted.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ». ";
+		promptExecepeted.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».";
 		prompts.add(promptExecepeted);
 
 		promptExecepeted = new Prompt();
-		promptExecepeted.tts = "dites tarif. ";
+		promptExecepeted.tts = "dites tarif.";
 		prompts.add(promptExecepeted);
 
 		promptExecepeted = new Prompt();
 		promptExecepeted.timeout = "300ms";
 		promptExecepeted.bargein = "true";
 		promptExecepeted.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav ";
-		promptExecepeted.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ». ";
+		promptExecepeted.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».";
 		prompts.add(promptExecepeted);
 
 		promptExecepeted = new Prompt();
-		promptExecepeted.tts = "dites tarif. ";
+		promptExecepeted.tts = "dites tarif.";
 		prompts.add(promptExecepeted);
 
 		interpreterContext = new InterpreterContext("prompt.vxml");
@@ -211,12 +212,12 @@ public class InterpreterTest {
 
 		promptExecepeted = new Prompt();
 		promptExecepeted.audio = "rtsp://www.piafcauserie.example.com/grive.wav http://www.piafcauserie.example.com/tourterelle.wav ";
-		promptExecepeted.tts = "Bienvenue chez Graines a gogo. Ce mois-ci nous proposons le barril de 250 kg de graines de chardon a 299.95€ frais d'expédition et de transport compris. ";
+		promptExecepeted.tts = "Bienvenue chez Graines a gogo. Ce mois-ci nous proposons le barril de 250 kg de graines de chardon a 299.95€ frais d'expédition et de transport compris.";
 		prompts.add(promptExecepeted);
 
 		interpreterContext = new InterpreterContext("prompt1.vxml");
 		interpreterContext.launchInterpreter();
-
+		
 		assertTrue(interpreterContext.interpreter.getPrompts().size() == 1);
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
@@ -236,16 +237,15 @@ public class InterpreterTest {
 		prompts.add(promptExecepeted);
 
 		promptExecepeted = new Prompt();
-		promptExecepeted.tts = "ha ok: cette variable est defini partout dans le formulaire. c'est compris ";
+		promptExecepeted.tts = "ha ok: cette variable est defini partout dans le formulaire. c'est compris";
 		prompts.add(promptExecepeted);
 
 		interpreterContext = new InterpreterContext("root.vxml");
 		interpreterContext.launchInterpreter();
 
-	//ssertEquals(varExcepted, interpreterContext.interpreter.getVar());
+		// ssertEquals(varExcepted, interpreterContext.interpreter.getVar());
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
-
 
 	@Test
 	public void sideEffectInScript() throws SAXException, IOException {
@@ -269,5 +269,28 @@ public class InterpreterTest {
 	public void dialogScopeVariable() throws SAXException, IOException {
 		interpreterContext = new InterpreterContext("dialogScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
+	}
+
+	@Test
+	public void documentScopeVariableIsVisibleInAllDocument()
+			throws SAXException, IOException {
+		List<Prompt> prompts = new ArrayList<Prompt>();
+		Prompt promptExecepeted;
+
+		promptExecepeted = new Prompt();
+		promptExecepeted.tts = "variable du document1";
+		prompts.add(promptExecepeted);
+		promptExecepeted = new Prompt();
+		promptExecepeted.tts = "variable du document2";
+		prompts.add(promptExecepeted);
+		promptExecepeted = new Prompt();
+		promptExecepeted.tts = "variable du document3";
+		prompts.add(promptExecepeted);
+
+		interpreterContext = new InterpreterContext(
+				"documentScopeVariable.vxml");
+		interpreterContext.launchInterpreter();
+
+		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
 }

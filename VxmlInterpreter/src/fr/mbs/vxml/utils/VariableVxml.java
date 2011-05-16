@@ -21,6 +21,7 @@ public final class VariableVxml {
 	private static final int DOCUMENT_SCOPE = 2;
 	private static final int APPLICATION_SCOPE = 3;
 	private static final int SESSION_SCOPE = 4;
+	private static final int NUMBER_OF_SCOPE = 3;
 
 	private ScriptEngineManager manager = new ScriptEngineManager();
 	private ScriptEngine engine = manager.getEngineByName("js");
@@ -28,6 +29,7 @@ public final class VariableVxml {
 	private int anonymeNameCount = 0;
 	private ScriptContext anonyme = new SimpleScriptContext();
 	private ScriptContext dialog = new SimpleScriptContext();
+	private ScriptContext document = new SimpleScriptContext();
 
 	public String declareVariable(Node node, int scope) throws DOMException,
 			ScriptException {
@@ -51,6 +53,10 @@ public final class VariableVxml {
 					.eval(expr.getNodeValue()));
 			break;
 		case DOCUMENT_SCOPE:
+			scopeBindings = document.getBindings(ScriptContext.ENGINE_SCOPE);
+			scopeBindings.put(name, (expr == null) ? "undefined" : engine
+					.eval(expr.getNodeValue()));
+			break;
 		case APPLICATION_SCOPE:
 		case SESSION_SCOPE:
 		default:
@@ -83,10 +89,9 @@ public final class VariableVxml {
 	public String getValue(String declareVariable, int scope) {
 		ScriptContext context;
 		int tmp = scope - 1;
-		while (++tmp < 2 && (context = getContext(tmp)) != null) {
+		while (++tmp < NUMBER_OF_SCOPE && (context = getContext(tmp)) != null) {
 			if (context.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
 					declareVariable)) {
-
 				return context.getBindings(ScriptContext.ENGINE_SCOPE).get(
 						declareVariable)
 						+ "";
@@ -96,7 +101,6 @@ public final class VariableVxml {
 		if (engine.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
 				declareVariable))
 			return engine.get(declareVariable) + "";
-
 		throw new IllegalArgumentException(declareVariable
 				+ " is not derclared in this scope " + scope);
 	}
@@ -107,6 +111,8 @@ public final class VariableVxml {
 			return anonyme;
 		case DIALOG_SCOPE:
 			return dialog;
+		case DOCUMENT_SCOPE:
+			return document;
 		default:
 			return null;
 		}
@@ -123,6 +129,10 @@ public final class VariableVxml {
 					.setBindings(new SimpleBindings(),
 							ScriptContext.ENGINE_SCOPE);
 			break;
+		case DOCUMENT_SCOPE:
+			document.setBindings(new SimpleBindings(),
+					ScriptContext.ENGINE_SCOPE);
+			break;
 		default:
 
 		}
@@ -132,7 +142,7 @@ public final class VariableVxml {
 			throws ScriptException {
 		int tmp = scope - 1;
 		ScriptContext context;
-		while (++tmp < 2 && (context = getContext(tmp)) != null) {
+		while (++tmp < NUMBER_OF_SCOPE && (context = getContext(tmp)) != null) {
 			Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 			if (bindings.containsKey(declareVariable)) {
 				bindings.put(declareVariable, engine.eval(expr));

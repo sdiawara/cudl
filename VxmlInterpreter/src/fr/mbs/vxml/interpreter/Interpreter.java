@@ -28,15 +28,17 @@ import fr.mbs.vxml.utils.VxmlElementType;
 
 public class Interpreter {
 	public VariableVxml variableVxml = new VariableVxml();
-	private Map<Node, String> nodeItemVariablesName = new Hashtable<Node, String>();
+	public Node selectedItem;
 
+	// to test w3c IR
+	public List<String> w3cNodeConfSuite = new ArrayList<String>();
+
+	private Map<Node, String> nodeItemVariablesName = new Hashtable<Node, String>();
 	private List<String> traceLog = new ArrayList<String>();
 	private List<String> traceStat = new ArrayList<String>();
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 
-	public Node selectedItem;
 	private boolean nextItemSelectGuard = false;
-	public List<String> w3cNodeConfSuite = new ArrayList<String>();
 	private Properties currentDialogProperties = new Properties();
 
 	private Hashtable<String, NodeExecutor> nodeExecution = new Hashtable<String, NodeExecutor>() {
@@ -95,21 +97,15 @@ public class Interpreter {
 			});
 			put("script", new NodeExecutor() {
 				public void execute(Node node) {
-
+					System.err.println("TODO: implemtn script");
 				}
 			});
 			put("var", new NodeExecutor() {
 				public void execute(Node node) {
 					try {
-						String variableName = variableVxml.declareVariable(
-								node, getNodeScope(node));
-						// allVariable.put(variableName, variableVxml
-						// .getValue(variableName));
-					} catch (DOMException e) {
-						e.printStackTrace();
-					} catch (ScriptException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						variableVxml.declareVariable(node, getNodeScope(node));
+					} catch (Exception e) {
+						throw new RuntimeException(e);
 					}
 				}
 			});
@@ -125,17 +121,19 @@ public class Interpreter {
 				}
 			});
 			put("if", new NodeExecutor() {
-				public void execute(Node node) throws InterpreterException, ScriptException {
+				public void execute(Node node) throws InterpreterException,
+						ScriptException {
 					checkConditionAndExecute(node);
 				}
 			});
 			put("goto", new NodeExecutor() {
-				public void execute(Node node) throws GotoException, ScriptException {
+				public void execute(Node node) throws GotoException,
+						ScriptException {
 					// FIXME: do same for expritem (script interpretation value
 					// )
 					// add assert163.txml file from to test
 					if (node.getAttributes().getNamedItem("nextitem") == null) {
-						//FIXME: remove 1
+						// FIXME: remove 1
 						variableVxml.resetScope(1);
 						throw new GotoException(node.getAttributes()
 								.getNamedItem("next").getNodeValue());
@@ -165,9 +163,17 @@ public class Interpreter {
 			});
 		}
 	};
+	private boolean first = true;
 
 	public void interpretDialog(Node dialog) throws InterpreterException,
 			ScriptException, FileNotFoundException, DOMException {
+
+		// FIXME: move this block in interpreterContext
+		if (first) {
+			initVar(dialog.getOwnerDocument().getChildNodes().item(0)
+					.getChildNodes());
+			first = false;
+		}
 		// PHASE INITIALIZATION
 		NodeList nodeList = dialog.getChildNodes();
 		initVar(nodeList);
@@ -179,7 +185,7 @@ public class Interpreter {
 		// traitement
 
 		// Boucle principale
-		int i = 0;
+
 		while (true) {
 			// PHASE SELECTION
 			if ((selectedItem = phaseSelect(dialog)) == null) {
@@ -203,9 +209,9 @@ public class Interpreter {
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
 				execute(selectedItem);
+				variableVxml.resetScope(0);
 			}
-			//FIXME: remove 0
-			variableVxml.resetScope(0);
+			// FIXME: remove 0
 
 			// System.out.println("After selection ["+
 			// variables.get(selectedItem)+"]"+" n°"
@@ -214,18 +220,17 @@ public class Interpreter {
 		}
 	}
 
-	private void initVar(NodeList nodeList) throws FileNotFoundException,
-			DOMException, ScriptException {
+	void initVar(NodeList nodeList) throws FileNotFoundException, DOMException,
+			ScriptException {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals("var")
 					|| VxmlElementType.isFormItem(node)) {
 				String declareVariable = variableVxml.declareVariable(node,
 						VxmlElementType.isFormItem(node) ? 5
-								:getNodeScope(node));
+								: getNodeScope(node));
 				if (VxmlElementType.isFormItem(node)) {
 					nodeItemVariablesName.put(node, declareVariable);
-					// FIXME: add prompt counter
 				}
 			} else if (node.getNodeName().equals("script")) {
 				variableVxml.evaluateScript(node);
@@ -279,7 +284,7 @@ public class Interpreter {
 			if (executor != null) {
 				executor.execute(node1);
 			}
-			
+
 			if (nextItemSelectGuard) {
 				nextItemSelectGuard = false;
 				return;
@@ -331,31 +336,31 @@ public class Interpreter {
 					try {
 						addPromptWithValue(child, p);
 					} catch (DOMException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (ScriptException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			}
 		}
-
+		p.tts = p.tts.trim();
 		prompts.add(p);
 	}
 
 	private void collectSimpleSpeechPrompt(Node node) {
 		Prompt p = new Prompt();
 		addPromtTextToSpeech(node, p);
-		if (p.tts != "")
+		if (p.tts != "") {
+			p.tts = p.tts.trim();
 			prompts.add(p);
+		}
 	}
 
 	private void addPromtTextToSpeech(Node node, Prompt p) {
 		String nodeValue = node.getNodeValue().trim();
 		if (nodeValue != null && !nodeValue.equals(" ")
 				&& nodeValue.length() > 0) {
-			p.tts += nodeValue.replaceAll("@", " ") + " ";
+			p.tts += nodeValue + " ";
 		}
 	}
 
@@ -500,6 +505,8 @@ public class Interpreter {
 			return 0;
 		else if (isAnDialogContext(node))
 			return 1;
+		else if (node.getParentNode().getNodeName().equals("vxml"))
+			return 2;
 		return 5;
 	}
 }

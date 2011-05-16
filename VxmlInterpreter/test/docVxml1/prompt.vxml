@@ -9,17 +9,14 @@
   	     dites tarif.
   	     </prompt>
   	   
-  	  	  	    </block>
-  	    	    
+		</block>	    
          <block>
        <prompt timeout="300ms" bargein="true">
         	<audio src="/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav">Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».</audio>
           	</prompt>
           	dites tarif.
           	</block>
-          	
           	<block>
-          	
           	</block>
   </form>
 </vxml>  

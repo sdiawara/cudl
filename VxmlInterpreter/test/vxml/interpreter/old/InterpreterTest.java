@@ -42,7 +42,7 @@ public class InterpreterTest extends TestCase {
 		expectedPrompt = new Prompt();
 		expectedPrompt.timeout = "300ms";
 		expectedPrompt.bargein = "false";
-		expectedPrompt.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ». ";
+		expectedPrompt.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».";
 		expectedPrompts.add(expectedPrompt);
 
 		expectedPrompt = new Prompt();
@@ -56,7 +56,7 @@ public class InterpreterTest extends TestCase {
 		expectedPrompt.bargein = "true";
 		expectedPrompt.bargeinType = "hotword";
 		expectedPrompt.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav ";
-		expectedPrompt.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ». ";
+		expectedPrompt.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».";
 		// expectedPrompt.interruptionGrammar = "/data/modeles/TARIF.srg";
 		expectedPrompts.add(expectedPrompt);
 

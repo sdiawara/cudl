@@ -23,7 +23,6 @@ import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.interpreter.execption.SubmitException;
 import fr.mbs.vxml.utils.Utils;
 
-
 public class InterpreterContext {
 	public final static String FILE_DIR = "test/docVxml1/";
 	private Document currentdocDocument;
@@ -32,9 +31,9 @@ public class InterpreterContext {
 	public Interpreter interpreter = new Interpreter();
 	private Vector<InterpreterListener> interpreterListeners = new Vector<InterpreterListener>();
 	private String url;
-	
+
 	public InterpreterContext(String fileName) throws SAXException, IOException {
-		this(FILE_DIR, fileName);	
+		this(FILE_DIR, fileName);
 	}
 
 	public InterpreterContext(String url, String fileName) throws SAXException,
@@ -79,7 +78,6 @@ public class InterpreterContext {
 			GotoException gotoException = (GotoException) e;
 			currentDialog = Utils.searchDialogByName(dialogs,
 					gotoException.next.replace("#", ""));
-			System.err.println("goto find ->"+currentDialog);
 			launchInterpreter();
 		} else if (e instanceof SubmitException) {
 			buildDocument(((SubmitException) e).next);
