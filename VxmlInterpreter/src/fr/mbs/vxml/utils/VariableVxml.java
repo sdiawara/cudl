@@ -68,20 +68,32 @@ public final class VariableVxml {
 		return name;
 	}
 
-	public String evaluateScript(Node node) throws FileNotFoundException,
-			DOMException, ScriptException {
+	public String evaluateScript(Node node, int scope)
+			throws FileNotFoundException, DOMException, ScriptException {
 		assert (node.getNodeName().equals("script"));
+		ScriptContext context = getContext(scope);
+
 		String value = "";
 		if (node.getAttributes() != null
 				&& node.getAttributes().getLength() > 0) {
 
 			if (node.getAttributes().getNamedItem("src") != null) {
-				value = engine.eval(
-						new FileReader(node.getAttributes().getNamedItem("src")
-								.getNodeValue())).toString();
+				if (context == null) {
+					value = engine.eval(
+							new FileReader(node.getAttributes().getNamedItem(
+									"src").getNodeValue())).toString();
+				} else {
+
+					value = engine.eval(
+							new FileReader(node.getAttributes().getNamedItem(
+									"src").getNodeValue()), context).toString();
+				}
 			}
 		} else {
-			value = engine.eval(node.getTextContent()) + "";
+			if (context == null) {
+				value = engine.eval(node.getTextContent()) + "";
+			} else
+				value = engine.eval(node.getTextContent(), context) + "";
 		}
 		return value;
 	}

@@ -233,7 +233,7 @@ public class Interpreter {
 					nodeItemVariablesName.put(node, declareVariable);
 				}
 			} else if (node.getNodeName().equals("script")) {
-				variableVxml.evaluateScript(node);
+				variableVxml.evaluateScript(node, getNodeScope(node));
 			}
 		}
 	}
