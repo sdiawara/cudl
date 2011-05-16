@@ -12,8 +12,9 @@ import java.util.TreeMap;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import vxml.interpreter.execption.InterpreterException;
-import vxml.utils.Prompt;
+import fr.mbs.vxml.interpreter.InterpreterContext;
+import fr.mbs.vxml.interpreter.execption.InterpreterException;
+import fr.mbs.vxml.utils.Prompt;
 
 public class InterpreterTest {
 	private Map<String, String> varExcepted = new TreeMap<String, String>();
@@ -220,9 +221,6 @@ public class InterpreterTest {
 		interpreterContext = new InterpreterContext("prompt1.vxml");
 		interpreterContext.launchInterpreter();
 
-		// System.out.println(prompts);
-		// System.out.println(interpreterContext.interpreter.getPrompts());
-
 		assertTrue(interpreterContext.interpreter.getPrompts().size() == 1);
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
@@ -256,22 +254,25 @@ public class InterpreterTest {
 	public void anonymeScopeVariable() throws SAXException, IOException {
 		interpreterContext = new InterpreterContext("anonymeScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
-	
 	}
-	
+
 	@Test
 	public void sideEffectInScript() throws SAXException, IOException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("bla bla");
 		traceLog.add("un exemple de variable de global avec effet de bord");
-		
-		interpreterContext = new InterpreterContext("sideEffectInScope.vxml");
 
-		System.out.println("side effect");
+		interpreterContext = new InterpreterContext("sideEffectInScope.vxml");
 		interpreterContext.launchInterpreter();
-			
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());	
+
+		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
-	// System.out.println(prompts);
-	// System.out.println(varExcepted);
+
+	@Test(expected = IllegalArgumentException.class)
+	public void dialogScopeVariable() throws SAXException, IOException {
+
+		interpreterContext = new InterpreterContext("dialogScopeVariable.vxml");
+		interpreterContext.launchInterpreter();
+		System.err.println(interpreterContext.interpreter.getPrompts().size());
+	}
 }

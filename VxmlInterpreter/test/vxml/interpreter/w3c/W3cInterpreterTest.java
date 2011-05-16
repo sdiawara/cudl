@@ -10,8 +10,9 @@ import java.util.List;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import vxml.interpreter.InterpreterContext;
-import vxml.interpreter.execption.InterpreterException;
+import fr.mbs.vxml.interpreter.InterpreterContext;
+import fr.mbs.vxml.interpreter.execption.InterpreterException;
+
 
 public class W3cInterpreterTest {
 	private InterpreterContext interpreterContext;
@@ -59,6 +60,14 @@ public class W3cInterpreterTest {
 			// FIA ends when it encounters an <return>.
 			// FIXME: Implemeent dialog
 			add("w3c/assert114.txml");
+
+			// The next dialog is determined by the previous dialog.
+			add("w3c/assert_48_1.txml");
+
+			// Application root document variables are available for use by the
+			// leaf document.
+			//FIXME: Eval variables
+			add("w3c/a59-leaf.txml");
 		}
 	};
 

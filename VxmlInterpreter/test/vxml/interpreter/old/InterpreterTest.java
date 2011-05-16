@@ -9,13 +9,13 @@ import javax.xml.xpath.XPathExpressionException;
 
 import junit.framework.TestCase;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import vxml.interpreter.InterpreterContext;
-import vxml.interpreter.execption.InterpreterException;
-import vxml.utils.Prompt;
+import fr.mbs.vxml.interpreter.InterpreterContext;
+import fr.mbs.vxml.interpreter.execption.InterpreterException;
+import fr.mbs.vxml.utils.Prompt;
+
 
 public class InterpreterTest extends TestCase {
 
@@ -100,40 +100,37 @@ public class InterpreterTest extends TestCase {
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 	}
 
-
-	@Test
-	public void testDisconnectCallsTheCorrespondingEventManager()
-			throws XPathExpressionException, IOException, SAXException,
-			TransformerException {
-		List<String> expectedLogs = new ArrayList<String>();
-		expectedLogs.add("LOG PHASE init");
-		expectedLogs.add("LOG PHASE relai");
-		expectedLogs.add("info:+@_relai.enter");
-		expectedLogs.add("LOG PHASE interaction");
-		expectedLogs.add("LOG PHASE raccrocher");
-		//	
-		// vxml3900Browser.call3900();
-		// vxml3900Browser.disconnect();
-		//	
-		// assertFalse(vxml3900Browser.navigationTracesLogs.isEmpty());
-		// assertEquals(expectedLogs, vxml3900Browser.navigationTracesLogs);
-	}
+	// @Test
+	// public void testDisconnectCallsTheCorrespondingEventManager()
+	// throws XPathExpressionException, IOException, SAXException,
+	// TransformerException {
+	// List<String> expectedLogs = new ArrayList<String>();
+	// expectedLogs.add("LOG PHASE init");
+	// expectedLogs.add("LOG PHASE relai");
+	// expectedLogs.add("info:+@_relai.enter");
+	// expectedLogs.add("LOG PHASE interaction");
+	// expectedLogs.add("LOG PHASE raccrocher");
+	//
+	// assertTrue(false);
+	//
+	// }
 	//
 	// @Test
 	// public void
 	// testNavigatorConstructorClearsVxmlCollectedPagesDirectoryWhenOptionActivated()
 	// throws XPathExpressionException, IOException, SAXException {
 	//
-	// DefinitionDeLEnvironnement.logPagesDirectory = "/tmp/test_log_pages/";
-	//
-	// File testDirectory = new File(
-	// DefinitionDeLEnvironnement.logPagesDirectory + "TEST");
-	// testDirectory.delete();
-	// assertTrue(testDirectory.mkdirs());
-	//
-	// new Vxml3900Browser();
-	//
-	// assertFalse(testDirectory.exists());
+	// // DefinitionDeLEnvironnement.logPagesDirectory =
+	// // "/tmp/test_log_pages/";
+	// //
+	// // File testDirectory = new File(
+	// // DefinitionDeLEnvironnement.logPagesDirectory + "TEST");
+	// // testDirectory.delete();
+	// // assertTrue(testDirectory.mkdirs());
+	// //
+	// // new Vxml3900Browser();
+	// assertTrue(false);
+	// //assertFalse(testDirectory.exists());
 	// }
 	//
 	// @Test
