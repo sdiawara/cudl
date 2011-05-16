@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.0">
+<form>
+<var name="form_0_scope_var" expr="toto='variable de global'; 'variable de formulaire'"/>
+ 	<block> 
+		<var name="block_0_scope_var" expr="toto='variable de global'; 'variable de block'"/>
+		<prompt><value expr="block_0_scope_var"/></prompt>
+		<prompt><value expr="form_0_scope_var"/></prompt>
+		</block>
+   <block> 
+   	<goto next="#forme2"/>
+   </block>
+</form>
+<form id="forme2">
+   <block> 
+ 		<prompt><value expr="form_0_scope_var"/> 2</prompt>
+   </block>
+</form>
+</vxml>

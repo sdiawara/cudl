@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.0">
+<var name="document_scope_var" expr="'variable du document'"/>
+<form>
+	<block> 
+ 	 <prompt><value expr="document_scope_var"/>1</prompt>
+   </block>
+   <block> 
+ 	 <prompt><value expr="document_scope_var"/>2</prompt>
+   	<goto next="#forme2"/>
+   </block>
+</form>
+<form id="forme2">
+   <block> 
+ 	 <prompt><value expr="document_scope_var"/>3</prompt>
+   </block>
+</form>
+</vxml>
