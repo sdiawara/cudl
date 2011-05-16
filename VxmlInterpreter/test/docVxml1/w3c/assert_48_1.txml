@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<meta name="author" content="John Doe"/>
+<meta name="maintainer" content="hello-support@hi.example.com"/>
+
+  <catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+
+ <var name="hi" expr="'Hello World!'"/>
+ <form>
+  <block>
+     <value expr="hi"/>
+     <goto next="#say_goodbye"/>
+  </block>
+ </form>
+
+
+ <form id="unreachable_form">
+  <block>
+      <conf:fail/>
+  </block>
+ </form>
+
+ <form id="say_goodbye">
+  <block>
+      <conf:pass/>
+  </block>
+ </form>
+
+</vxml>
+
