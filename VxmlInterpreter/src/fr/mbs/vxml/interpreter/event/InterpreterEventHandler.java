@@ -6,6 +6,8 @@ import java.util.EventObject;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.script.ScriptException;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -17,26 +19,26 @@ import fr.mbs.vxml.utils.Utils;
 
 public class InterpreterEventHandler implements InterpreterListener {
 
-	public void noInput(InterpreterEvent interpreterEvent) {
+	public void noInput(InterpreterEvent interpreterEvent) throws ScriptException {
 		handle(interpreterEvent, "noinput");
 	}
 
 	@Override
-	public void NoMatch(InterpreterEvent interpreterEvent) {
+	public void NoMatch(InterpreterEvent interpreterEvent) throws ScriptException {
 		handle(interpreterEvent, "nomatch");
 	}
 
 	@Override
-	public void error(InterpreterEvent interpreterEvent) {
+	public void error(InterpreterEvent interpreterEvent) throws ScriptException {
 		handle(interpreterEvent, "error");
 	}
 
 	@Override
-	public void help(InterpreterEvent interpreterEvent) {
+	public void help(InterpreterEvent interpreterEvent) throws ScriptException {
 		handle(interpreterEvent, "help");
 	}
 
-	private void handle(EventObject interpreterEvent, String eventName) {
+	private void handle(EventObject interpreterEvent, String eventName) throws ScriptException {
 		InterpreterContext context = (InterpreterContext) interpreterEvent
 				.getSource();
 

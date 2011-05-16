@@ -8,7 +8,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 
 import javax.script.ScriptException;
 
@@ -27,10 +26,8 @@ import fr.mbs.vxml.utils.Prompt;
 import fr.mbs.vxml.utils.VariableVxml;
 import fr.mbs.vxml.utils.VxmlElementType;
 
-
 public class Interpreter {
-	private VariableVxml variableVxml = new VariableVxml();
-	private Map<String, String> allVariable = new TreeMap<String, String>();
+	public VariableVxml variableVxml = new VariableVxml();
 	private Map<Node, String> nodeItemVariablesName = new Hashtable<Node, String>();
 
 	private List<String> traceLog = new ArrayList<String>();
@@ -104,12 +101,11 @@ public class Interpreter {
 			put("var", new NodeExecutor() {
 				public void execute(Node node) {
 					try {
-						String variableName = variableVxml
-								.declareVariable(node);
-						allVariable.put(variableName, variableVxml
-								.getValue(variableName));
+						String variableName = variableVxml.declareVariable(
+								node, getNodeScope(node));
+						// allVariable.put(variableName, variableVxml
+						// .getValue(variableName));
 					} catch (DOMException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (ScriptException e) {
 						// TODO Auto-generated catch block
@@ -129,21 +125,23 @@ public class Interpreter {
 				}
 			});
 			put("if", new NodeExecutor() {
-				public void execute(Node node) throws InterpreterException {
+				public void execute(Node node) throws InterpreterException, ScriptException {
 					checkConditionAndExecute(node);
 				}
 			});
 			put("goto", new NodeExecutor() {
-				public void execute(Node node) throws GotoException {
+				public void execute(Node node) throws GotoException, ScriptException {
 					// FIXME: do same for expritem (script interpretation value
 					// )
 					// add assert163.txml file from to test
-					if (node.getAttributes().getNamedItem("nextitem") == null)
+					if (node.getAttributes().getNamedItem("nextitem") == null) {
+						//FIXME: remove 1
+						variableVxml.resetScope(1);
 						throw new GotoException(node.getAttributes()
 								.getNamedItem("next").getNodeValue());
+					}
 					selectedItem = selectDialogNextItemTovisit(node);
 					nextItemSelectGuard = true;
-					System.out.println("goto nextitem");
 				}
 
 			});
@@ -181,20 +179,19 @@ public class Interpreter {
 		// traitement
 
 		// Boucle principale
-
+		int i = 0;
 		while (true) {
 			// PHASE SELECTION
 			if ((selectedItem = phaseSelect(dialog)) == null) {
 				break;
 			}
-
 			// Exécuter l'élément de formulaire.
 
 			variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
-					"'defined'");
-			allVariable.put(nodeItemVariablesName.get(selectedItem),
-					variableVxml.getValue(nodeItemVariablesName
-							.get(selectedItem)));
+					"'defined'", getNodeScope(selectedItem));
+			// allVariable.put(nodeItemVariablesName.get(selectedItem),
+			// variableVxml.getValue(nodeItemVariablesName
+			// .get(selectedItem)));
 
 			String nodeName = selectedItem.getNodeName();
 			if (nodeName.equals("field")) {
@@ -206,9 +203,9 @@ public class Interpreter {
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
 				execute(selectedItem);
-
 			}
-			variableVxml.resetScope(selectedItem);
+			//FIXME: remove 0
+			variableVxml.resetScope(0);
 
 			// System.out.println("After selection ["+
 			// variables.get(selectedItem)+"]"+" n°"
@@ -223,9 +220,9 @@ public class Interpreter {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals("var")
 					|| VxmlElementType.isFormItem(node)) {
-				String declareVariable = variableVxml.declareVariable(node);
-				allVariable.put(declareVariable, variableVxml
-						.getValue(declareVariable));
+				String declareVariable = variableVxml.declareVariable(node,
+						VxmlElementType.isFormItem(node) ? 5
+								:getNodeScope(node));
 				if (VxmlElementType.isFormItem(node)) {
 					nodeItemVariablesName.put(node, declareVariable);
 					// FIXME: add prompt counter
@@ -253,7 +250,8 @@ public class Interpreter {
 
 	private Node phaseSelect(Node dialog) {
 		return (selectedItem != null && variableVxml.getValue(
-				nodeItemVariablesName.get(selectedItem)).equals("undefined")) ? selectedItem
+				nodeItemVariablesName.get(selectedItem),
+				getNodeScope(selectedItem)).equals("undefined")) ? selectedItem
 				: unsatisfiedGuardCondition(dialog.getChildNodes());
 	}
 
@@ -264,7 +262,7 @@ public class Interpreter {
 			if (VxmlElementType.isFormItem(node)) {
 				if (nodeItemVariablesName.get(node) != null
 						&& variableVxml.getValue(
-								nodeItemVariablesName.get(node)).equals(
+								nodeItemVariablesName.get(node), 1).equals(
 								"undefined") && checkCond(node)) {
 					return node;
 				}
@@ -273,7 +271,7 @@ public class Interpreter {
 		return null;
 	}
 
-	public void execute(Node node) throws InterpreterException {
+	public void execute(Node node) throws InterpreterException, ScriptException {
 		NodeList child = node.getChildNodes();
 		for (int i = 0; i < child.getLength(); i++) {
 			Node node1 = child.item(i);
@@ -281,10 +279,11 @@ public class Interpreter {
 			if (executor != null) {
 				executor.execute(node1);
 			}
+			
 			if (nextItemSelectGuard) {
 				nextItemSelectGuard = false;
 				return;
-				
+
 			}
 		}
 	}
@@ -364,7 +363,7 @@ public class Interpreter {
 			ScriptException {
 		assert (value.getNodeName().endsWith("value"));
 		p.tts += variableVxml.getValue(value.getAttributes().item(0)
-				.getNodeValue());
+				.getNodeValue(), 0);
 	}
 
 	private void clearVariable(Node node1) {
@@ -373,10 +372,9 @@ public class Interpreter {
 
 		for (int i = 0; i < nameList.length; i++) {
 			try {
-				variableVxml.setValue(nameList[i], "'undefined'");
-				allVariable.put(nameList[i], "undefined");
+				variableVxml.setValue(nameList[i], "'undefined'",
+						getNodeScope(node1));
 			} catch (ScriptException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -389,14 +387,12 @@ public class Interpreter {
 					.getNodeValue();
 			Node expr = node1.getAttributes().getNamedItem("expr");
 
-			variableVxml.setValue(nodeName, expr.getNodeValue());
-			allVariable.put(nodeName, variableVxml.evaluateScript(expr));
+			variableVxml.setValue(nodeName, expr.getNodeValue(),
+					getNodeScope(node1));
 		} catch (DOMException e) {
 			e.printStackTrace();
 		} catch (ScriptException e) {
 			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -441,7 +437,8 @@ public class Interpreter {
 			Node child = childs.item(i);
 			if ("value".equals(child.getNodeName()))
 				value += variableVxml.getValue(child.getAttributes()
-						.getNamedItem("expr").getNodeValue());
+						.getNamedItem("expr").getNodeValue(),
+						getNodeScope(child));
 			else
 				value += child.getNodeValue();
 		}
@@ -449,7 +446,7 @@ public class Interpreter {
 	}
 
 	private void checkConditionAndExecute(Node node)
-			throws InterpreterException {
+			throws InterpreterException, ScriptException {
 		boolean conditionChecked = checkCond(node);
 		NodeList childs = node.getChildNodes();
 
@@ -490,7 +487,19 @@ public class Interpreter {
 
 	}
 
-	public Map<String, String> getVar() {
-		return allVariable;
+	private boolean isAnAnonymeContext(Node node) {
+		return VxmlElementType.isFormItem(node.getParentNode());
+	}
+
+	private boolean isAnDialogContext(Node node) {
+		return VxmlElementType.isADialog(node.getParentNode());
+	}
+
+	private int getNodeScope(Node node) {
+		if (isAnAnonymeContext(node))
+			return 0;
+		else if (isAnDialogContext(node))
+			return 1;
+		return 5;
 	}
 }

@@ -50,15 +50,13 @@ public class InterpreterContext {
 		} catch (InterpreterException e) {
 			executionHandler(e);
 		} catch (DOMException e) {
-			// TODO Auto-generated catch block
 			throw new RuntimeException(e);
 		} catch (ScriptException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public void noInput() {
+	public void noInput() throws ScriptException {
 		fireNoInput();
 	}
 
@@ -89,11 +87,11 @@ public class InterpreterContext {
 		}
 	}
 
-	public void noMatch() {
+	public void noMatch() throws ScriptException {
 		fireNoMatch();
 	}
 
-	private void fireNoInput() {
+	private void fireNoInput() throws ScriptException {
 		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
 		for (Iterator<InterpreterListener> iterator = interpreterListeners
 				.iterator(); iterator.hasNext();) {
@@ -103,7 +101,7 @@ public class InterpreterContext {
 		}
 	}
 
-	private void fireNoMatch() {
+	private void fireNoMatch() throws ScriptException {
 		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
 		for (Iterator<InterpreterListener> iterator = interpreterListeners
 				.iterator(); iterator.hasNext();) {

@@ -16,31 +16,47 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public final class VariableVxml {
+	private static final int ANONYME_SCOPE = 0;
+	private static final int DIALOG_SCOPE = 1;
+	private static final int DOCUMENT_SCOPE = 2;
+	private static final int APPLICATION_SCOPE = 3;
+	private static final int SESSION_SCOPE = 4;
+
 	private ScriptEngineManager manager = new ScriptEngineManager();
 	private ScriptEngine engine = manager.getEngineByName("js");
 
 	private int anonymeNameCount = 0;
-	private ScriptContext context = new SimpleScriptContext();
+	private ScriptContext anonyme = new SimpleScriptContext();
+	private ScriptContext dialog = new SimpleScriptContext();
 
-	public String declareVariable(Node node) throws DOMException,
+	public String declareVariable(Node node, int scope) throws DOMException,
 			ScriptException {
 
 		String name = null;
-
 		NamedNodeMap attributes = node.getAttributes();
 		Node namedItem = attributes.getNamedItem("name");
 		name = (namedItem == null) ? node.getNodeName() + "_"
 				+ anonymeNameCount++ : namedItem.getNodeValue();
 		Node expr = attributes.getNamedItem("expr");
-
-		if (hasAnAnonymeContext(node)) {
-			Bindings anonymeScope = context
-					.getBindings(ScriptContext.ENGINE_SCOPE);
-			anonymeScope.put(name, (expr == null) ? "undefined" : engine
+		Bindings scopeBindings;
+		switch (scope) {
+		case ANONYME_SCOPE:
+			scopeBindings = anonyme.getBindings(ScriptContext.ENGINE_SCOPE);
+			scopeBindings.put(name, (expr == null) ? "undefined" : engine
 					.eval(expr.getNodeValue()));
-		} else {
+			break;
+		case DIALOG_SCOPE:
+			scopeBindings = dialog.getBindings(ScriptContext.ENGINE_SCOPE);
+			scopeBindings.put(name, (expr == null) ? "undefined" : engine
+					.eval(expr.getNodeValue()));
+			break;
+		case DOCUMENT_SCOPE:
+		case APPLICATION_SCOPE:
+		case SESSION_SCOPE:
+		default:
 			engine.put(name, (expr == null) ? "undefined" : engine.eval(expr
 					.getNodeValue()));
+			break;
 		}
 
 		return name;
@@ -64,30 +80,65 @@ public final class VariableVxml {
 		return value;
 	}
 
-	public void resetScope(Node node) {
-		context.setBindings(new SimpleBindings(), ScriptContext.ENGINE_SCOPE);
-	}
+	public String getValue(String declareVariable, int scope) {
+		ScriptContext context;
+		int tmp = scope - 1;
+		while (++tmp < 2 && (context = getContext(tmp)) != null) {
+			if (context.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
+					declareVariable)) {
 
-	public String getValue(String declareVariable) {
-		if (context.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
-				declareVariable)) {
-			return context.getBindings(ScriptContext.ENGINE_SCOPE).get(
-					declareVariable)
-					+ "";
-		} else if (engine.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
+				return context.getBindings(ScriptContext.ENGINE_SCOPE).get(
+						declareVariable)
+						+ "";
+			}
+		}
+
+		if (engine.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
 				declareVariable))
 			return engine.get(declareVariable) + "";
 
 		throw new IllegalArgumentException(declareVariable
-				+ " is not derclared in this scope");
+				+ " is not derclared in this scope " + scope);
 	}
 
-	public void setValue(String declareVariable, String expr)
+	private ScriptContext getContext(int scope) {
+		switch (scope) {
+		case ANONYME_SCOPE:
+			return anonyme;
+		case DIALOG_SCOPE:
+			return dialog;
+		default:
+			return null;
+		}
+	}
+
+	public void resetScope(int scope) {
+		switch (scope) {
+		case ANONYME_SCOPE:
+			anonyme.setBindings(new SimpleBindings(),
+					ScriptContext.ENGINE_SCOPE);
+			break;
+		case DIALOG_SCOPE:
+			dialog
+					.setBindings(new SimpleBindings(),
+							ScriptContext.ENGINE_SCOPE);
+			break;
+		default:
+
+		}
+	}
+
+	public void setValue(String declareVariable, String expr, int scope)
 			throws ScriptException {
+		int tmp = scope - 1;
+		ScriptContext context;
+		while (++tmp < 2 && (context = getContext(tmp)) != null) {
+			Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
+			if (bindings.containsKey(declareVariable)) {
+				bindings.put(declareVariable, engine.eval(expr));
+				return;
+			}
+		}
 		engine.put(declareVariable, engine.eval(expr));
-	}
-
-	private boolean hasAnAnonymeContext(Node node) {
-		return VxmlElementType.isFormItem(node.getParentNode());
 	}
 }

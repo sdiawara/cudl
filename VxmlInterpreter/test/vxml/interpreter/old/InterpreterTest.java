@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.script.ScriptException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -63,13 +64,6 @@ public class InterpreterTest extends TestCase {
 				"oldtestfile/VxmlGlobalServletService");
 		interpreterContext.launchInterpreter();
 
-		// System.out.println("logs "
-		// + interpreterContext.interpreter.getTraceLog());
-		// System.out.println("stats "
-		// + interpreterContext.interpreter.getTraceStat());
-		// System.out.println(interpreterContext.interpreter.getPrompts());
-		// System.out.println(expectedPrompts);
-
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 		assertEquals(expectedStats, interpreterContext.interpreter
 				.getTraceStat());
@@ -79,7 +73,7 @@ public class InterpreterTest extends TestCase {
 
 	@Test
 	public void testNoInputAndNoMatchNavigatesUntilNextInteraction()
-			throws InterpreterException, SAXException, IOException {
+			throws InterpreterException, SAXException, IOException, ScriptException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("new call");

@@ -21,7 +21,7 @@ public class SubmitException extends InterpreterException {
 			String declareVariable = namelist[i];
 
 			urlSuite += declareVariable + "="
-					+ variableVxml.getValue(declareVariable) + "&";
+					+ variableVxml.getValue(declareVariable,0) + "&";
 			
 		}
 		
