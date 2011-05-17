@@ -23,11 +23,11 @@ import fr.mbs.vxml.interpreter.execption.GotoException;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.interpreter.execption.SubmitException;
 import fr.mbs.vxml.utils.Prompt;
-import fr.mbs.vxml.utils.VariableVxml;
+import fr.mbs.vxml.utils.VariableDeclaration;
 import fr.mbs.vxml.utils.VxmlElementType;
 
 public class Interpreter {
-	public VariableVxml variableVxml = new VariableVxml();
+	public VariableDeclaration variableVxml = new VariableDeclaration();
 	public Node selectedItem;
 
 	// to test w3c IR
@@ -193,12 +193,12 @@ public class Interpreter {
 			}
 			// Exécuter l'élément de formulaire.
 
-			variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
-					"'defined'", getNodeScope(selectedItem));
 			// allVariable.put(nodeItemVariablesName.get(selectedItem),
 			// variableVxml.getValue(nodeItemVariablesName
 			// .get(selectedItem)));
 
+			variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
+					"'defined'", getNodeScope(selectedItem));
 			String nodeName = selectedItem.getNodeName();
 			if (nodeName.equals("field")) {
 				execute(selectedItem);
@@ -288,7 +288,6 @@ public class Interpreter {
 			if (nextItemSelectGuard) {
 				nextItemSelectGuard = false;
 				return;
-
 			}
 		}
 	}
@@ -508,5 +507,12 @@ public class Interpreter {
 		else if (node.getParentNode().getNodeName().equals("vxml"))
 			return 2;
 		return 5;
+	}
+	
+	private boolean checkCond(Node node) {
+		NamedNodeMap attribute = node.getAttributes();
+		Node cond = (attribute.getLength() == 0) ? null : attribute
+				.getNamedItem("cond");
+		return cond == null || cond.getNodeValue().equals("true");
 	}
 }

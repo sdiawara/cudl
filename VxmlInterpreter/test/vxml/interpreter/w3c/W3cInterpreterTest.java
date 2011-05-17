@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.script.ScriptException;
+
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
-
 
 public class W3cInterpreterTest {
 	private InterpreterContext interpreterContext;
@@ -66,7 +67,7 @@ public class W3cInterpreterTest {
 
 			// Application root document variables are available for use by the
 			// leaf document.
-			//FIXME: Eval variables
+			// FIXME: Eval variables
 			add("w3c/a59-leaf.txml");
 		}
 	};
@@ -116,6 +117,20 @@ public class W3cInterpreterTest {
 		// Read file
 		interpreterContext = new InterpreterContext("w3c/assert165.txml");
 		interpreterContext.launchInterpreter();
+
+		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());
+	}
+
+	@Test()
+	public void w3cdDefaultValueIsUndefined() throws SAXException, IOException, ScriptException
+			 {
+		// The default value of the attribute is ECMAScript undefined.
+		// The file (w3c/235.txml) has been modified to adapt to interpret the
+		// tests
+
+		interpreterContext = new InterpreterContext("w3c/235.txml");
+		interpreterContext.launchInterpreter();
+		interpreterContext.noInput();
 
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());
 	}

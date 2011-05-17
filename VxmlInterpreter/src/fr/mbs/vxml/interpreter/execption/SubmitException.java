@@ -3,13 +3,13 @@ package fr.mbs.vxml.interpreter.execption;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import fr.mbs.vxml.utils.VariableVxml;
+import fr.mbs.vxml.utils.VariableDeclaration;
 
 
 public class SubmitException extends InterpreterException {
 	public String next;
 	
-	public SubmitException(Node node, VariableVxml variableVxml) {
+	public SubmitException(Node node, VariableDeclaration variableVxml) {
 		NamedNodeMap attributes = node.getAttributes();
 		this.next = attributes.getNamedItem("next").getNodeValue();
 		System.err.println("->>"+next);

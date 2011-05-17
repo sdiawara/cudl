@@ -44,6 +44,7 @@ public class InterpreterEventHandler implements InterpreterListener {
 
 		List<Node> catchList = searchEvent(eventName,
 				context.interpreter.selectedItem);
+		System.err.println("catchList "+catchList);
 		removeUnlessCond(catchList);
 		try {
 			// FIXME: take the first with a correct event counter
@@ -75,7 +76,7 @@ public class InterpreterEventHandler implements InterpreterListener {
 
 	private List<Node> searchEvent(String eventName, Node parent) {
 		ArrayList<Node> eventList = new ArrayList<Node>();
-
+		System.err.println("parent "+ parent);
 		while (parent != null) {
 			NodeList nodeList = parent.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
