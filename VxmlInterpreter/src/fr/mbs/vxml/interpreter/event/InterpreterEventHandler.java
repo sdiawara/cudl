@@ -16,15 +16,16 @@ import fr.mbs.vxml.interpreter.InterpreterContext;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.utils.Utils;
 
-
 public class InterpreterEventHandler implements InterpreterListener {
 
-	public void noInput(InterpreterEvent interpreterEvent) throws ScriptException {
+	public void noInput(InterpreterEvent interpreterEvent)
+			throws ScriptException {
 		handle(interpreterEvent, "noinput");
 	}
 
 	@Override
-	public void NoMatch(InterpreterEvent interpreterEvent) throws ScriptException {
+	public void NoMatch(InterpreterEvent interpreterEvent)
+			throws ScriptException {
 		handle(interpreterEvent, "nomatch");
 	}
 
@@ -38,13 +39,13 @@ public class InterpreterEventHandler implements InterpreterListener {
 		handle(interpreterEvent, "help");
 	}
 
-	private void handle(EventObject interpreterEvent, String eventName) throws ScriptException {
+	private void handle(EventObject interpreterEvent, String eventName)
+			throws ScriptException {
 		InterpreterContext context = (InterpreterContext) interpreterEvent
 				.getSource();
 
 		List<Node> catchList = searchEvent(eventName,
-				context.interpreter.selectedItem);
-		System.err.println("catchList "+catchList);
+				context.field);
 		removeUnlessCond(catchList);
 		try {
 			// FIXME: take the first with a correct event counter
@@ -76,8 +77,8 @@ public class InterpreterEventHandler implements InterpreterListener {
 
 	private List<Node> searchEvent(String eventName, Node parent) {
 		ArrayList<Node> eventList = new ArrayList<Node>();
-		System.err.println("parent "+ parent);
 		while (parent != null) {
+			System.err.println("parent " + parent);
 			NodeList nodeList = parent.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);

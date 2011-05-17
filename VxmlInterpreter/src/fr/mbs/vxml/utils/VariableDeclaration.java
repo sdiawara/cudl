@@ -44,9 +44,11 @@ public final class VariableDeclaration {
 				.getNodeValue());
 
 		ScriptContext context = getContext(scope);
-
+		System.err.println(scope + " " + name + " " + context);
 		if (null == context) {
 			engine.put(nodeDeclarationName, value);
+			System.err.println(engine.getBindings(ScriptContext.ENGINE_SCOPE)
+					.containsKey(nodeDeclarationName));
 		} else {
 			context.getBindings(ScriptContext.ENGINE_SCOPE).put(
 					nodeDeclarationName, value + "");
@@ -55,20 +57,48 @@ public final class VariableDeclaration {
 		return nodeDeclarationName;
 	}
 
-	public Object evaluateScript(Node node, int scope)
+	public String evaluateScript(Node node, int scope)
 			throws FileNotFoundException, DOMException, ScriptException {
-		assert (node.getNodeName().equals("script"));
-		ScriptContext context = getContext(scope);
 
-		Object value = "";
-		NamedNodeMap attributes = node.getAttributes();
-		Node src;
-		if (null != attributes && attributes.getLength() > 0
-				&& (null != (src = attributes.getNamedItem("src")))) {
-			value = engine.eval(new FileReader(src.getNodeValue()));
+		// ScriptContext context = getContext(scope);
+		//
+		// Object value = "";
+		// NamedNodeMap attributes = node.getAttributes();
+		// Node src;
+		// if (null != attributes && attributes.getLength() > 0
+		// && (null != (src = attributes.getNamedItem("src")))) {
+		// value = engine.eval(new FileReader(src.getNodeValue()));
+		// } else {
+		// value = engine.eval(node.getTextContent()) + "";
+		// }
+		//		 
+		// return value+"";
+
+		ScriptContext context = getContext(scope);
+		System.err.println("scope " + scope + " " + context);
+		String value = "";
+		if (node.getAttributes() != null
+				&& node.getAttributes().getLength() > 0) {
+
+			if (node.getAttributes().getNamedItem("src") != null) {
+				if (context == null) {
+					value = engine.eval(
+							new FileReader(node.getAttributes().getNamedItem(
+									"src").getNodeValue())).toString();
+				} else {
+
+					value = engine.eval(
+							new FileReader(node.getAttributes().getNamedItem(
+									"src").getNodeValue()), context).toString();
+				}
+			}
 		} else {
-			value = engine.eval(node.getTextContent()) + "";
+			if (context == null) {
+				value = engine.eval(node.getTextContent()) + "";
+			} else
+				value = engine.eval(node.getTextContent(), context) + "";
 		}
+
 		return value;
 	}
 

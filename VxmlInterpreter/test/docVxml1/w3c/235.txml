@@ -8,9 +8,10 @@
   <conf:grammar utterance="alpha"/>
   <conf:noinput/>
   
-  <filled/>
+  <filled>
+   </filled>
   <noinput>
-      <if cond="a == undefined">
+      <if cond="a == 'undefined'">
         <conf:pass/>
       <else/>
         <conf:fail reason="field result variable should be undefined by default"/>

@@ -31,6 +31,7 @@ public class InterpreterContext {
 	public Interpreter interpreter = new Interpreter();
 	private Vector<InterpreterListener> interpreterListeners = new Vector<InterpreterListener>();
 	private String url;
+	public Node field;
 
 	public InterpreterContext(String fileName) throws SAXException, IOException {
 		this(FILE_DIR, fileName);
@@ -46,6 +47,8 @@ public class InterpreterContext {
 	public void launchInterpreter() throws SAXException, IOException {
 		try {
 			interpreter.interpretDialog(currentDialog);
+			field = interpreter.selectedItem ;
+			interpreter.selectedItem = null;
 		} catch (InterpreterException e) {
 			executionHandler(e);
 		} catch (DOMException e) {

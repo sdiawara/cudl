@@ -90,7 +90,9 @@ public class InterpreterTest extends TestCase {
 		interpreterContext.launchInterpreter();
 		interpreterContext.noInput();
 		interpreterContext.noMatch();
-
+		
+		System.err.println(expectedLogs);
+		System.err.println(interpreterContext.interpreter.getTraceLog());
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 	}
 

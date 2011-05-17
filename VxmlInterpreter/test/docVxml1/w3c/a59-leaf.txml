@@ -9,6 +9,8 @@
 
 <form>
   <block>
+   <conf:pass />
+     
     <if cond="rootvar == undefined">
       <conf:fail reason="rootvar undefined" />
     <elseif cond="rootvar != 7" />

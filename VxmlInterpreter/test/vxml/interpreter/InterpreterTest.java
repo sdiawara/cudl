@@ -139,6 +139,9 @@ public class InterpreterTest {
 		interpreterContext.launchInterpreter();
 
 		assertTrue(interpreterContext.interpreter.getTraceStat().isEmpty());
+		
+		System.err.println(traceLog);
+		System.err.println(interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 

@@ -1,7 +1,5 @@
 package fr.mbs.vxml.interpreter;
 
-import static fr.mbs.vxml.utils.Utils.checkCond;
-
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -29,7 +27,7 @@ import fr.mbs.vxml.utils.VxmlElementType;
 public class Interpreter {
 	public VariableDeclaration variableVxml = new VariableDeclaration();
 	public Node selectedItem;
-
+	private List<String> blackList = new ArrayList<String>();
 	// to test w3c IR
 	public List<String> w3cNodeConfSuite = new ArrayList<String>();
 
@@ -59,8 +57,8 @@ public class Interpreter {
 			put("conf:fail", new NodeExecutor() {
 				public void execute(Node node) {
 					w3cNodeConfSuite.add(node.toString());
-					System.err.println(node.getAttributes().getNamedItem(
-							"reason").getNodeValue());
+//					System.err.println(node.getAttributes().getNamedItem(
+//							"reason").getNodeValue());
 				}
 			});
 
@@ -197,18 +195,23 @@ public class Interpreter {
 			// variableVxml.getValue(nodeItemVariablesName
 			// .get(selectedItem)));
 
-			variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
-					"'defined'", getNodeScope(selectedItem));
 			String nodeName = selectedItem.getNodeName();
 			if (nodeName.equals("field")) {
 				execute(selectedItem);
+				return;
 			} else if (nodeName.equals("record")) {
 			} else if (nodeName.equals("object")) {
 			} else if (nodeName.equals("subdialog")) {
+				variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
+						"'defined'", getNodeScope(selectedItem));
 			} else if (nodeName.equals("transfer")) {
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
+
+				variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
+						"'defined'", getNodeScope(selectedItem));
 				execute(selectedItem);
+
 				variableVxml.resetScope(0);
 			}
 			// FIXME: remove 0
@@ -268,7 +271,7 @@ public class Interpreter {
 				if (nodeItemVariablesName.get(node) != null
 						&& variableVxml.getValue(
 								nodeItemVariablesName.get(node), 1).equals(
-								"undefined") && checkCond(node)) {
+								"undefined") && this.checkCond(node)) {
 					return node;
 				}
 			}
@@ -281,8 +284,14 @@ public class Interpreter {
 		for (int i = 0; i < child.getLength(); i++) {
 			Node node1 = child.item(i);
 			NodeExecutor executor = nodeExecution.get(node1.getNodeName());
+
+			if (node1.getNodeName().equals("filled")) {
+				return;
+			}
+
 			if (executor != null) {
 				executor.execute(node1);
+
 			}
 
 			if (nextItemSelectGuard) {
@@ -451,7 +460,7 @@ public class Interpreter {
 
 	private void checkConditionAndExecute(Node node)
 			throws InterpreterException, ScriptException {
-		boolean conditionChecked = checkCond(node);
+		boolean conditionChecked = this.checkCond(node);
 		NodeList childs = node.getChildNodes();
 
 		for (int i = 0; i < childs.getLength(); i++) {
@@ -465,7 +474,7 @@ public class Interpreter {
 				if (conditionChecked) {
 					break;
 				} else {
-					conditionChecked = checkCond(item);
+					conditionChecked = this.checkCond(item);
 				}
 			}
 		}
@@ -508,11 +517,28 @@ public class Interpreter {
 			return 2;
 		return 5;
 	}
-	
+
+	Object toto;
+
 	private boolean checkCond(Node node) {
 		NamedNodeMap attribute = node.getAttributes();
 		Node cond = (attribute.getLength() == 0) ? null : attribute
 				.getNamedItem("cond");
-		return cond == null || cond.getNodeValue().equals("true");
+		try {
+			return cond == null
+					|| variableVxml.evaluateScript(cond, getNodeScope(node))
+							.equals("true");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ScriptException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
+
 }

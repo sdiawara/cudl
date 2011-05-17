@@ -2,6 +2,7 @@
 <vxml version = "2.0">
   <form>
     <block>
+    
      <if cond="true">
      	<log>LOG Hello</log>
 		<log>LOG Hello 1</log>
