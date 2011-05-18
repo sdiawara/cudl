@@ -20,7 +20,7 @@ public final class VariableDeclaration {
 	private static final int DIALOG_SCOPE = 1;
 	private static final int DOCUMENT_SCOPE = 2;
 	private static final int APPLICATION_SCOPE = 3;
-	private static final int SESSION_SCOPE = 4;
+	//private static final int SESSION_SCOPE = 4;
 	private static final int NUMBER_OF_SCOPE = 3;
 	private int anonymeNameCount = 0;
 

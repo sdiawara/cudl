@@ -83,7 +83,7 @@ public class W3cInterpreterTest {
 		int count = 0;
 		for (Iterator<String> iterator = fileNames.iterator(); iterator
 				.hasNext();) {
-			String fileName = (String) iterator.next();
+			String fileName = iterator.next();
 
 			interpreterContext = new InterpreterContext(fileName);
 			interpreterContext.launchInterpreter();

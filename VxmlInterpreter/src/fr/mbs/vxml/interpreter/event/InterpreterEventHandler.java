@@ -67,7 +67,7 @@ public class InterpreterEventHandler implements InterpreterListener {
 
 	private void removeUnlessCond(List<Node> catchList) {
 		for (Iterator<Node> iterator = catchList.iterator(); iterator.hasNext();) {
-			Node node = (Node) iterator.next();
+			Node node = iterator.next();
 			if (!Utils.checkCond(node)) {
 				catchList.remove(node);
 			}

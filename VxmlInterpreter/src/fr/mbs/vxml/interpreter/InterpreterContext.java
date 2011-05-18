@@ -123,7 +123,7 @@ public class InterpreterContext {
 		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
 		for (Iterator<InterpreterListener> iterator = interpreterListeners
 				.iterator(); iterator.hasNext();) {
-			InterpreterListener interpreterListener = (InterpreterListener) iterator
+			InterpreterListener interpreterListener = iterator
 					.next();
 			interpreterListener.noInput(interpreterEvent);
 		}
@@ -133,7 +133,7 @@ public class InterpreterContext {
 		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
 		for (Iterator<InterpreterListener> iterator = interpreterListeners
 				.iterator(); iterator.hasNext();) {
-			InterpreterListener interpreterListener = (InterpreterListener) iterator
+			InterpreterListener interpreterListener = iterator
 					.next();
 			interpreterListener.NoMatch(interpreterEvent);
 		}
