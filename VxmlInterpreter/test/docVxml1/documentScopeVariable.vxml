@@ -3,7 +3,11 @@
 <var name="document_scope_var" expr="'variable du document'"/>
 <form>
 	<block> 
- 	 <prompt><value expr="document_scope_var"/>1</prompt>
+ 		<if cond="document_scope_var != 'variable du document'">
+ 			<prompt>document_scope_var est forcemenent egal à variable du doucument</prompt>
+ 		<else/>
+ 			 <prompt><value expr="document_scope_var"/>1</prompt>
+ 		 </if>
    </block>
    <block> 
  	 <prompt><value expr="document_scope_var"/>2</prompt>

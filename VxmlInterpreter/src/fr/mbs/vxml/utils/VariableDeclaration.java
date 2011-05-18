@@ -44,11 +44,9 @@ public final class VariableDeclaration {
 				.getNodeValue());
 
 		ScriptContext context = getContext(scope);
-		System.err.println(scope + " " + name + " " + context);
+
 		if (null == context) {
 			engine.put(nodeDeclarationName, value);
-			System.err.println(engine.getBindings(ScriptContext.ENGINE_SCOPE)
-					.containsKey(nodeDeclarationName));
 		} else {
 			context.getBindings(ScriptContext.ENGINE_SCOPE).put(
 					nodeDeclarationName, value + "");
@@ -60,46 +58,41 @@ public final class VariableDeclaration {
 	public String evaluateScript(Node node, int scope)
 			throws FileNotFoundException, DOMException, ScriptException {
 
-		// ScriptContext context = getContext(scope);
-		//
-		// Object value = "";
-		// NamedNodeMap attributes = node.getAttributes();
-		// Node src;
-		// if (null != attributes && attributes.getLength() > 0
-		// && (null != (src = attributes.getNamedItem("src")))) {
-		// value = engine.eval(new FileReader(src.getNodeValue()));
-		// } else {
-		// value = engine.eval(node.getTextContent()) + "";
-		// }
-		//		 
-		// return value+"";
-
 		ScriptContext context = getContext(scope);
-		System.err.println("scope " + scope + " " + context);
 		String value = "";
 		if (node.getAttributes() != null
 				&& node.getAttributes().getLength() > 0) {
-
-			if (node.getAttributes().getNamedItem("src") != null) {
-				if (context == null) {
-					value = engine.eval(
-							new FileReader(node.getAttributes().getNamedItem(
-									"src").getNodeValue())).toString();
-				} else {
-
-					value = engine.eval(
-							new FileReader(node.getAttributes().getNamedItem(
-									"src").getNodeValue()), context).toString();
-				}
-			}
+			value = evaluateScriptWithSrc(node, context);
 		} else {
 			if (context == null) {
 				value = engine.eval(node.getTextContent()) + "";
-			} else
-				value = engine.eval(node.getTextContent(), context) + "";
+			} else {
+				int tmp = scope;
+				do {
+					try {
+						value = engine.eval(node.getTextContent(), context)
+								+ "";
+					} catch (ScriptException e) {
+					}
+				} while (++tmp < NUMBER_OF_SCOPE
+						&& (context = getContext(tmp)) != null);
+			}
 		}
-
+		
 		return value;
+	}
+
+	private String evaluateScriptWithSrc(Node node, ScriptContext context)
+			throws ScriptException, FileNotFoundException {
+
+		Node namedItem = node.getAttributes().getNamedItem("src");
+		if (context == null) {
+			return engine.eval(new FileReader(namedItem.getNodeValue()))
+					.toString();
+		} else {
+			return engine.eval(new FileReader(namedItem.getNodeValue()),
+					context).toString();
+		}
 	}
 
 	public String getValue(String declareVariable, int scope) {

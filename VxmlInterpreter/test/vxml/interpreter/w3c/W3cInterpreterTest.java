@@ -10,6 +10,7 @@ import java.util.List;
 import javax.script.ScriptException;
 
 import org.junit.Test;
+import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
@@ -19,7 +20,7 @@ public class W3cInterpreterTest {
 	private InterpreterContext interpreterContext;
 	private List<String> fileNames = new ArrayList<String>() {
 		{
-			/**
+			/*
 			 * These test file is from
 			 * http://www.w3.org/Voice/2004/vxml-ir/#test_api
 			 */
@@ -56,7 +57,7 @@ public class W3cInterpreterTest {
 			add("w3c/assert112.txml");
 
 			// FIA ends when it encounters an <exit>.
-		//	add("w3c/assert113.txml");
+			// add("w3c/assert113.txml");
 
 			// FIA ends when it encounters an <return>.
 			// FIXME: Implemeent dialog
@@ -69,12 +70,16 @@ public class W3cInterpreterTest {
 			// leaf document.
 			// FIXME: Eval variables
 			add("w3c/a59-leaf.txml");
+
+			// A variable declared at document scope is accessible within an
+			// anonymous scope contained within the same document.
+			add("w3c/510.txml");
 		}
 	};
 
 	@Test
 	public void w3cIRTest() throws SAXException, IOException,
-			InterpreterException {
+			InterpreterException, DOMException, ScriptException {
 		int count = 0;
 		for (Iterator<String> iterator = fileNames.iterator(); iterator
 				.hasNext();) {
@@ -83,11 +88,15 @@ public class W3cInterpreterTest {
 			interpreterContext = new InterpreterContext(fileName);
 			interpreterContext.launchInterpreter();
 
-			if (!(interpreterContext.interpreter.w3cNodeConfSuite.get(0).equals("[conf:pass: null]"))) {
-				System.out.println(interpreterContext.interpreter.w3cNodeConfSuite.get(0));
+			if (!(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
+					.equals("[conf:pass: null]"))) {
+				System.out
+						.println(interpreterContext.interpreter.w3cNodeConfSuite
+								.get(0));
 				System.out.println(count + " tests of " + fileNames.size());
 			}
-			assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0).equals("[conf:pass: null]"));
+			assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
+					.equals("[conf:pass: null]"));
 			count++;
 			System.out.println(fileName + " test pass");
 		}
@@ -96,7 +105,7 @@ public class W3cInterpreterTest {
 
 	@Test
 	public void w3cManual1() throws SAXException, IOException,
-			InterpreterException {
+			InterpreterException, DOMException, ScriptException {
 		// If the last main FIA loop did not result in a goto nextitem
 		// and there is no form item which is eligible to be visited
 		// then an implicit exit is generated.
@@ -110,7 +119,7 @@ public class W3cInterpreterTest {
 
 	@Test
 	public void w3cVariableScope() throws SAXException, IOException,
-			InterpreterException {
+			InterpreterException, DOMException, ScriptException {
 		// If the last main FIA loop did not result in a goto nextitem
 		// and there is no form item which is eligible to be visited
 		// then an implicit exit is generated.
@@ -118,14 +127,13 @@ public class W3cInterpreterTest {
 		// Read file
 		interpreterContext = new InterpreterContext("w3c/assert165.txml");
 		interpreterContext.launchInterpreter();
-		
-		
+
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());
 	}
 
 	@Test()
-	public void w3cDefaultValueIsUndefined() throws SAXException, IOException, ScriptException
-			 {
+	public void w3cDefaultValueIsUndefined() throws SAXException, IOException,
+			ScriptException {
 		// The default value of the attribute is ECMAScript undefined.
 		// The file (w3c/235.txml) has been modified to adapt to interpret the
 		// tests
@@ -133,8 +141,10 @@ public class W3cInterpreterTest {
 		interpreterContext = new InterpreterContext("w3c/235.txml");
 		interpreterContext.launchInterpreter();
 		interpreterContext.noInput();
-		
+
 		System.out.println(interpreterContext.interpreter.w3cNodeConfSuite);
-		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0).equals("[conf:pass: null]"));
+		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
+				.equals("[conf:pass: null]"));
 	}
+
 }

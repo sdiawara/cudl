@@ -78,7 +78,6 @@ public class InterpreterEventHandler implements InterpreterListener {
 	private List<Node> searchEvent(String eventName, Node parent) {
 		ArrayList<Node> eventList = new ArrayList<Node>();
 		while (parent != null) {
-			System.err.println("parent " + parent);
 			NodeList nodeList = parent.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);

@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.script.ScriptException;
+
 import org.junit.Test;
+import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
@@ -22,7 +25,7 @@ public class InterpreterTest {
 
 	@Test
 	public void variableDeclarationTest() throws SAXException, IOException,
-			InterpreterException {
+			InterpreterException, DOMException, ScriptException {
 
 		interpreterContext = new InterpreterContext("variable.vxml");
 		// interpreterContext.launchInterpreter();
@@ -32,7 +35,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTrace() throws SAXException, IOException {
+	public void testLogTrace() throws SAXException, IOException, DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -50,7 +53,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTraceWithExit() throws SAXException, IOException {
+	public void testLogTraceWithExit() throws SAXException, IOException, DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -66,7 +69,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTraceWhithVariable() throws SAXException, IOException {
+	public void testLogTraceWhithVariable() throws SAXException, IOException, DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 2");
@@ -123,7 +126,7 @@ public class InterpreterTest {
 
 	@Test
 	public void testLogTraceWithIfElseifAndElse() throws SAXException,
-			IOException {
+			IOException, DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -140,13 +143,13 @@ public class InterpreterTest {
 
 		assertTrue(interpreterContext.interpreter.getTraceStat().isEmpty());
 		
-		System.err.println(traceLog);
-		System.err.println(interpreterContext.interpreter.getTraceLog());
+//		System.err.println(traceLog);
+//		System.err.println(interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
 	@Test
-	public void testLogManyBlock() throws SAXException, IOException {
+	public void testLogManyBlock() throws SAXException, IOException, DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -160,7 +163,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogGotoInASameDialog() throws SAXException, IOException {
+	public void testLogGotoInASameDialog() throws SAXException, IOException, DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -176,7 +179,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testCollectPrompt() throws SAXException, IOException {
+	public void testCollectPrompt() throws SAXException, IOException, DOMException, ScriptException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -209,7 +212,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testCombinattionPromptTrace() throws SAXException, IOException {
+	public void testCombinattionPromptTrace() throws SAXException, IOException, DOMException, ScriptException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -226,7 +229,7 @@ public class InterpreterTest {
 	}
 
 	@Test()
-	public void testNodeValue() throws SAXException, IOException {
+	public void testNodeValue() throws SAXException, IOException, DOMException, ScriptException {
 		varExcepted = new TreeMap<String, String>();
 		varExcepted.put("block_0", "defined");
 		varExcepted.put("appli_scope_var",
@@ -251,7 +254,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void sideEffectInScript() throws SAXException, IOException {
+	public void sideEffectInScript() throws SAXException, IOException, DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("bla bla");
 		traceLog.add("un exemple de variable de global avec effet de bord");
@@ -263,20 +266,20 @@ public class InterpreterTest {
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void anonymeScopeVariable() throws SAXException, IOException {
+	public void anonymeScopeVariable() throws SAXException, IOException, DOMException, ScriptException {
 		interpreterContext = new InterpreterContext("anonymeScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void dialogScopeVariable() throws SAXException, IOException {
+	public void dialogScopeVariable() throws SAXException, IOException, DOMException, ScriptException {
 		interpreterContext = new InterpreterContext("dialogScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
 	}
 
 	@Test
 	public void documentScopeVariableIsVisibleInAllDocument()
-			throws SAXException, IOException {
+			throws SAXException, IOException, DOMException, ScriptException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+      xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+<!--
+    A form item variable does not need to have a name attribute.
+-->
+
+  <catch>
+    <conf:comment>
+      Toplevel caught event <value expr="_event"/>
+    </conf:comment>
+    <conf:fail expr="_event"/>
+  </catch>
+
+
+  <form>
+    <field>
+      <conf:speech value="alpha"/>
+      <conf:grammar utterance="alpha" interp="alpha"/>
+    <filled>
+    
+    </field>
+	
+    <block>
+      <conf:pass/>
+    </block>
+  </form>
+
+</vxml>

@@ -1,5 +1,6 @@
 package fr.mbs.vxml.interpreter;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Vector;
@@ -25,48 +26,42 @@ import fr.mbs.vxml.utils.Utils;
 
 public class InterpreterContext {
 	public final static String FILE_DIR = "test/docVxml1/";
-	private Document currentdocDocument;
+	private Document currentdDocument;
 	private Node currentDialog;
 	private NodeList dialogs;
 	public Interpreter interpreter = new Interpreter();
 	private Vector<InterpreterListener> interpreterListeners = new Vector<InterpreterListener>();
 	private String url;
 	public Node field;
+	private Object currentFileName;
 
-	public InterpreterContext(String fileName) throws SAXException, IOException {
+	public InterpreterContext(String fileName) throws SAXException,
+			IOException, DOMException, ScriptException {
 		this(FILE_DIR, fileName);
 	}
 
 	public InterpreterContext(String url, String fileName) throws SAXException,
-			IOException {
+			IOException, DOMException, ScriptException {
 		this.url = url;
 		buildDocument(fileName);
 		interpreterListeners.add(new InterpreterEventHandler());
 	}
 
-	public void launchInterpreter() throws SAXException, IOException {
+	public void launchInterpreter() throws SAXException, IOException,
+			DOMException, ScriptException {
 		try {
 			interpreter.interpretDialog(currentDialog);
-			field = interpreter.selectedItem ;
+			field = interpreter.selectedItem;
 			interpreter.selectedItem = null;
 		} catch (InterpreterException e) {
 			executionHandler(e);
-		} catch (DOMException e) {
-			throw new RuntimeException(e);
-		} catch (ScriptException e) {
-			e.printStackTrace();
 		}
-	}
-
-	public void noInput() throws ScriptException {
-		fireNoInput();
 	}
 
 	public synchronized void addInterpreterListener(
 			InterpreterListener interpreterListener) {
 		if (interpreterListeners.contains(interpreterListener))
 			return;
-
 		interpreterListeners.add(interpreterListener);
 	}
 
@@ -76,7 +71,7 @@ public class InterpreterContext {
 	}
 
 	public void executionHandler(InterpreterException e) throws SAXException,
-			IOException {
+			IOException, DOMException, ScriptException {
 		if (e instanceof GotoException) {
 			GotoException gotoException = (GotoException) e;
 			currentDialog = Utils.searchDialogByName(dialogs,
@@ -88,8 +83,40 @@ public class InterpreterContext {
 		}
 	}
 
+	public void noInput() throws ScriptException {
+		fireNoInput();
+	}
+
 	public void noMatch() throws ScriptException {
 		fireNoMatch();
+	}
+
+	private void buildDocument(String fileName) throws SAXException,
+			IOException, DOMException, ScriptException {
+
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
+				.newInstance();
+		try {
+			DocumentBuilder builder = builderFactory.newDocumentBuilder();
+			currentdDocument = builder.parse(url + fileName);
+			declareDocumentScopeVariableIfNeed(fileName);
+			dialogs = currentdDocument.getElementsByTagName("form");
+			currentDialog = dialogs.item(0);
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void declareDocumentScopeVariableIfNeed(String fileName)
+			throws FileNotFoundException, ScriptException {
+		if (!fileName.equals(currentFileName)) {
+			interpreter.declareVariable(currentdDocument.getElementsByTagName(
+					"vxml").item(0).getChildNodes());
+		
+			currentFileName = fileName;
+
+			
+		}
 	}
 
 	private void fireNoInput() throws ScriptException {
@@ -112,17 +139,4 @@ public class InterpreterContext {
 		}
 	}
 
-	private void buildDocument(String fileName) throws SAXException,
-			IOException {
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-				.newInstance();
-		try {
-			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-			currentdocDocument = builder.parse(url + fileName);
-			dialogs = currentdocDocument.getElementsByTagName("form");
-			currentDialog = dialogs.item(0);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-	}
 }

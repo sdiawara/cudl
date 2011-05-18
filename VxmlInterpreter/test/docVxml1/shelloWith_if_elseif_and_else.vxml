@@ -3,12 +3,12 @@
   <form>
     <block>
     
-     <if cond="true">
+     <if cond="'a'=='a'">
      	<log>LOG Hello</log>
 		<log>LOG Hello 1</log>
      </if> 
       
-      <if cond="true"> 
+      <if cond="'b'=='b'"> 
 	<log>LOG Hello 2</log>	
 	
 	<else/> 

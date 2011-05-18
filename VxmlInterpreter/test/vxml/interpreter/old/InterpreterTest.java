@@ -11,6 +11,7 @@ import javax.xml.xpath.XPathExpressionException;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
@@ -25,7 +26,7 @@ public class InterpreterTest extends TestCase {
 	@Test
 	public void testCallServiceNavigateUntilNextInteractionAndCollectsNavigationTraces()
 			throws IOException, SAXException, XPathExpressionException,
-			TransformerException {
+			TransformerException, DOMException, ScriptException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("new call");
@@ -91,8 +92,6 @@ public class InterpreterTest extends TestCase {
 		interpreterContext.noInput();
 		interpreterContext.noMatch();
 		
-		System.err.println(expectedLogs);
-		System.err.println(interpreterContext.interpreter.getTraceLog());
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 	}
 
