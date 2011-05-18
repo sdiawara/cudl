@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+
+  <script><![CDATA[ 
+    function myMult(n,m) 
+         {
+             return n*m;
+             } 
+         ]]></script>
+  <var name="docVar2" expr="myMult(1,3)"/>
+
+  <form id="myForm2">
+    <block>
+      <if cond="typeof(myFactorial) != 'undefined'">
+        <conf:fail reason="Document scope script myFactorial is still accessible when another document is entered"/>
+      </if>
+
+      <if cond="typeof(docVar1) != 'undefined'">
+        <conf:fail reason="Document scope variable docVar1 is still accessible when another document is entered"/>
+      </if>
+
+      <if cond="typeof(document.myMult) == 'undefined'">
+        <conf:fail reason="Document scope script myMult hasn't been correctly defined"/>
+      </if>
+
+      <if cond="typeof(document.docVar2) == 'undefined'">
+        <conf:fail reason="Document scope variable docVar2 hasn't been correctly defined"/>
+      </if>
+
+      <if cond="docVar2 != 3">
+        <conf:fail reason="Document scope variable docVar2 hasn't been correctly initialized"/>
+      <else/>
+        <conf:pass/>
+      </if>
+    </block>
+  </form>
+</vxml>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+  <script><![CDATA[ 
+    function myFactorial(n) 
+         {
+             return (n <= 1)? 1 : n * myFactorial(n-1);
+    } 
+        ]]></script>
+  <var name="docVar1" expr="myFactorial(3)"/>
+
+  <form id="myForm1">
+    <block>
+      <if cond="typeof(document.myFactorial) == 'undefined'">
+        <conf:fail reason="Document scope script myFactorial hasn't been correctly defined"/>
+      </if>
+
+      <if cond="typeof(document.docVar1) == 'undefined'">
+        <conf:fail reason="Document scope variable docVar1 hasn't been correctly defined"/>
+      </if>
+
+      <if cond="docVar1 != 6">
+        <conf:fail reason="Document scope variable docVar1 hasn't been correctly initialized"/>
+      <else/>
+         <conf:pass/>
+         <goto next="400bis.vxml"/>
+      </if>
+    </block>
+  </form>
+</vxml>

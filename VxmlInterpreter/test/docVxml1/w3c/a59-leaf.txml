@@ -1,6 +1,6 @@
 <!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
-<vxml version="2.0" application="a59-root.vxml"
-   xmlns="http://www.w3.org/2001/vxml"
+<vxml version="2.0" application="a59-root.txml"
+   xmlns="http://www.w3.org/2001/txml"
    xmlns:conf="http://www.w3.org/2002/vxml-conformance"
 >
 
@@ -9,11 +9,9 @@
 
 <form>
   <block>
-   <conf:pass />
-     
-    <if cond="rootvar == undefined">
+    <if cond="rootvar != 7">
       <conf:fail reason="rootvar undefined" />
-    <elseif cond="rootvar != 7" />
+    <elseif cond="rootvar == 'undefined'" />
       <conf:fail expr="'rootvar expected value is 7, actual is' + rootvar" />
     <else />
       <conf:pass />

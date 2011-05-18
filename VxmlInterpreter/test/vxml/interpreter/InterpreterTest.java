@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 import javax.script.ScriptException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
@@ -254,6 +255,7 @@ public class InterpreterTest {
 	}
 
 	@Test
+	@Ignore
 	public void sideEffectInScript() throws SAXException, IOException, DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("bla bla");
@@ -297,6 +299,31 @@ public class InterpreterTest {
 				"documentScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
 
+		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
+	}
+	
+	@Test
+	public void RootVariableIsAllWaysVisible()
+			throws SAXException, IOException, DOMException, ScriptException {
+		List<Prompt> prompts = new ArrayList<Prompt>();
+		Prompt promptExecepeted;
+
+		promptExecepeted = new Prompt();
+		promptExecepeted.tts = "variable application";
+		prompts.add(promptExecepeted);
+		promptExecepeted = new Prompt();
+		promptExecepeted.tts = "variable du document";
+		prompts.add(promptExecepeted);
+//		promptExecepeted = new Prompt();
+//		promptExecepeted.tts = "variable du document3";
+//		prompts.add(promptExecepeted);
+
+		interpreterContext = new InterpreterContext(
+				"rootVariable.vxml");
+		interpreterContext.launchInterpreter();
+
+		System.err.println(prompts);
+		System.err.println(interpreterContext.interpreter.getPrompts());
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.0" application="root.vxml">
+<var name="document_scope_var" expr="'variable du document'"/>
+<form>
+	<block> 
+ 		<prompt><value expr="varRoot"/></prompt>
+ 	</block>
+   <block> 
+ 	 <prompt><value expr="document_scope_var"/></prompt>
+   	</block>
+</form>
+
+</vxml>

@@ -2,6 +2,8 @@ package fr.mbs.vxml.interpreter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -28,12 +30,14 @@ public class InterpreterContext {
 	public final static String FILE_DIR = "test/docVxml1/";
 	private Document currentdDocument;
 	private Node currentDialog;
+	private Document rootDocument;
 	private NodeList dialogs;
 	public Interpreter interpreter = new Interpreter();
 	private Vector<InterpreterListener> interpreterListeners = new Vector<InterpreterListener>();
 	private String url;
 	public Node field;
 	private Object currentFileName;
+	private Object currentRootFileName;
 
 	public InterpreterContext(String fileName) throws SAXException,
 			IOException, DOMException, ScriptException {
@@ -99,23 +103,50 @@ public class InterpreterContext {
 		try {
 			DocumentBuilder builder = builderFactory.newDocumentBuilder();
 			currentdDocument = builder.parse(url + fileName);
-			declareDocumentScopeVariableIfNeed(fileName);
 			dialogs = currentdDocument.getElementsByTagName("form");
 			currentDialog = dialogs.item(0);
+			declareDocumentScopeVariableIfNeed(fileName);
+			Node appplicationRoot = currentdDocument.getElementsByTagName(
+					"vxml").item(0).getAttributes().getNamedItem("application");
+			if (null != appplicationRoot) {
+				String textContent = appplicationRoot.getTextContent();
+				try {
+					String path = new URI(url + fileName).getPath();
+					rootDocument = builder.parse(path.substring(0, path
+							.lastIndexOf("/"))
+							+ "/" + textContent);
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				declareRootScopeVariableIfNeed(textContent);
+			}
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	private void declareRootScopeVariableIfNeed(String textContent)
+			throws FileNotFoundException, DOMException, ScriptException {
+
+		// String textContent = root.getTextContent();
+
+		if (!textContent.equals(currentRootFileName)) {
+			interpreter.declareVariable(rootDocument.getElementsByTagName(
+					"vxml").item(0).getChildNodes(), 3);
+			currentRootFileName = textContent;
+		}
+
+	}
+
 	private void declareDocumentScopeVariableIfNeed(String fileName)
 			throws FileNotFoundException, ScriptException {
 		if (!fileName.equals(currentFileName)) {
+
 			interpreter.declareVariable(currentdDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes());
-		
 			currentFileName = fileName;
 
-			
 		}
 	}
 
@@ -123,8 +154,7 @@ public class InterpreterContext {
 		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
 		for (Iterator<InterpreterListener> iterator = interpreterListeners
 				.iterator(); iterator.hasNext();) {
-			InterpreterListener interpreterListener = iterator
-					.next();
+			InterpreterListener interpreterListener = iterator.next();
 			interpreterListener.noInput(interpreterEvent);
 		}
 	}
@@ -133,8 +163,7 @@ public class InterpreterContext {
 		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
 		for (Iterator<InterpreterListener> iterator = interpreterListeners
 				.iterator(); iterator.hasNext();) {
-			InterpreterListener interpreterListener = iterator
-					.next();
+			InterpreterListener interpreterListener = iterator.next();
 			interpreterListener.NoMatch(interpreterEvent);
 		}
 	}

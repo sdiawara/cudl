@@ -2,6 +2,7 @@ package fr.mbs.vxml.utils;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Map;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -20,8 +21,8 @@ public final class VariableDeclaration {
 	private static final int DIALOG_SCOPE = 1;
 	private static final int DOCUMENT_SCOPE = 2;
 	private static final int APPLICATION_SCOPE = 3;
-	//private static final int SESSION_SCOPE = 4;
-	private static final int NUMBER_OF_SCOPE = 3;
+	// private static final int SESSION_SCOPE = 4;
+	private static final int NUMBER_OF_SCOPE = 4;
 	private int anonymeNameCount = 0;
 
 	private ScriptEngineManager manager = new ScriptEngineManager();
@@ -40,11 +41,11 @@ public final class VariableDeclaration {
 				+ anonymeNameCount++ : name.getNodeValue();
 
 		Node expr = attributes.getNamedItem("expr");
-		Object value = (null == expr) ? "undefined" : engine.eval(expr
-				.getNodeValue());
 
 		ScriptContext context = getContext(scope);
-
+		Object value = (null == expr) ? "undefined"
+				: (null == context) ? engine.eval(expr.getNodeValue()) : engine
+						.eval(expr.getNodeValue(), context);
 		if (null == context) {
 			engine.put(nodeDeclarationName, value);
 		} else {
@@ -78,7 +79,7 @@ public final class VariableDeclaration {
 						&& (context = getContext(tmp)) != null);
 			}
 		}
-		
+
 		return value;
 	}
 
@@ -86,13 +87,16 @@ public final class VariableDeclaration {
 			throws ScriptException, FileNotFoundException {
 
 		Node namedItem = node.getAttributes().getNamedItem("src");
+		String value;
 		if (context == null) {
-			return engine.eval(new FileReader(namedItem.getNodeValue()))
+			value = engine.eval(new FileReader(namedItem.getNodeValue()))
 					.toString();
 		} else {
-			return engine.eval(new FileReader(namedItem.getNodeValue()),
+			value = engine.eval(new FileReader(namedItem.getNodeValue()),
 					context).toString();
 		}
+
+		return value;
 	}
 
 	public String getValue(String declareVariable, int scope) {
@@ -110,7 +114,7 @@ public final class VariableDeclaration {
 			return engine.get(declareVariable) + "";
 
 		throw new IllegalArgumentException(declareVariable
-				+ " is not derclared in this scope " + scope);
+				+ " is not derclared in this scope " + tmp);
 	}
 
 	public void resetScope(int scope) {

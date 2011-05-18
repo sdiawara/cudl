@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.print.attribute.standard.MediaSize.Engineering;
 import javax.script.ScriptException;
 
 import org.w3c.dom.DOMException;
@@ -54,9 +55,9 @@ public class Interpreter {
 			// Just for W3C test
 			put("conf:fail", new NodeExecutor() {
 				public void execute(Node node) {
-					w3cNodeConfSuite.add(node.toString());
-					// System.err.println(node.getAttributes().getNamedItem(
-					// "reason").getNodeValue());
+					w3cNodeConfSuite.add(node.getNodeName()+" reason ="+node.getAttributes().getNamedItem(
+					 "reason").getNodeValue());
+					 
 				}
 			});
 
@@ -92,17 +93,23 @@ public class Interpreter {
 				}
 			});
 			put("script", new NodeExecutor() {
-				public void execute(Node node) {
-					System.err.println("TODO: implemtn script");
+				public void execute(Node node) throws ScriptException {
+					System.err.println("scripppppppppppppppptinnnnnnnng oki");
+					try {
+						variableVxml.evaluateScript(node, getNodeScope(node));
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (DOMException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			});
 			put("var", new NodeExecutor() {
-				public void execute(Node node) {
-					try {
-						variableVxml.declareVariable(node, getNodeScope(node));
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
+				public void execute(Node node) throws DOMException,
+						ScriptException {
+					variableVxml.declareVariable(node, getNodeScope(node));
 				}
 			});
 			put("assign", new NodeExecutor() {
@@ -129,7 +136,7 @@ public class Interpreter {
 					// )
 					// add assert163.txml file from to test
 					if (node.getAttributes().getNamedItem("nextitem") == null) {
-						
+
 						variableVxml.resetScope(1);
 						throw new GotoException(node.getAttributes()
 								.getNamedItem("next").getNodeValue());
@@ -223,6 +230,23 @@ public class Interpreter {
 				}
 			} else if (node.getNodeName().equals("script")) {
 				variableVxml.evaluateScript(node, getNodeScope(node));
+			}
+		}
+	}
+
+	public void declareVariable(NodeList nodeList, int scope)
+			throws FileNotFoundException, DOMException, ScriptException {
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			Node node = nodeList.item(i);
+			if (node.getNodeName().equals("var")
+					|| VxmlElementType.isFormItem(node)) {
+				String declareVariable = variableVxml.declareVariable(node,
+						scope);
+				if (VxmlElementType.isFormItem(node)) {
+					nodeItemVariablesName.put(node, declareVariable);
+				}
+			} else if (node.getNodeName().equals("script")) {
+				variableVxml.evaluateScript(node, scope);
 			}
 		}
 	}
@@ -452,9 +476,10 @@ public class Interpreter {
 	}
 
 	private int getNodeScope(Node node) {
-		if (isAnAnonymeContext(node))
+		Node tmp =VxmlElementType.isConditionalItem(node)?node.getParentNode():node;
+		if (isAnAnonymeContext(tmp))
 			return 0;
-		else if (isAnDialogContext(node))
+		else if (isAnDialogContext(tmp))
 			return 1;
 		else if (node.getParentNode().getNodeName().equals("vxml"))
 			return 2;
@@ -476,8 +501,7 @@ public class Interpreter {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ScriptException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		return false;
 	}
