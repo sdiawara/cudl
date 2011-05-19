@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.print.attribute.standard.MediaSize.Engineering;
+import javax.management.RuntimeErrorException;
 import javax.script.ScriptException;
 
 import org.w3c.dom.DOMException;
@@ -55,9 +55,11 @@ public class Interpreter {
 			// Just for W3C test
 			put("conf:fail", new NodeExecutor() {
 				public void execute(Node node) {
-					w3cNodeConfSuite.add(node.getNodeName()+" reason ="+node.getAttributes().getNamedItem(
-					 "reason").getNodeValue());
-					 
+					w3cNodeConfSuite.add(node.toString());
+//							+ " reason ="
+//							+ node.getAttributes().getNamedItem("reason")
+//									.getNodeValue());
+
 				}
 			});
 
@@ -154,7 +156,7 @@ public class Interpreter {
 
 			});
 			put("log", new NodeExecutor() {
-				public void execute(Node node) {
+				public void execute(Node node) throws DOMException, ScriptException {
 					collectTrace(node);
 				}
 			});
@@ -345,9 +347,11 @@ public class Interpreter {
 
 	private void addPromptWithValue(Node value, Prompt p) throws DOMException,
 			ScriptException {
-		assert (value.getNodeName().endsWith("value"));
-		p.tts += variableVxml.getValue(value.getAttributes().item(0)
-				.getNodeValue(), 0);
+		try {
+			p.tts += variableVxml.evaluateScript(value, 0);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void clearVariable(Node node1) {
@@ -411,7 +415,7 @@ public class Interpreter {
 		return traceStat;
 	}
 
-	private void collectTrace(Node node) {
+	private void collectTrace(Node node) throws DOMException, ScriptException {
 		String value = getNodeValue(node);
 		traceLog.add(value);
 		for (int j = 0; j < node.getAttributes().getLength(); j++) {
@@ -421,16 +425,19 @@ public class Interpreter {
 		}
 	}
 
-	private String getNodeValue(Node node) {
+	private String getNodeValue(Node node) throws  DOMException, ScriptException {
 		NodeList childs = node.getChildNodes();
 		String value = "";
 
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
 			if ("value".equals(child.getNodeName()))
-				value += variableVxml.getValue(child.getAttributes()
-						.getNamedItem("expr").getNodeValue(),
-						getNodeScope(child));
+				try {
+					value +=variableVxml.evaluateScript(node, 0);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			else
 				value += child.getNodeValue();
 		}
@@ -447,6 +454,7 @@ public class Interpreter {
 			if (isAnExecutableItem(item)) { // FIXME: Déplacer dans VxmlElement
 				// la fonction isAnExecutableItem
 				if (conditionChecked) {
+					System.err.println();
 					nodeExecution.get(item.getNodeName()).execute(item);
 				}
 			} else if (VxmlElementType.isConditionalItem(item)) {
@@ -476,7 +484,8 @@ public class Interpreter {
 	}
 
 	private int getNodeScope(Node node) {
-		Node tmp =VxmlElementType.isConditionalItem(node)?node.getParentNode():node;
+		Node tmp = VxmlElementType.isConditionalItem(node) ? node
+				.getParentNode() : node;
 		if (isAnAnonymeContext(tmp))
 			return 0;
 		else if (isAnDialogContext(tmp))

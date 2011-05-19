@@ -65,20 +65,37 @@ public class W3cInterpreterTest {
 //
 //			// The next dialog is determined by the previous dialog.
 //			add("w3c/assert_48_1.txml");
-
-			// Application root document variables are available for use by the
-			// leaf document.
-			
-			add("w3c/a59-leaf.txml");
-
+//
+//			// Application root document variables are available for use by the
+//			// leaf document.
+//
+//			add("w3c/a59-leaf.txml");
+//
 //			// A variable declared at document scope is accessible within an
 //			// anonymous scope contained within the same document.
 //			add("w3c/510.txml");
-//			
+//
 //			// and elements that are children of the document's element create
 //			// their variables at document scope. They are no longer accessible
 //			// when another document is entered.
 //			add("w3c/400.txml");
+//
+//			// Common ECMAScript code can be defined in the application root and
+//			// used in leaf documents.
+//			add("w3c/a61-leaf.txml");
+//
+//			// If the expr attribute specifies a valid ECMAScript expression,
+//			// the value element evaluates it correctly.
+//			// FIXME : script evaluation
+//			add("w3c/377.txml");
+//
+//			// VoiceXML variables and ECMAScript variables are contained in the
+//			// same variable space.
+//			add("w3c/assertion-390.txml");
+
+			// VoiceXML variables can be used in a . Variables defined in a can
+			// be used in VoiceXML.
+			add("w3c/assertion-391.txml");
 		}
 	};
 
@@ -91,7 +108,7 @@ public class W3cInterpreterTest {
 			String fileName = iterator.next();
 
 			interpreterContext = new InterpreterContext(fileName);
-		
+
 			interpreterContext.launchInterpreter();
 
 			if (!(interpreterContext.interpreter.w3cNodeConfSuite.get(0)

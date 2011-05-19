@@ -105,7 +105,6 @@ public class InterpreterContext {
 			currentdDocument = builder.parse(url + fileName);
 			dialogs = currentdDocument.getElementsByTagName("form");
 			currentDialog = dialogs.item(0);
-			declareDocumentScopeVariableIfNeed(fileName);
 			Node appplicationRoot = currentdDocument.getElementsByTagName(
 					"vxml").item(0).getAttributes().getNamedItem("application");
 			if (null != appplicationRoot) {
@@ -121,6 +120,7 @@ public class InterpreterContext {
 				}
 				declareRootScopeVariableIfNeed(textContent);
 			}
+			declareDocumentScopeVariableIfNeed(fileName);
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
@@ -131,10 +131,12 @@ public class InterpreterContext {
 
 		// String textContent = root.getTextContent();
 
+		
 		if (!textContent.equals(currentRootFileName)) {
 			interpreter.declareVariable(rootDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes(), 3);
 			currentRootFileName = textContent;
+			
 		}
 
 	}

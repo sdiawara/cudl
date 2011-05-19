@@ -32,8 +32,7 @@ public final class VariableDeclaration {
 	private ScriptContext document = new SimpleScriptContext();
 	private ScriptContext application = new SimpleScriptContext();
 
-	public String declareVariable(Node node, int scope) throws DOMException,
-			ScriptException {
+	public String declareVariable(Node node, int scope) throws DOMException {
 
 		NamedNodeMap attributes = node.getAttributes();
 		Node name = attributes.getNamedItem("name");
@@ -43,14 +42,27 @@ public final class VariableDeclaration {
 		Node expr = attributes.getNamedItem("expr");
 
 		ScriptContext context = getContext(scope);
-		Object value = (null == expr) ? "undefined"
-				: (null == context) ? engine.eval(expr.getNodeValue()) : engine
-						.eval(expr.getNodeValue(), context);
+		Object value = null;
+		int tmp = scope;
+		do {
+			try {
+
+				value = (null == expr) ? "undefined"
+						: (null == context) ? engine.eval(expr.getNodeValue())
+								: engine.eval(expr.getNodeValue(), context);
+				if (value != null) {
+					System.err.println("name="+nodeDeclarationName+ " expr="+value);
+					break;
+				}
+			} catch (ScriptException e) {
+			}
+		} while (++tmp < NUMBER_OF_SCOPE && (context = getContext(tmp)) != null);
+
 		if (null == context) {
 			engine.put(nodeDeclarationName, value);
 		} else {
 			context.getBindings(ScriptContext.ENGINE_SCOPE).put(
-					nodeDeclarationName, value + "");
+					nodeDeclarationName, value );
 		}
 
 		return nodeDeclarationName;
@@ -63,7 +75,7 @@ public final class VariableDeclaration {
 		String value = "";
 		if (node.getAttributes() != null
 				&& node.getAttributes().getLength() > 0) {
-			value = evaluateScriptWithSrc(node, context);
+			value = evaluateScriptWithAttribute(node, scope);
 		} else {
 			if (context == null) {
 				value = engine.eval(node.getTextContent()) + "";
@@ -73,6 +85,8 @@ public final class VariableDeclaration {
 					try {
 						value = engine.eval(node.getTextContent(), context)
 								+ "";
+						if (value != "")
+							break;
 					} catch (ScriptException e) {
 					}
 				} while (++tmp < NUMBER_OF_SCOPE
@@ -83,17 +97,41 @@ public final class VariableDeclaration {
 		return value;
 	}
 
-	private String evaluateScriptWithSrc(Node node, ScriptContext context)
+	private String evaluateScriptWithAttribute(Node node, int scope)
 			throws ScriptException, FileNotFoundException {
-
+		ScriptContext context = getContext(scope);
 		Node namedItem = node.getAttributes().getNamedItem("src");
-		String value;
-		if (context == null) {
-			value = engine.eval(new FileReader(namedItem.getNodeValue()))
-					.toString();
+		String value = "";
+		if (null != namedItem) {
+			if (context == null) {
+				value = engine.eval(new FileReader(namedItem.getNodeValue()))
+						.toString();
+			} else {
+
+				value = engine.eval(new FileReader(namedItem.getNodeValue()),
+						context).toString();
+			}
 		} else {
-			value = engine.eval(new FileReader(namedItem.getNodeValue()),
-					context).toString();
+			namedItem = node.getAttributes().getNamedItem("expr");
+			if (context == null) {
+				value = engine.eval(namedItem.getNodeValue()).toString();
+			} else {
+				int tmp = scope;
+				do {
+					try {
+						value = engine.eval(namedItem.getNodeValue(), context)
+								.toString();
+						if (value != "") {
+							break;
+						}
+					} catch (ScriptException e) {
+					}
+				} while (++tmp < NUMBER_OF_SCOPE
+						&& (context = getContext(tmp)) != null);
+				if ("".equals(value))
+					throw new IllegalArgumentException();
+			}
+
 		}
 
 		return value;
