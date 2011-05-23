@@ -5,23 +5,22 @@
   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
 >
 
+
   <catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
 
-  <var name="x" expr="2"/>
-  <script>
-   <![CDATA[
-     var y = 1 + x;  
-   ]]>
-  </script>
+  <var name="x"/>
 
   <form>
     <block>
-      <var name="z" expr="y + x"/>
-      <if cond="z == 5">
-         <conf:pass/>
-      <else/>
-         <conf:fail expr="failed to use all defined variables"/>
-      </if>
+     <if cond="x === 'undefined'">
+      <conf:pass/>
+     <else/>
+      <conf:fail expr="'failed because x was not undefined'"/>
+     </if>
     </block>
   </form>
+
 </vxml>
+
+ 
+

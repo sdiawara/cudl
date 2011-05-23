@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.management.RuntimeErrorException;
 import javax.script.ScriptException;
 
 import org.w3c.dom.DOMException;
@@ -56,9 +55,15 @@ public class Interpreter {
 			put("conf:fail", new NodeExecutor() {
 				public void execute(Node node) {
 					w3cNodeConfSuite.add(node.toString());
-//							+ " reason ="
-//							+ node.getAttributes().getNamedItem("reason")
-//									.getNodeValue());
+					NamedNodeMap attributes = node.getAttributes();
+					if (attributes == null)
+						return;
+					Node namedItem = attributes.getNamedItem("reason");
+					System.err.println(namedItem);
+					System.err
+							.println(" reason =" + namedItem != null ? namedItem
+									.getNodeValue()
+									: "undefined reason");
 
 				}
 			});
@@ -96,14 +101,12 @@ public class Interpreter {
 			});
 			put("script", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException {
-					System.err.println("scripppppppppppppppptinnnnnnnng oki");
+
 					try {
 						variableVxml.evaluateScript(node, getNodeScope(node));
 					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (DOMException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -137,8 +140,9 @@ public class Interpreter {
 					// FIXME: do same for expritem (script interpretation value
 					// )
 					// add assert163.txml file from to test
-					if (node.getAttributes().getNamedItem("nextitem") == null) {
 
+					if (node.getAttributes().getNamedItem("nextitem") == null) {
+						variableVxml.resetScope(0);
 						variableVxml.resetScope(1);
 						throw new GotoException(node.getAttributes()
 								.getNamedItem("next").getNodeValue());
@@ -156,7 +160,8 @@ public class Interpreter {
 
 			});
 			put("log", new NodeExecutor() {
-				public void execute(Node node) throws DOMException, ScriptException {
+				public void execute(Node node) throws DOMException,
+						ScriptException {
 					collectTrace(node);
 				}
 			});
@@ -211,8 +216,8 @@ public class Interpreter {
 			}
 			// FIXME: remove 0
 
-			// System.out.println("After selection ["+
 			// variables.get(selectedItem)+"]"+" n°"
+			// System.out.println("After selection ["+
 			// +i+++" "+currentNodeVariables);
 			// TODO: PHASE PROCESS
 		}
@@ -360,10 +365,10 @@ public class Interpreter {
 
 		for (int i = 0; i < nameList.length; i++) {
 			try {
-				variableVxml.setValue(nameList[i], "'undefined'",
+				variableVxml.setValue(nameList[i], "undefined",
 						getNodeScope(node1));
 			} catch (ScriptException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -425,7 +430,7 @@ public class Interpreter {
 		}
 	}
 
-	private String getNodeValue(Node node) throws  DOMException, ScriptException {
+	private String getNodeValue(Node node) throws DOMException, ScriptException {
 		NodeList childs = node.getChildNodes();
 		String value = "";
 
@@ -433,7 +438,7 @@ public class Interpreter {
 			Node child = childs.item(i);
 			if ("value".equals(child.getNodeName()))
 				try {
-					value +=variableVxml.evaluateScript(node, 0);
+					value += variableVxml.evaluateScript(node, 0);
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -454,7 +459,6 @@ public class Interpreter {
 			if (isAnExecutableItem(item)) { // FIXME: Déplacer dans VxmlElement
 				// la fonction isAnExecutableItem
 				if (conditionChecked) {
-					System.err.println();
 					nodeExecution.get(item.getNodeName()).execute(item);
 				}
 			} else if (VxmlElementType.isConditionalItem(item)) {

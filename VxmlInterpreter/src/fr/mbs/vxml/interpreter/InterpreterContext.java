@@ -1,22 +1,22 @@
 package fr.mbs.vxml.interpreter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Vector;
 
 import javax.script.ScriptException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.xml.XmlPage;
 
 import fr.mbs.vxml.interpreter.event.InterpreterEvent;
 import fr.mbs.vxml.interpreter.event.InterpreterEventHandler;
@@ -25,30 +25,36 @@ import fr.mbs.vxml.interpreter.execption.GotoException;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.interpreter.execption.SubmitException;
 import fr.mbs.vxml.utils.Utils;
+import fr.mbs.vxml.utils.VxmlDefaultPageCreator;
 
-public class InterpreterContext {
-	public final static String FILE_DIR = "test/docVxml1/";
+public class InterpreterContext extends WebClient {
+	public final static String FILE_DIR = "/test/docVxml1/";
 	private Document currentdDocument;
 	private Node currentDialog;
 	private Document rootDocument;
 	private NodeList dialogs;
 	public Interpreter interpreter = new Interpreter();
 	private Vector<InterpreterListener> interpreterListeners = new Vector<InterpreterListener>();
-	private String url;
+
 	public Node field;
-	private Object currentFileName;
-	private Object currentRootFileName;
+	private String currentFileName;
+	private String currentRootFileName;
 
 	public InterpreterContext(String fileName) throws SAXException,
 			IOException, DOMException, ScriptException {
-		this(FILE_DIR, fileName);
-	}
-
-	public InterpreterContext(String url, String fileName) throws SAXException,
-			IOException, DOMException, ScriptException {
-		this.url = url;
+		setPageCreator(new VxmlDefaultPageCreator());
 		buildDocument(fileName);
 		interpreterListeners.add(new InterpreterEventHandler());
+	}
+
+	private String tackWeelFormedUrl(String relativePath) throws IOException {
+		if (relativePath.startsWith("http://")
+				|| relativePath.startsWith("file://"))
+			return relativePath;
+		
+		return "file://" + new File(".").getCanonicalPath().toString()
+				+ FILE_DIR + relativePath;
+
 	}
 
 	public void launchInterpreter() throws SAXException, IOException,
@@ -95,35 +101,26 @@ public class InterpreterContext {
 		fireNoMatch();
 	}
 
-	private void buildDocument(String fileName) throws SAXException,
-			IOException, DOMException, ScriptException {
+	private void buildDocument(String fileName) throws ScriptException,
+			IOException {
 
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-				.newInstance();
-		try {
-			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-			currentdDocument = builder.parse(url + fileName);
-			dialogs = currentdDocument.getElementsByTagName("form");
-			currentDialog = dialogs.item(0);
-			Node appplicationRoot = currentdDocument.getElementsByTagName(
-					"vxml").item(0).getAttributes().getNamedItem("application");
-			if (null != appplicationRoot) {
-				String textContent = appplicationRoot.getTextContent();
-				try {
-					String path = new URI(url + fileName).getPath();
-					rootDocument = builder.parse(path.substring(0, path
-							.lastIndexOf("/"))
-							+ "/" + textContent);
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				declareRootScopeVariableIfNeed(textContent);
-			}
-			declareDocumentScopeVariableIfNeed(fileName);
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
+		String url = tackWeelFormedUrl(fileName);
+
+		XmlPage page = getPage(url);
+		currentdDocument = page.getXmlDocument();
+		dialogs = currentdDocument.getElementsByTagName("form");
+		currentDialog = dialogs.item(0);
+		Node appplicationRoot = currentdDocument.getElementsByTagName("vxml")
+				.item(0).getAttributes().getNamedItem("application");
+		if (null != appplicationRoot) {
+			String rootUrl = tackWeelFormedUrl(appplicationRoot
+					.getTextContent());
+			System.err.println(rootUrl);
+			XmlPage rootPage = getPage(rootUrl);
+			rootDocument = rootPage.getXmlDocument();
+			declareRootScopeVariableIfNeed(rootUrl);
 		}
+		declareDocumentScopeVariableIfNeed(fileName);
 	}
 
 	private void declareRootScopeVariableIfNeed(String textContent)
@@ -131,12 +128,11 @@ public class InterpreterContext {
 
 		// String textContent = root.getTextContent();
 
-		
 		if (!textContent.equals(currentRootFileName)) {
 			interpreter.declareVariable(rootDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes(), 3);
 			currentRootFileName = textContent;
-			
+
 		}
 
 	}

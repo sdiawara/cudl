@@ -2,7 +2,6 @@ package fr.mbs.vxml.utils;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.Map;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -26,14 +25,14 @@ public final class VariableDeclaration {
 	private int anonymeNameCount = 0;
 
 	private ScriptEngineManager manager = new ScriptEngineManager();
-	private ScriptEngine engine = manager.getEngineByName("js");
+	private ScriptEngine engine = manager.getEngineByName("ecmascript");
+
 	private ScriptContext anonyme = new SimpleScriptContext();
 	private ScriptContext dialog = new SimpleScriptContext();
 	private ScriptContext document = new SimpleScriptContext();
 	private ScriptContext application = new SimpleScriptContext();
 
 	public String declareVariable(Node node, int scope) throws DOMException {
-
 		NamedNodeMap attributes = node.getAttributes();
 		Node name = attributes.getNamedItem("name");
 		String nodeDeclarationName = (name == null) ? node.getNodeName() + "_"
@@ -51,7 +50,6 @@ public final class VariableDeclaration {
 						: (null == context) ? engine.eval(expr.getNodeValue())
 								: engine.eval(expr.getNodeValue(), context);
 				if (value != null) {
-					System.err.println("name="+nodeDeclarationName+ " expr="+value);
 					break;
 				}
 			} catch (ScriptException e) {
@@ -62,7 +60,7 @@ public final class VariableDeclaration {
 			engine.put(nodeDeclarationName, value);
 		} else {
 			context.getBindings(ScriptContext.ENGINE_SCOPE).put(
-					nodeDeclarationName, value );
+					nodeDeclarationName, value);
 		}
 
 		return nodeDeclarationName;
@@ -85,15 +83,19 @@ public final class VariableDeclaration {
 					try {
 						value = engine.eval(node.getTextContent(), context)
 								+ "";
-						if (value != "")
+
+						if (!("".equals(value))) {
+							System.err.println("expr= " + node.getTextContent()
+									+ " scope=" + tmp);
+							System.err.println("value =" + value);
 							break;
+						}
 					} catch (ScriptException e) {
 					}
 				} while (++tmp < NUMBER_OF_SCOPE
 						&& (context = getContext(tmp)) != null);
 			}
 		}
-
 		return value;
 	}
 
@@ -121,13 +123,14 @@ public final class VariableDeclaration {
 					try {
 						value = engine.eval(namedItem.getNodeValue(), context)
 								.toString();
-						if (value != "") {
+						if (!"".equals(value)) {
 							break;
 						}
 					} catch (ScriptException e) {
 					}
 				} while (++tmp < NUMBER_OF_SCOPE
 						&& (context = getContext(tmp)) != null);
+				
 				if ("".equals(value))
 					throw new IllegalArgumentException();
 			}
