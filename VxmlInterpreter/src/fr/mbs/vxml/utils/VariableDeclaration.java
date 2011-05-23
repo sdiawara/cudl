@@ -85,9 +85,9 @@ public final class VariableDeclaration {
 								+ "";
 
 						if (!("".equals(value))) {
-							System.err.println("expr= " + node.getTextContent()
-									+ " scope=" + tmp);
-							System.err.println("value =" + value);
+//							System.err.println("expr= " + node.getTextContent()
+//									+ " scope=" + tmp);
+//							System.err.println("value =" + value);
 							break;
 						}
 					} catch (ScriptException e) {

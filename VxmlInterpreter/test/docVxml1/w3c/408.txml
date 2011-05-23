@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<vxml version="2.0" application="w3c/408r.txml"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+ <catch>
+  <conf:fail expr="'document caught event ' + _event"/>
+ </catch>
+
+ <var name="leVar" expr="1"/>
+
+
+ <form id="first">
+
+  <block>
+   <var name="leVar" expr="2"/>
+
+   <if cond="leVar != 2">
+    <conf:comment>
+     Failed inside first form block, value is <value expr="leVar"/>
+    </conf:comment>
+    <conf:fail reason="'Inside first form block, value is ' + leVar"/>
+   <else/>
+    <conf:comment>
+     Passed first, value is <value expr="leVar"/>
+    </conf:comment>
+    <goto next="#second"/>
+   </if>
+  </block>
+
+ </form>
+
+
+ <form id="second">
+  <block>
+   <if cond="leVar != 1">
+    <conf:comment>
+     Failed inside second form block, value is <value expr="leVar"/>
+    </conf:comment>
+    <conf:fail reason="'Inside second form block, value is ' + leVar"/>
+   <else/>
+    <conf:comment>
+     Passed second, value is <value expr="leVar"/>
+    </conf:comment>
+    <conf:pass/>
+   </if>
+  </block>
+ </form>
+
+</vxml>

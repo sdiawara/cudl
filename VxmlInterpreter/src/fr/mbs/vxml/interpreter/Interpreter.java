@@ -58,12 +58,12 @@ public class Interpreter {
 					NamedNodeMap attributes = node.getAttributes();
 					if (attributes == null)
 						return;
-					Node namedItem = attributes.getNamedItem("reason");
-					System.err.println(namedItem);
-					System.err
-							.println(" reason =" + namedItem != null ? namedItem
-									.getNodeValue()
-									: "undefined reason");
+				//	Node namedItem = attributes.getNamedItem("reason");
+//					System.err.println(namedItem);
+//					System.err
+//							.println(" reason =" + namedItem != null ? namedItem
+//									.getNodeValue()
+//									: "undefined reason");
 
 				}
 			});

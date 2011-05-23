@@ -147,8 +147,6 @@ public class InterpreterTest {
 
 		assertTrue(interpreterContext.interpreter.getTraceStat().isEmpty());
 
-		// System.err.println(traceLog);
-		// System.err.println(interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
@@ -258,9 +256,6 @@ public class InterpreterTest {
 		interpreterContext = new InterpreterContext("root.vxml");
 		interpreterContext.launchInterpreter();
 
-		System.err.println(prompts);
-		System.err.println(interpreterContext.interpreter.getPrompts());
-		// ssertEquals(varExcepted, interpreterContext.interpreter.getVar());
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
 
@@ -320,7 +315,7 @@ public class InterpreterTest {
 			IOException, DOMException, ScriptException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
-
+		
 		promptExecepeted = new Prompt();
 		promptExecepeted.tts = "variable application";
 		prompts.add(promptExecepeted);

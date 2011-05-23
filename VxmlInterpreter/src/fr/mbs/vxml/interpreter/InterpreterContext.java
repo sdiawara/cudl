@@ -1,7 +1,6 @@
 package fr.mbs.vxml.interpreter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
@@ -49,17 +48,28 @@ public class InterpreterContext extends WebClient {
 
 	private String tackWeelFormedUrl(String relativePath) throws IOException {
 		if (relativePath.startsWith("http://")
-				|| relativePath.startsWith("file://"))
+				|| relativePath.startsWith("file://")) {
+			System.err.println(relativePath);
 			return relativePath;
-		
+		}
+
+		if (null != currentFileName && currentFileName.startsWith("http://")) {
+			URL tempUrl = new URL(currentFileName);
+
+			System.err.println(tempUrl.getProtocol() + "://"
+					+ tempUrl.getHost() + "/" + relativePath);
+			return tempUrl.getProtocol() + "://" + tempUrl.getHost() + "/"
+					+ relativePath;
+		}
+
 		return "file://" + new File(".").getCanonicalPath().toString()
 				+ FILE_DIR + relativePath;
-
 	}
 
 	public void launchInterpreter() throws SAXException, IOException,
 			DOMException, ScriptException {
 		try {
+
 			interpreter.interpretDialog(currentDialog);
 			field = interpreter.selectedItem;
 			interpreter.selectedItem = null;
@@ -124,26 +134,21 @@ public class InterpreterContext extends WebClient {
 	}
 
 	private void declareRootScopeVariableIfNeed(String textContent)
-			throws FileNotFoundException, DOMException, ScriptException {
-
-		// String textContent = root.getTextContent();
-
+			throws DOMException, ScriptException, IOException {
 		if (!textContent.equals(currentRootFileName)) {
 			interpreter.declareVariable(rootDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes(), 3);
-			currentRootFileName = textContent;
-
+			currentRootFileName = tackWeelFormedUrl(textContent);
 		}
-
 	}
 
 	private void declareDocumentScopeVariableIfNeed(String fileName)
-			throws FileNotFoundException, ScriptException {
+			throws ScriptException, IOException {
 		if (!fileName.equals(currentFileName)) {
 
 			interpreter.declareVariable(currentdDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes());
-			currentFileName = fileName;
+			currentFileName = tackWeelFormedUrl(fileName);
 
 		}
 	}
