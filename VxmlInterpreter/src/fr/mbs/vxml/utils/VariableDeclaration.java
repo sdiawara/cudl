@@ -20,8 +20,8 @@ public final class VariableDeclaration {
 	private static final int DIALOG_SCOPE = 1;
 	private static final int DOCUMENT_SCOPE = 2;
 	private static final int APPLICATION_SCOPE = 3;
-	// private static final int SESSION_SCOPE = 4;
-	private static final int NUMBER_OF_SCOPE = 4;
+	//private static final int SESSION_SCOPE = 4;
+	private static final int NUMBER_OF_SCOPE = 5;
 	private int anonymeNameCount = 0;
 
 	private ScriptEngineManager manager = new ScriptEngineManager();
@@ -31,6 +31,7 @@ public final class VariableDeclaration {
 	private ScriptContext dialog = new SimpleScriptContext();
 	private ScriptContext document = new SimpleScriptContext();
 	private ScriptContext application = new SimpleScriptContext();
+	private ScriptContext session = new SimpleScriptContext();
 
 	public String declareVariable(Node node, int scope) throws DOMException {
 		NamedNodeMap attributes = node.getAttributes();
@@ -53,6 +54,7 @@ public final class VariableDeclaration {
 					break;
 				}
 			} catch (ScriptException e) {
+				System.err.println(e);
 			}
 		} while (++tmp < NUMBER_OF_SCOPE && (context = getContext(tmp)) != null);
 
@@ -64,6 +66,11 @@ public final class VariableDeclaration {
 		}
 
 		return nodeDeclarationName;
+	}
+
+	public void declareVariable(String script, int scope)
+			throws ScriptException, FileNotFoundException {
+		engine.eval(new FileReader(script), session);
 	}
 
 	public String evaluateScript(Node node, int scope)
@@ -85,12 +92,10 @@ public final class VariableDeclaration {
 								+ "";
 
 						if (!("".equals(value))) {
-//							System.err.println("expr= " + node.getTextContent()
-//									+ " scope=" + tmp);
-//							System.err.println("value =" + value);
 							break;
 						}
 					} catch (ScriptException e) {
+						System.err.println(e.getCause().getMessage().indexOf(""));
 					}
 				} while (++tmp < NUMBER_OF_SCOPE
 						&& (context = getContext(tmp)) != null);
@@ -127,10 +132,12 @@ public final class VariableDeclaration {
 							break;
 						}
 					} catch (ScriptException e) {
+						System.err.println(e);
 					}
 				} while (++tmp < NUMBER_OF_SCOPE
 						&& (context = getContext(tmp)) != null);
-				
+
+				System.err.println(tmp);
 				if ("".equals(value))
 					throw new IllegalArgumentException();
 			}
@@ -167,14 +174,19 @@ public final class VariableDeclaration {
 			throws ScriptException {
 		int tmp = scope - 1;
 		ScriptContext context;
-		while (++tmp < NUMBER_OF_SCOPE && (context = getContext(tmp)) != null) {
+		while (++tmp < NUMBER_OF_SCOPE - 1
+				&& (context = getContext(tmp)) != null) {
 			Bindings bindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
 			if (bindings.containsKey(declareVariable)) {
+
 				bindings.put(declareVariable, engine.eval(expr));
 				return;
 			}
 		}
-		engine.put(declareVariable, engine.eval(expr));
+		if (engine.getBindings(ScriptContext.ENGINE_SCOPE).containsKey(
+				declareVariable)) {
+			engine.put(declareVariable, engine.eval(expr));
+		}
 	}
 
 	private ScriptContext getContext(int scope) {

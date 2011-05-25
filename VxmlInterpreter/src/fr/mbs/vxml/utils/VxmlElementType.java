@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class VxmlElementType {
-	
+
 	private static final Set<String> EVENT = new HashSet<String>() {
 		{
 			add("noinput");
@@ -18,7 +18,7 @@ public class VxmlElementType {
 			add("help");
 		}
 	};
-	
+
 	private static final Set<String> DIALOG = new HashSet<String>() {
 		{
 			add("menu");
@@ -32,7 +32,7 @@ public class VxmlElementType {
 			add("initial");
 		}
 	};
-	
+
 	private static final Set<String> FORM_INPUT_ITEM_TYPES = new HashSet<String>() {
 		{
 			add("field");
@@ -62,7 +62,7 @@ public class VxmlElementType {
 	public static boolean isAnEvent(Node node) {
 		return EVENT.contains(node.getNodeName());
 	}
-	
+
 	public static boolean isSimpleIfItem(Node item) {
 		assert (item.getNodeName().equals("if"));
 		return getIfItemConditionChildsNumber(item) == 0;

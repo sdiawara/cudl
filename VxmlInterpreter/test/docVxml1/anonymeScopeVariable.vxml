@@ -3,7 +3,7 @@
 
 <form>
 	   <block> 
-			<var name="block_0_scope_var" expr="toto='variable de global'; 'variable de block'"/>
+		<var name="block_0_scope_var" expr="toto='variable de global'; 'variable de block'"/>
 		<prompt><value expr="block_0_scope_var"/></prompt>
    </block>
    <block> 

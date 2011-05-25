@@ -1,14 +1,17 @@
 package fr.mbs.vxml.interpreter.execption;
 
+import javax.script.ScriptException;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import fr.mbs.vxml.utils.VariableDeclaration;
+import fr.mbs.vxml.script.InterpreterVariableDeclaration;
 
 public class SubmitException extends InterpreterException {
 	public String next;
 
-	public SubmitException(Node node, VariableDeclaration variableVxml) {
+	public SubmitException(Node node, InterpreterVariableDeclaration declaration)
+			throws ScriptException {
 		NamedNodeMap attributes = node.getAttributes();
 		this.next = attributes.getNamedItem("next").getNodeValue();
 
@@ -20,10 +23,9 @@ public class SubmitException extends InterpreterException {
 			String declareVariable = namelist[i];
 
 			urlSuite += declareVariable + "="
-					+ variableVxml.getValue(declareVariable, 0) + "&";
+					+ declaration.getValue(declareVariable) + "&";
 
 		}
-
 		this.next += urlSuite;
 	}
 }

@@ -12,7 +12,7 @@
 
   <form>
     <block>
-     <if cond="x === 'undefined'">
+     <if cond="x == undefined">
       <conf:pass/>
      <else/>
       <conf:fail expr="'failed because x was not undefined'"/>

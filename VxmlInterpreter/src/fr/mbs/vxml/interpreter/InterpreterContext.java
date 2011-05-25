@@ -42,6 +42,7 @@ public class InterpreterContext extends WebClient {
 	public InterpreterContext(String fileName) throws SAXException,
 			IOException, DOMException, ScriptException {
 		setPageCreator(new VxmlDefaultPageCreator());
+		interpreter.setSessionVariable();
 		buildDocument(fileName);
 		interpreterListeners.add(new InterpreterEventHandler());
 	}
@@ -49,15 +50,14 @@ public class InterpreterContext extends WebClient {
 	private String tackWeelFormedUrl(String relativePath) throws IOException {
 		if (relativePath.startsWith("http://")
 				|| relativePath.startsWith("file://")) {
-			System.err.println(relativePath);
 			return relativePath;
 		}
 
 		if (null != currentFileName && currentFileName.startsWith("http://")) {
 			URL tempUrl = new URL(currentFileName);
 
-			System.err.println(tempUrl.getProtocol() + "://"
-					+ tempUrl.getHost() + "/" + relativePath);
+			// System.err.println(tempUrl.getProtocol() + "://"
+			// + tempUrl.getHost() + "/" + relativePath);
 			return tempUrl.getProtocol() + "://" + tempUrl.getHost() + "/"
 					+ relativePath;
 		}
@@ -125,7 +125,6 @@ public class InterpreterContext extends WebClient {
 		if (null != appplicationRoot) {
 			String rootUrl = tackWeelFormedUrl(appplicationRoot
 					.getTextContent());
-			System.err.println(rootUrl);
 			XmlPage rootPage = getPage(rootUrl);
 			rootDocument = rootPage.getXmlDocument();
 			declareRootScopeVariableIfNeed(rootUrl);
@@ -145,7 +144,6 @@ public class InterpreterContext extends WebClient {
 	private void declareDocumentScopeVariableIfNeed(String fileName)
 			throws ScriptException, IOException {
 		if (!fileName.equals(currentFileName)) {
-
 			interpreter.declareVariable(currentdDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes());
 			currentFileName = tackWeelFormedUrl(fileName);

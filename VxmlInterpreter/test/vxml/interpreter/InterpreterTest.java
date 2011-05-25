@@ -11,29 +11,16 @@ import java.util.TreeMap;
 
 import javax.script.ScriptException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.DOMException;
 import org.xml.sax.SAXException;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
-import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.utils.Prompt;
 
 public class InterpreterTest {
 	private Map<String, String> varExcepted = new TreeMap<String, String>();
 	private InterpreterContext interpreterContext;
-
-	@Test
-	public void variableDeclarationTest() throws SAXException, IOException,
-			InterpreterException, DOMException, ScriptException {
-
-		interpreterContext = new InterpreterContext("variable.vxml");
-		// interpreterContext.launchInterpreter();
-
-		// assertEquals("3.0",
-		// interpreterContext.interpreter.variableVxml.getValue("trois"));
-	}
 
 	@Test
 	public void testLogTrace() throws SAXException, IOException, DOMException,
@@ -260,7 +247,6 @@ public class InterpreterTest {
 	}
 
 	@Test
-	@Ignore
 	public void sideEffectInScript() throws SAXException, IOException,
 			DOMException, ScriptException {
 		List<String> traceLog = new ArrayList<String>();
@@ -273,16 +259,17 @@ public class InterpreterTest {
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = ScriptException.class)
 	public void anonymeScopeVariable() throws SAXException, IOException,
 			DOMException, ScriptException {
+
 		interpreterContext = new InterpreterContext("anonymeScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void dialogScopeVariable() throws SAXException, IOException,
-			DOMException, ScriptException {
+	@Test(expected = ScriptException.class)
+	public void dialogScopeVariable() throws DOMException, SAXException,
+			IOException, ScriptException {
 		interpreterContext = new InterpreterContext("dialogScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
 	}
@@ -315,20 +302,26 @@ public class InterpreterTest {
 			IOException, DOMException, ScriptException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
-		
+
 		promptExecepeted = new Prompt();
 		promptExecepeted.tts = "variable application";
 		prompts.add(promptExecepeted);
 		promptExecepeted = new Prompt();
 		promptExecepeted.tts = "variable du document";
 		prompts.add(promptExecepeted);
-		// promptExecepeted = new Prompt();
-		// promptExecepeted.tts = "variable du document3";
-		// prompts.add(promptExecepeted);
 
 		interpreterContext = new InterpreterContext("rootVariable.vxml");
 		interpreterContext.launchInterpreter();
 
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
+	}
+
+	@Test
+	public void comparerTwoVariableInDifferentScope() throws DOMException,
+			SAXException, IOException, ScriptException {
+
+		interpreterContext = new InterpreterContext(
+				"compareTwoVariableDeclaredIndifferentScope");
+		interpreterContext.launchInterpreter();
 	}
 }

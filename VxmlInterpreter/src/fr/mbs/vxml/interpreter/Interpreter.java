@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.script.ScriptException;
@@ -20,16 +19,16 @@ import fr.mbs.vxml.interpreter.execption.FilledException;
 import fr.mbs.vxml.interpreter.execption.GotoException;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.interpreter.execption.SubmitException;
+import fr.mbs.vxml.script.InterpreterScriptContext;
+import fr.mbs.vxml.script.InterpreterVariableDeclaration;
 import fr.mbs.vxml.utils.Prompt;
-import fr.mbs.vxml.utils.VariableDeclaration;
 import fr.mbs.vxml.utils.VxmlElementType;
 
 public class Interpreter {
-	public VariableDeclaration variableVxml = new VariableDeclaration();
+	private InterpreterVariableDeclaration declaration = new InterpreterVariableDeclaration();
 	public Node selectedItem;
 	public List<String> w3cNodeConfSuite = new ArrayList<String>();
 
-	private Map<Node, String> nodeItemVariablesName = new Hashtable<Node, String>();
 	private List<String> traceLog = new ArrayList<String>();
 	private List<String> traceStat = new ArrayList<String>();
 	private List<Prompt> prompts = new ArrayList<Prompt>();
@@ -58,12 +57,12 @@ public class Interpreter {
 					NamedNodeMap attributes = node.getAttributes();
 					if (attributes == null)
 						return;
-				//	Node namedItem = attributes.getNamedItem("reason");
-//					System.err.println(namedItem);
-//					System.err
-//							.println(" reason =" + namedItem != null ? namedItem
-//									.getNodeValue()
-//									: "undefined reason");
+					// Node namedItem = attributes.getNamedItem("reason");
+					// System.err.println(namedItem);
+					// System.err
+					// .println(" reason =" + namedItem != null ? namedItem
+					// .getNodeValue()
+					// : "undefined reason");
 
 				}
 			});
@@ -74,7 +73,7 @@ public class Interpreter {
 				}
 			});
 			put("prompt", new NodeExecutor() {
-				public void execute(Node node) {
+				public void execute(Node node) throws ScriptException {
 					collectPrompt(node);
 
 				}
@@ -101,24 +100,19 @@ public class Interpreter {
 			});
 			put("script", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException {
-
-					try {
-						variableVxml.evaluateScript(node, getNodeScope(node));
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					} catch (DOMException e) {
-						e.printStackTrace();
-					}
+					// variableVxml.evaluateScript(node, getNodeScope(node));
+					declaration.evaluateScript(node);
 				}
 			});
 			put("var", new NodeExecutor() {
-				public void execute(Node node) throws DOMException,
-						ScriptException {
-					variableVxml.declareVariable(node, getNodeScope(node));
+				public void execute(Node node) throws ScriptException {
+					// variableVxml.declareVariable(node, getNodeScope(node));
+					declaration.declareVariable(node);
 				}
 			});
 			put("assign", new NodeExecutor() {
-				public void execute(Node node) {
+				public void execute(Node node) throws DOMException,
+						ScriptException {
 					assignVariableValue(node);
 				}
 			});
@@ -142,8 +136,12 @@ public class Interpreter {
 					// add assert163.txml file from to test
 
 					if (node.getAttributes().getNamedItem("nextitem") == null) {
-						variableVxml.resetScope(0);
-						variableVxml.resetScope(1);
+						declaration
+								.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
+						declaration
+								.resetScopeBinding(InterpreterScriptContext.DIALOG_SCOPE);
+						// variableVxml.resetScope(0);
+						// variableVxml.resetScope(1);
 						throw new GotoException(node.getAttributes()
 								.getNamedItem("next").getNodeValue());
 					}
@@ -154,8 +152,8 @@ public class Interpreter {
 			});
 			put("submit", new NodeExecutor() {
 				public void execute(Node node) throws GotoException,
-						SubmitException {
-					throw new SubmitException(node, variableVxml);
+						SubmitException, ScriptException {
+					throw new SubmitException(node, declaration);
 				}
 
 			});
@@ -193,6 +191,7 @@ public class Interpreter {
 			if ((selectedItem = phaseSelect(dialog)) == null) {
 				break;
 			}
+
 			// Exécuter l'élément de formulaire.
 
 			String nodeName = selectedItem.getNodeName();
@@ -202,17 +201,20 @@ public class Interpreter {
 			} else if (nodeName.equals("record")) {
 			} else if (nodeName.equals("object")) {
 			} else if (nodeName.equals("subdialog")) {
-				variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
-						"'defined'", getNodeScope(selectedItem));
+				// variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
+				// "'defined'", getNodeScope(selectedItem));
+				declaration.setValue(selectedItem, "'defined'");
 			} else if (nodeName.equals("transfer")) {
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
-
-				variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
-						"'defined'", getNodeScope(selectedItem));
+				declaration.setValue(selectedItem, "'defined'");
+				// variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
+				// "'defined'", getNodeScope(selectedItem));
 				execute(selectedItem);
 
-				variableVxml.resetScope(0);
+				declaration
+						.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
+				// variableVxml.resetScope(0);
 			}
 			// FIXME: remove 0
 
@@ -227,16 +229,12 @@ public class Interpreter {
 			throws FileNotFoundException, DOMException, ScriptException {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
-			if (node.getNodeName().equals("var")
-					|| VxmlElementType.isFormItem(node)) {
-				String declareVariable = variableVxml.declareVariable(node,
-						VxmlElementType.isFormItem(node) ? 5
-								: getNodeScope(node));
-				if (VxmlElementType.isFormItem(node)) {
-					nodeItemVariablesName.put(node, declareVariable);
-				}
+			if (node.getNodeName().equals("var"))
+				declaration.declareVariable(node);
+			else if (VxmlElementType.isFormItem(node)) {
+				declaration.declareDialogItem(node);
 			} else if (node.getNodeName().equals("script")) {
-				variableVxml.evaluateScript(node, getNodeScope(node));
+				declaration.evaluateScript(node);
 			}
 		}
 	}
@@ -245,15 +243,12 @@ public class Interpreter {
 			throws FileNotFoundException, DOMException, ScriptException {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
-			if (node.getNodeName().equals("var")
-					|| VxmlElementType.isFormItem(node)) {
-				String declareVariable = variableVxml.declareVariable(node,
-						scope);
-				if (VxmlElementType.isFormItem(node)) {
-					nodeItemVariablesName.put(node, declareVariable);
-				}
+			if (node.getNodeName().equals("var"))
+				declaration.declareVariable(node);
+			else if (VxmlElementType.isFormItem(node)) {
+				declaration.declareDialogItem(node);
 			} else if (node.getNodeName().equals("script")) {
-				variableVxml.evaluateScript(node, scope);
+				declaration.evaluateScript(node);
 			}
 		}
 	}
@@ -279,7 +274,7 @@ public class Interpreter {
 		}
 	}
 
-	private void collectPrompt(Node node) {
+	private void collectPrompt(Node node) throws ScriptException {
 		Prompt p = new Prompt();
 		if (node.getNodeName().equals("prompt")) {
 			NamedNodeMap attributes = node.getAttributes();
@@ -323,9 +318,7 @@ public class Interpreter {
 						addPromptWithValue(child, p);
 					} catch (DOMException e) {
 						e.printStackTrace();
-					} catch (ScriptException e) {
-						e.printStackTrace();
-					}
+					} 
 				}
 			}
 		}
@@ -352,41 +345,29 @@ public class Interpreter {
 
 	private void addPromptWithValue(Node value, Prompt p) throws DOMException,
 			ScriptException {
-		try {
-			p.tts += variableVxml.evaluateScript(value, 0);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
+		p.tts += declaration.evaluateScript(value);
 	}
 
 	private void clearVariable(Node node1) {
+
 		String[] nameList = node1.getAttributes().getNamedItem("namelist")
 				.getNodeValue().split(" ");
 
 		for (int i = 0; i < nameList.length; i++) {
-			try {
-				variableVxml.setValue(nameList[i], "undefined",
-						getNodeScope(node1));
-			} catch (ScriptException e) {
-				throw new RuntimeException(e);
-			}
 		}
 	}
 
-	private void assignVariableValue(Node node1) {
+	private void assignVariableValue(Node node1) throws DOMException,
+			ScriptException {
 
-		try {
-			String nodeName = node1.getAttributes().getNamedItem("name")
-					.getNodeValue();
-			Node expr = node1.getAttributes().getNamedItem("expr");
+		// String nodeName = node1.getAttributes().getNamedItem("name")
+		// .getNodeValue();
+		Node expr = node1.getAttributes().getNamedItem("expr");
 
-			variableVxml.setValue(nodeName, expr.getNodeValue(),
-					getNodeScope(node1));
-		} catch (DOMException e) {
-			e.printStackTrace();
-		} catch (ScriptException e) {
-			e.printStackTrace();
-		}
+		// variableVxml.setValue(nodeName, expr.getNodeValue(),
+		// getNodeScope(node1));
+		declaration.setValue(node1, expr.getNodeValue());
+
 	}
 
 	private Node selectDialogNextItemTovisit(Node node) {
@@ -430,20 +411,15 @@ public class Interpreter {
 		}
 	}
 
-	private String getNodeValue(Node node) throws DOMException, ScriptException {
+	private String getNodeValue(Node node) throws ScriptException {
 		NodeList childs = node.getChildNodes();
 		String value = "";
 
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
-			if ("value".equals(child.getNodeName()))
-				try {
-					value += variableVxml.evaluateScript(node, 0);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			else
+			if ("value".equals(child.getNodeName())) {
+				value += declaration.evaluateScript(child);
+			} else
 				value += child.getNodeValue();
 		}
 		return value;
@@ -479,44 +455,16 @@ public class Interpreter {
 		return nodeExecution.get(item.getNodeName()) != null;
 	}
 
-	private boolean isAnAnonymeContext(Node node) {
-		return VxmlElementType.isFormItem(node.getParentNode());
-	}
-
-	private boolean isAnDialogContext(Node node) {
-		return VxmlElementType.isADialog(node.getParentNode());
-	}
-
-	private int getNodeScope(Node node) {
-		Node tmp = VxmlElementType.isConditionalItem(node) ? node
-				.getParentNode() : node;
-		if (isAnAnonymeContext(tmp))
-			return 0;
-		else if (isAnDialogContext(tmp))
-			return 1;
-		else if (node.getParentNode().getNodeName().equals("vxml"))
-			return 2;
-		return 5;
-	}
-
-	private boolean checkCond(Node node) {
+	private boolean checkCond(Node node) throws ScriptException {
 		NamedNodeMap attribute = node.getAttributes();
 		Node cond = (attribute.getLength() == 0) ? null : attribute
 				.getNamedItem("cond");
-		try {
-			return cond == null
-					|| variableVxml.evaluateScript(cond, getNodeScope(node))
-							.equals("true");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ScriptException e) {
-			throw new RuntimeException(e);
-		}
-		return false;
+
+		// return cond == null
+		// || variableVxml.evaluateScript(cond, getNodeScope(node))
+		// .equals("true");
+		return cond == null || declaration.evaluateScript(cond).equals("true");
+
 	}
 
 	private void collectDialogProperty(NodeList nodeList) {
@@ -534,26 +482,29 @@ public class Interpreter {
 				.getNodeValue());
 	}
 
-	private Node phaseSelect(Node dialog) {
-		return (selectedItem != null && variableVxml.getValue(
-				nodeItemVariablesName.get(selectedItem),
-				getNodeScope(selectedItem)).equals("undefined")) ? selectedItem
+	private Node phaseSelect(Node dialog) throws ScriptException {
+		return (selectedItem != null && declaration.getValue(selectedItem)
+				.equals("undefined")) ? selectedItem
 				: unsatisfiedGuardCondition(dialog.getChildNodes());
 	}
 
-	private Node unsatisfiedGuardCondition(NodeList nodeList) {
+	private Node unsatisfiedGuardCondition(NodeList nodeList)
+			throws ScriptException {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 
 			if (VxmlElementType.isFormItem(node)) {
-				if (nodeItemVariablesName.get(node) != null
-						&& variableVxml.getValue(
-								nodeItemVariablesName.get(node), 1).equals(
-								"undefined") && this.checkCond(node)) {
-					return node;
-				}
+				if (declaration.getValue(node).equals("undefined"))
+					if (this.checkCond(node)) {
+						return node;
+					}
 			}
 		}
 		return null;
+	}
+
+	public void setSessionVariable() throws FileNotFoundException,
+			ScriptException {
+		 //declaration.de
 	}
 }

@@ -104,6 +104,8 @@ public class W3cInterpreterTest {
 			// Variable references match the closest enclosing scope.
 			add("w3c/408.txml");
 
+			// Variables in session scope can be read but not written by VoiceXML documents. 
+			//add("w3c/assertion-398.txml");
 		}
 	};
 
@@ -173,6 +175,7 @@ public class W3cInterpreterTest {
 		interpreterContext.launchInterpreter();
 		interpreterContext.noInput();
 
+		System.out.println(interpreterContext.interpreter.w3cNodeConfSuite);
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
 				.equals("[conf:pass: null]"));
 	}

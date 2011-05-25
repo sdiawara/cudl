@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.0">
+<var name="toto" expr="'toto'"/>
+<form>
+<var name="tata" expr="'toto'"/>
+
+
+	   <block>
+	   <if cond="toto == tata" >
+	   	<log > pass </log>
+	   <else />
+	   	<log > fail </log>
+	   </if> 
+  </block>
+   <block> 
+ 		
+   </block>
+</form>
+</vxml>

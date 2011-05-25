@@ -14,11 +14,11 @@
 
   <form id="myForm1">
     <block>
-      <if cond="typeof(document.myFactorial) == 'undefined'">
+      <if cond="typeof(myFactorial) == undefined">
         <conf:fail reason="Document scope script myFactorial hasn't been correctly defined"/>
       </if>
 
-      <if cond="typeof(document.docVar1) == 'undefined'">
+      <if cond="typeof(docVar1) == undefined">
         <conf:fail reason="Document scope variable docVar1 hasn't been correctly defined"/>
       </if>
 

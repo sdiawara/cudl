@@ -31,6 +31,7 @@
 	<target name="clean">
 		<delete dir="${build.dir}" />
 		<delete dir="${test.report.dir}" />
+		<delete dir="${deploy.dir}" />
 	</target>
 
 
@@ -55,14 +56,14 @@
          ================================= -->
 
 	<target name="junit.test" depends="compile">
-		<junit printsummary="yes" haltonfailure="yes"> 
+		<junit printsummary="yes" haltonfailure="yes">
 			<classpath refid="junit.class.path" />
 			<formatter type="xml" />
 			<batchtest todir="${test.report.dir}">
 				<fileset dir="${test.dir}">
 					<include name="**/*.java" />
 				</fileset>
-			</batchtest>
+			</batchtest> 
 		</junit>
 	</target>
 
