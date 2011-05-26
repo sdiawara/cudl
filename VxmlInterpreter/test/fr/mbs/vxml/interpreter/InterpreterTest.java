@@ -1,4 +1,4 @@
-package vxml.interpreter;
+package fr.mbs.vxml.interpreter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

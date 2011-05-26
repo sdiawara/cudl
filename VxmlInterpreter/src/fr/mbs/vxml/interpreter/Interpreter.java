@@ -40,7 +40,7 @@ public class Interpreter {
 		{
 			// TODO: implement interpretation of: reprompt,
 			// return,
-			
+
 			// Just for W3C test
 			put("conf:pass", new NodeExecutor() {
 				public void execute(Node node) throws ExitException {
@@ -130,8 +130,6 @@ public class Interpreter {
 								.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
 						declaration
 								.resetScopeBinding(InterpreterScriptContext.DIALOG_SCOPE);
-						// variableVxml.resetScope(0);
-						// variableVxml.resetScope(1);
 						throw new GotoException(node.getAttributes()
 								.getNamedItem("next").getNodeValue());
 					}
@@ -191,20 +189,14 @@ public class Interpreter {
 			} else if (nodeName.equals("record")) {
 			} else if (nodeName.equals("object")) {
 			} else if (nodeName.equals("subdialog")) {
-				// variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
-				// "'defined'", getNodeScope(selectedItem));
 				declaration.setValue(selectedItem, "'defined'");
 			} else if (nodeName.equals("transfer")) {
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
 				declaration.setValue(selectedItem, "'defined'");
-				// variableVxml.setValue(nodeItemVariablesName.get(selectedItem),
-				// "'defined'", getNodeScope(selectedItem));
 				execute(selectedItem);
-
 				declaration
 						.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
-				// variableVxml.resetScope(0);
 			}
 			// FIXME: remove 0
 
@@ -228,20 +220,6 @@ public class Interpreter {
 			}
 		}
 	}
-
-//	public void declareVariable(NodeList nodeList)
-//			throws FileNotFoundException, DOMException, ScriptException {
-//		for (int i = 0; i < nodeList.getLength(); i++) {
-//			Node node = nodeList.item(i);
-//			if (node.getNodeName().equals("var"))
-//				declaration.declareVariable(node);
-//			else if (VxmlElementType.isFormItem(node)) {
-//				declaration.declareDialogItem(node);
-//			} else if (node.getNodeName().equals("script")) {
-//				declaration.evaluateScript(node);
-//			}
-//		}
-//	}
 
 	public void execute(Node node) throws InterpreterException, ScriptException {
 		NodeList child = node.getChildNodes();
@@ -308,7 +286,7 @@ public class Interpreter {
 						addPromptWithValue(child, p);
 					} catch (DOMException e) {
 						e.printStackTrace();
-					} 
+					}
 				}
 			}
 		}
@@ -495,6 +473,6 @@ public class Interpreter {
 
 	public void setSessionVariable() throws FileNotFoundException,
 			ScriptException {
-		 //declaration.de
+		// declaration.de
 	}
 }

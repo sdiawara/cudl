@@ -1,4 +1,4 @@
-package vxml.interpreter.w3c;
+package fr.mbs.vxml.interpreter.w3c;
 
 import static org.junit.Assert.assertTrue;
 

@@ -1,4 +1,4 @@
-package vxml.interpreter.old;
+package fr.mbs.vxml.interpreter.old;
 
 import java.io.IOException;
 import java.util.ArrayList;
