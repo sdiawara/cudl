@@ -136,7 +136,7 @@ public class InterpreterContext extends WebClient {
 			throws DOMException, ScriptException, IOException {
 		if (!textContent.equals(currentRootFileName)) {
 			interpreter.declareVariable(rootDocument.getElementsByTagName(
-					"vxml").item(0).getChildNodes(), 3);
+					"vxml").item(0).getChildNodes());
 			currentRootFileName = tackWeelFormedUrl(textContent);
 		}
 	}

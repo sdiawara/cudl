@@ -70,7 +70,6 @@ public final class InterpreterVariableDeclaration {
 						getNodeScope(script)))
 						+ "";
 			} else {
-				// System.err.println("=======>" + (script.getTextContent()));
 				val = engine.eval(script.getTextContent()) + "";
 			}
 		} else if (script.getNodeName().equals("value")) {
@@ -78,7 +77,7 @@ public final class InterpreterVariableDeclaration {
 					+ "";
 		} else
 			val = engine.eval(script.getTextContent()) + "";
-		System.err.println("node "+script+ "val ="+val);
+		
 		return val;
 	}
 	

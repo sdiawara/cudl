@@ -13,51 +13,57 @@
 	<property name="build.dir" location="build" />
 	<property name="deploy.dir" location="deploy" />
 	<property name="test.dir" location="test" />
+	<property name="test.build.dir" location="${test.dir}/classes" />
 	<property name="bin.dir" location="bin" />
 	<property name="test.report.dir" location="testreport" />
+	<property name="ant.build.javac.source" value="1.6" />
+	<property name="ant.build.javac.target" value="1.6" />
 
-	<path id="mainpath">
+	<path id="src.classpath">
 		<fileset dir="lib">
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
 
-	<path id="junit.class.path">
-		<path refid="mainpath" />
+	<path id="test.classpath">
+		<path refid="src.classpath" />
 		<pathelement location="lib/junit.jar" />
 		<pathelement location="${build.dir}" />
+		<pathelement location="${test.build.dir}" />
 	</path>
 
-	<target name="clean">
+	<target name="clean" description="Clean project" >
 		<delete dir="${build.dir}" />
 		<delete dir="${test.report.dir}" />
+		<delete dir="${test.build.dir}" />
 		<delete dir="${deploy.dir}" />
 	</target>
 
 
 	<target name="makedir">
 		<mkdir dir="${build.dir}" />
-		<mkdir dir="${test.report.dir}" />
 		<mkdir dir="${deploy.dir}" />
+		<mkdir dir="${test.report.dir}" />
+		<mkdir dir="${test.build.dir}" />
 	</target>
 
-	<target name="compile" depends="clean,  makedir">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="mainpath" debug="on" optimize="off" deprecation="on" includeantruntime="false">
+	<target name="compile" depends="clean,  makedir" description="Compile source" >
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="src.classpath" debug="on" optimize="off" deprecation="on" includeantruntime="false">
 		</javac>
 	</target>
 
-	<target name="makejar" depends="compile">
+	<target name="compile.test" depends="clean,  makedir, compile" description="Compile unit tests" >
+		<javac srcdir="${test.dir}" destdir="${test.build.dir}" classpathref="test.classpath" debug="on" optimize="off" deprecation="on" includeantruntime="false">
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile" description="Generate jar file" >
 		<jar jarfile="${deploy.dir}\mbs-vxml-interpreter.jar" basedir="${bin.dir}" />
 	</target>
 
-	<!-- ================================= 
-          target: junit.test
-          FIXME: error in target              
-         ================================= -->
-
-	<target name="junit.test" depends="compile">
+	<target name="test" depends="compile.test" description="Launch unit tests" >
 		<junit printsummary="yes" haltonfailure="yes">
-			<classpath refid="junit.class.path" />
+			<classpath refid="test.classpath" />
 			<formatter type="xml" />
 			<batchtest todir="${test.report.dir}">
 				<fileset dir="${test.dir}">

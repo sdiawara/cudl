@@ -40,8 +40,7 @@ public class Interpreter {
 		{
 			// TODO: implement interpretation of: reprompt,
 			// return,
-			// script
-
+			
 			// Just for W3C test
 			put("conf:pass", new NodeExecutor() {
 				public void execute(Node node) throws ExitException {
@@ -57,13 +56,6 @@ public class Interpreter {
 					NamedNodeMap attributes = node.getAttributes();
 					if (attributes == null)
 						return;
-					// Node namedItem = attributes.getNamedItem("reason");
-					// System.err.println(namedItem);
-					// System.err
-					// .println(" reason =" + namedItem != null ? namedItem
-					// .getNodeValue()
-					// : "undefined reason");
-
 				}
 			});
 
@@ -100,13 +92,11 @@ public class Interpreter {
 			});
 			put("script", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException {
-					// variableVxml.evaluateScript(node, getNodeScope(node));
 					declaration.evaluateScript(node);
 				}
 			});
 			put("var", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException {
-					// variableVxml.declareVariable(node, getNodeScope(node));
 					declaration.declareVariable(node);
 				}
 			});
@@ -239,19 +229,19 @@ public class Interpreter {
 		}
 	}
 
-	public void declareVariable(NodeList nodeList, int scope)
-			throws FileNotFoundException, DOMException, ScriptException {
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Node node = nodeList.item(i);
-			if (node.getNodeName().equals("var"))
-				declaration.declareVariable(node);
-			else if (VxmlElementType.isFormItem(node)) {
-				declaration.declareDialogItem(node);
-			} else if (node.getNodeName().equals("script")) {
-				declaration.evaluateScript(node);
-			}
-		}
-	}
+//	public void declareVariable(NodeList nodeList)
+//			throws FileNotFoundException, DOMException, ScriptException {
+//		for (int i = 0; i < nodeList.getLength(); i++) {
+//			Node node = nodeList.item(i);
+//			if (node.getNodeName().equals("var"))
+//				declaration.declareVariable(node);
+//			else if (VxmlElementType.isFormItem(node)) {
+//				declaration.declareDialogItem(node);
+//			} else if (node.getNodeName().equals("script")) {
+//				declaration.evaluateScript(node);
+//			}
+//		}
+//	}
 
 	public void execute(Node node) throws InterpreterException, ScriptException {
 		NodeList child = node.getChildNodes();
