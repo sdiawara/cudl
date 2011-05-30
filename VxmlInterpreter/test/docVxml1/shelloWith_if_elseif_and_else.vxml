@@ -30,7 +30,7 @@
 		<if cond="true">
      		<log>LOG Hello C</log>
      	</if>
-	<elseif cond="true"/> 
+	<elseif cond="'a' == 'a'"/> 
 	<log>LOG Hello 4</log>
 	<elseif cond="false"/> 
 	<log>LOG Hello no-out</log>

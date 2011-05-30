@@ -1,9 +1,12 @@
 package fr.mbs.vxml.script;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -12,19 +15,21 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import fr.mbs.vxml.utils.VxmlElementType;
+import fr.mbs.vxml.utils.RemoteFileAccess;
 
 public final class InterpreterVariableDeclaration {
-	private Map<Node, String> formItemName;
+	private Map<Node, String> dialogItemName;
 	private int anonymeNameCount = 0;
 	private ScriptEngineManager manager;
 	private ScriptEngine engine;
+	private InterpreterScriptContext context;
+	private String location;
 
 	public InterpreterVariableDeclaration() {
 		manager = new ScriptEngineManager();
 		engine = manager.getEngineByName("ecmascript");
-		engine.setContext(new DefaultInterpreterScriptContext());
-		formItemName = new Hashtable<Node, String>();
+		context = new DefaultInterpreterScriptContext();
+		dialogItemName = new Hashtable<Node, String>();
 	}
 
 	public void declareDialogItem(Node formItem) throws ScriptException {
@@ -40,13 +45,13 @@ public final class InterpreterVariableDeclaration {
 		String nodeValue = (null == value) ? "undefined" : value
 				.getTextContent();
 
-		engine.getContext().getBindings(getNodeScope(formItem)).put(nodeName,
-				engine.eval(nodeValue));
+		context.getBindings(DefaultInterpreterScriptContext.DOCUMENT_SCOPE)
+				.put(nodeName, nodeValue);
 
-		formItemName.put(formItem, nodeName);
+		dialogItemName.put(formItem, nodeName);
 	}
 
-	public void declareVariable(Node node) throws ScriptException {
+	public void declareVariable(Node node, int scope) throws ScriptException {
 		if (!node.getNodeName().equals("var"))
 			throw new IllegalArgumentException(
 					"This node should be an vxml var node");
@@ -55,73 +60,54 @@ public final class InterpreterVariableDeclaration {
 		Node value = attributes.getNamedItem("expr");
 		String nodeValue = (null == value) ? "undefined" : value
 				.getTextContent();
-
-		engine.getContext().getBindings(getNodeScope(node)).put(nodeName,
-				engine.eval(nodeValue));
+		// System.err.println(nodeValue);
+		context.getBindings(scope).put(nodeName,
+				engine.eval(nodeValue, context));
 	}
 
-	public Object evaluateScript(Node script) throws ScriptException {
+	public void declareVariable(File file, int scope)
+			throws FileNotFoundException, ScriptException {
+		engine.eval(new FileReader(file), context.getBindings(scope));
+	}
+
+	public Object evaluateScript(Node script, int scope) throws DOMException,
+			ScriptException, IOException {
 		Object val = null;
 		NamedNodeMap attributes = script.getAttributes();
 		if (script.getNodeName().equals("script")) {
 			if (null != attributes && attributes.getNamedItem("src") != null) {
-				val = engine.eval(attributes.getNamedItem("src")
-						.getTextContent(), engine.getContext().getBindings(
-						getNodeScope(script)))
-						+ "";
+				System.err.println(attributes.getNamedItem("src")
+						.getTextContent());
+				File remoteFile = RemoteFileAccess.getRemoteFile(location + "/", attributes.getNamedItem("src").getTextContent());
+				val = engine.eval(new FileReader(remoteFile));
+				System.err.println("path "+remoteFile.getCanonicalPath());
 			} else {
-				val = engine.eval(script.getTextContent()) + "";
+				val = engine.eval(script.getTextContent(), context
+						.getBindings(scope));
 			}
 		} else if (script.getNodeName().equals("value")) {
-			val = engine.eval(attributes.getNamedItem("expr").getTextContent())
+			val = engine.eval(attributes.getNamedItem("expr").getTextContent(),
+					context);
+		} else {
+			val = engine.eval(script.getAttributes().getNamedItem("cond")
+					.getTextContent(), context)
 					+ "";
-		} else
-			val = engine.eval(script.getTextContent()) + "";
-		
+		}
+
 		return val;
 	}
-	
-	private int getNodeScope(Node node) {
-		if (VxmlElementType.isFormItem(node))
-			return ScriptContext.ENGINE_SCOPE;
-		
-		Node tmp = VxmlElementType.isConditionalItem(node) ? node
-				.getParentNode() : node;
-		tmp = null == tmp ? node : tmp;
 
-		if (isAnAnonymeContext(tmp))
-			return InterpreterScriptContext.ANONYME_SCOPE;
-		else if (isAnDialogContext(tmp))
-			return InterpreterScriptContext.DIALOG_SCOPE;
-		else if (node.getParentNode().getNodeName().equals("vxml"))
-			return InterpreterScriptContext.DOCUMENT_SCOPE;
-
-		return InterpreterScriptContext.APPLICATION_SCOPE;
-	}
-
-	private boolean isAnAnonymeContext(Node node) {
-		return VxmlElementType.isFormItem(node.getParentNode());
-	}
-
-	private boolean isAnDialogContext(Node node) {
-		return VxmlElementType.isADialog(node.getParentNode());
-	}
-
-	public void setValue(Node node, String value) throws ScriptException {
+	public void setValue(Node node, String value, int scope)
+			throws ScriptException {
 		NamedNodeMap attributes = node.getAttributes();
-
-		// System.err.println("setNODE " + node);
 		Node namedItem;
 		namedItem = (null == attributes) ? null : attributes
 				.getNamedItem("name");
 
 		if (namedItem == null) {
-
-			engine.eval(formItemName.get(node) + " = " + value + ";");
+			context.getBindings(scope).put(dialogItemName.get(node), engine.eval(value,context));
 		} else {
-			// System.err.println(" " + namedItem.getNodeValue() + " = " +
-			// value);
-			engine.eval(namedItem.getNodeValue() + " = " + value + ";");
+			context.getBindings(scope).put(namedItem.getNodeValue(), engine.eval(value,context));
 		}
 	}
 
@@ -130,18 +116,23 @@ public final class InterpreterVariableDeclaration {
 		NamedNodeMap attributes = selectedItem.getAttributes();
 		Node namedItem = (null == attributes) ? null : attributes
 				.getNamedItem("name");
-		String name = (null == namedItem) ? formItemName.get(selectedItem)
+		String name = (null == namedItem) ? dialogItemName.get(selectedItem)
 				: namedItem.getNodeValue();
 
 		return getValue(name);
 	}
 
 	public Object getValue(String name) throws ScriptException {
-		Object eval = engine.eval(name);
+		Object eval = engine.eval(name, context);
+		System.err.println("get("+name+")= "+eval);
 		return (null == eval) ? "undefined" : eval;
 	}
 
 	public void resetScopeBinding(int scope) {
-		engine.getContext().getBindings(scope).clear();
+		context.getBindings(scope).clear();
+	}
+
+	public void setLocation(String substring) {
+		this.location = substring;
 	}
 }

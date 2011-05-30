@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -21,28 +22,28 @@ import fr.mbs.vxml.utils.Utils;
 public class InterpreterEventHandler implements InterpreterListener {
 
 	public void noInput(InterpreterEvent interpreterEvent)
-			throws ScriptException {
+			throws ScriptException, DOMException, IOException {
 		handle(interpreterEvent, "noinput");
 	}
 
 	@Override
 	public void NoMatch(InterpreterEvent interpreterEvent)
-			throws ScriptException {
+			throws ScriptException, DOMException, IOException {
 		handle(interpreterEvent, "nomatch");
 	}
 
 	@Override
-	public void error(InterpreterEvent interpreterEvent) throws ScriptException {
+	public void error(InterpreterEvent interpreterEvent) throws ScriptException, DOMException, IOException {
 		handle(interpreterEvent, "error");
 	}
 
 	@Override
-	public void help(InterpreterEvent interpreterEvent) throws ScriptException {
+	public void help(InterpreterEvent interpreterEvent) throws ScriptException, DOMException, IOException {
 		handle(interpreterEvent, "help");
 	}
 
 	private void handle(EventObject interpreterEvent, String eventName)
-			throws ScriptException {
+			throws ScriptException, DOMException, IOException {
 		InterpreterContext context = (InterpreterContext) interpreterEvent
 				.getSource();
 

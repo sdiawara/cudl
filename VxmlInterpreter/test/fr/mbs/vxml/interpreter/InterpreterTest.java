@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class InterpreterTest {
 
 	@Test
 	public void testLogTrace() throws SAXException, IOException, DOMException,
-			ScriptException {
+			ScriptException, URISyntaxException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -43,7 +44,7 @@ public class InterpreterTest {
 
 	@Test
 	public void testLogTraceWithExit() throws SAXException, IOException,
-			DOMException, ScriptException {
+			DOMException, ScriptException, URISyntaxException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -60,7 +61,7 @@ public class InterpreterTest {
 
 	@Test
 	public void testLogTraceWhithVariable() throws SAXException, IOException,
-			DOMException, ScriptException {
+			DOMException, ScriptException, URISyntaxException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 2");
@@ -117,7 +118,7 @@ public class InterpreterTest {
 
 	@Test
 	public void testLogTraceWithIfElseifAndElse() throws SAXException,
-			IOException, DOMException, ScriptException {
+			IOException, DOMException, ScriptException, URISyntaxException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -134,12 +135,14 @@ public class InterpreterTest {
 
 		assertTrue(interpreterContext.interpreter.getTraceStat().isEmpty());
 
+		System.err.println(traceLog);
+		System.err.println(interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
 	@Test
 	public void testLogManyBlock() throws SAXException, IOException,
-			DOMException, ScriptException {
+			DOMException, ScriptException, URISyntaxException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -154,7 +157,7 @@ public class InterpreterTest {
 
 	@Test
 	public void testLogGotoInASameDialog() throws SAXException, IOException,
-			DOMException, ScriptException {
+			DOMException, ScriptException, URISyntaxException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -171,7 +174,7 @@ public class InterpreterTest {
 
 	@Test
 	public void testCollectPrompt() throws SAXException, IOException,
-			DOMException, ScriptException {
+			DOMException, ScriptException, URISyntaxException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -205,7 +208,7 @@ public class InterpreterTest {
 
 	@Test
 	public void testCombinattionPromptTrace() throws SAXException, IOException,
-			DOMException, ScriptException {
+			DOMException, ScriptException, URISyntaxException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -223,7 +226,7 @@ public class InterpreterTest {
 
 	@Test()
 	public void testNodeValue() throws SAXException, IOException, DOMException,
-			ScriptException {
+			ScriptException, URISyntaxException {
 		varExcepted = new TreeMap<String, String>();
 		varExcepted.put("block_0", "defined");
 		varExcepted.put("appli_scope_var",
@@ -248,7 +251,7 @@ public class InterpreterTest {
 
 	@Test
 	public void sideEffectInScript() throws SAXException, IOException,
-			DOMException, ScriptException {
+			DOMException, ScriptException, URISyntaxException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("bla bla");
 		traceLog.add("un exemple de variable de global avec effet de bord");
@@ -261,7 +264,7 @@ public class InterpreterTest {
 
 	@Test(expected = ScriptException.class)
 	public void anonymeScopeVariable() throws SAXException, IOException,
-			DOMException, ScriptException {
+			DOMException, ScriptException, URISyntaxException {
 
 		interpreterContext = new InterpreterContext("anonymeScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
@@ -269,14 +272,14 @@ public class InterpreterTest {
 
 	@Test(expected = ScriptException.class)
 	public void dialogScopeVariable() throws DOMException, SAXException,
-			IOException, ScriptException {
+			IOException, ScriptException, URISyntaxException {
 		interpreterContext = new InterpreterContext("dialogScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
 	}
 
 	@Test
 	public void documentScopeVariableIsVisibleInAllDocument()
-			throws SAXException, IOException, DOMException, ScriptException {
+			throws SAXException, IOException, DOMException, ScriptException, URISyntaxException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -299,7 +302,7 @@ public class InterpreterTest {
 
 	@Test
 	public void RootVariableIsAllWaysVisible() throws SAXException,
-			IOException, DOMException, ScriptException {
+			IOException, DOMException, ScriptException, URISyntaxException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -318,7 +321,7 @@ public class InterpreterTest {
 
 	@Test
 	public void comparerTwoVariableInDifferentScope() throws DOMException,
-			SAXException, IOException, ScriptException {
+			SAXException, IOException, ScriptException, URISyntaxException {
 
 		interpreterContext = new InterpreterContext(
 				"compareTwoVariableDeclaredIndifferentScope");

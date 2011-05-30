@@ -1,6 +1,8 @@
 package fr.mbs.vxml.interpreter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -19,6 +21,7 @@ import fr.mbs.vxml.interpreter.execption.FilledException;
 import fr.mbs.vxml.interpreter.execption.GotoException;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.interpreter.execption.SubmitException;
+import fr.mbs.vxml.script.DefaultInterpreterScriptContext;
 import fr.mbs.vxml.script.InterpreterScriptContext;
 import fr.mbs.vxml.script.InterpreterVariableDeclaration;
 import fr.mbs.vxml.utils.Prompt;
@@ -56,6 +59,8 @@ public class Interpreter {
 					NamedNodeMap attributes = node.getAttributes();
 					if (attributes == null)
 						return;
+					System.err.println(node.getAttributes().getNamedItem(
+							"reason").getTextContent());
 				}
 			});
 
@@ -65,7 +70,8 @@ public class Interpreter {
 				}
 			});
 			put("prompt", new NodeExecutor() {
-				public void execute(Node node) throws ScriptException {
+				public void execute(Node node) throws ScriptException,
+						DOMException, IOException {
 					collectPrompt(node);
 
 				}
@@ -77,7 +83,7 @@ public class Interpreter {
 			});
 			put("reprompt", new NodeExecutor() {
 				public void execute(Node node) {
-					System.out.println("TODO: implemente reprompt");
+					System.err.println("TODO: implemente reprompt");
 				}
 			});
 			put("return", new NodeExecutor() {
@@ -91,13 +97,16 @@ public class Interpreter {
 				}
 			});
 			put("script", new NodeExecutor() {
-				public void execute(Node node) throws ScriptException {
-					declaration.evaluateScript(node);
+				public void execute(Node node) throws ScriptException,
+						DOMException, IOException {
+					declaration.evaluateScript(node,
+							DefaultInterpreterScriptContext.ANONYME_SCOPE);
 				}
 			});
 			put("var", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException {
-					declaration.declareVariable(node);
+					declaration.declareVariable(node,
+							DefaultInterpreterScriptContext.ANONYME_SCOPE);
 				}
 			});
 			put("assign", new NodeExecutor() {
@@ -114,7 +123,7 @@ public class Interpreter {
 			});
 			put("if", new NodeExecutor() {
 				public void execute(Node node) throws InterpreterException,
-						ScriptException {
+						ScriptException, DOMException, IOException {
 					checkConditionAndExecute(node);
 				}
 			});
@@ -126,10 +135,6 @@ public class Interpreter {
 					// add assert163.txml file from to test
 
 					if (node.getAttributes().getNamedItem("nextitem") == null) {
-						declaration
-								.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
-						declaration
-								.resetScopeBinding(InterpreterScriptContext.DIALOG_SCOPE);
 						throw new GotoException(node.getAttributes()
 								.getNamedItem("next").getNodeValue());
 					}
@@ -161,11 +166,11 @@ public class Interpreter {
 	};
 
 	public void interpretDialog(Node dialog) throws InterpreterException,
-			ScriptException, FileNotFoundException, DOMException {
+			ScriptException, DOMException, IOException {
 
 		// PHASE INITIALIZATION
 		NodeList nodeList = dialog.getChildNodes();
-		declareVariable(nodeList);
+		declareVariable(nodeList, DefaultInterpreterScriptContext.DIALOG_SCOPE);
 		collectDialogProperty(nodeList);
 
 		// TODO: Si l'utlisateur sysest rentré an prononçant une phrase de la
@@ -189,11 +194,13 @@ public class Interpreter {
 			} else if (nodeName.equals("record")) {
 			} else if (nodeName.equals("object")) {
 			} else if (nodeName.equals("subdialog")) {
-				declaration.setValue(selectedItem, "'defined'");
+				declaration.setValue(selectedItem, "'defined'",
+						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 			} else if (nodeName.equals("transfer")) {
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
-				declaration.setValue(selectedItem, "'defined'");
+				declaration.setValue(selectedItem, "'defined'",
+						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 				execute(selectedItem);
 				declaration
 						.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
@@ -207,21 +214,22 @@ public class Interpreter {
 		}
 	}
 
-	public void declareVariable(NodeList nodeList)
-			throws FileNotFoundException, DOMException, ScriptException {
+	public void declareVariable(NodeList nodeList, int scope)
+			throws DOMException, ScriptException, IOException {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals("var"))
-				declaration.declareVariable(node);
+				declaration.declareVariable(node, scope);
 			else if (VxmlElementType.isFormItem(node)) {
 				declaration.declareDialogItem(node);
 			} else if (node.getNodeName().equals("script")) {
-				declaration.evaluateScript(node);
+				declaration.evaluateScript(node, scope);
 			}
 		}
 	}
 
-	public void execute(Node node) throws InterpreterException, ScriptException {
+	public void execute(Node node) throws InterpreterException,
+			ScriptException, DOMException, IOException {
 		NodeList child = node.getChildNodes();
 		for (int i = 0; i < child.getLength(); i++) {
 			Node node1 = child.item(i);
@@ -242,7 +250,8 @@ public class Interpreter {
 		}
 	}
 
-	private void collectPrompt(Node node) throws ScriptException {
+	private void collectPrompt(Node node) throws ScriptException, DOMException,
+			IOException {
 		Prompt p = new Prompt();
 		if (node.getNodeName().equals("prompt")) {
 			NamedNodeMap attributes = node.getAttributes();
@@ -282,11 +291,7 @@ public class Interpreter {
 				} else if (child.getNodeName().equals("#text")) {
 					addPromtTextToSpeech(child, p);
 				} else if (child.getNodeName().equals("value")) {
-					try {
-						addPromptWithValue(child, p);
-					} catch (DOMException e) {
-						e.printStackTrace();
-					}
+					addPromptWithValue(child, p);
 				}
 			}
 		}
@@ -312,8 +317,9 @@ public class Interpreter {
 	}
 
 	private void addPromptWithValue(Node value, Prompt p) throws DOMException,
-			ScriptException {
-		p.tts += declaration.evaluateScript(value);
+			ScriptException, IOException {
+		p.tts += declaration.evaluateScript(value,
+				DefaultInterpreterScriptContext.ANONYME_SCOPE);
 	}
 
 	private void clearVariable(Node node1) {
@@ -327,15 +333,9 @@ public class Interpreter {
 
 	private void assignVariableValue(Node node1) throws DOMException,
 			ScriptException {
-
-		// String nodeName = node1.getAttributes().getNamedItem("name")
-		// .getNodeValue();
 		Node expr = node1.getAttributes().getNamedItem("expr");
-
-		// variableVxml.setValue(nodeName, expr.getNodeValue(),
-		// getNodeScope(node1));
-		declaration.setValue(node1, expr.getNodeValue());
-
+		declaration.setValue(node1, expr.getNodeValue(),
+				DefaultInterpreterScriptContext.ANONYME_SCOPE);
 	}
 
 	private Node selectDialogNextItemTovisit(Node node) {
@@ -372,6 +372,7 @@ public class Interpreter {
 	private void collectTrace(Node node) throws DOMException, ScriptException {
 		String value = getNodeValue(node);
 		traceLog.add(value);
+		System.err.println("LOG :"+value);
 		for (int j = 0; j < node.getAttributes().getLength(); j++) {
 			traceStat.add("[" + node.getAttributes().item(j).getNodeName()
 					+ ":" + node.getAttributes().item(j).getNodeValue() + "] "
@@ -386,7 +387,8 @@ public class Interpreter {
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
 			if ("value".equals(child.getNodeName())) {
-				value += declaration.evaluateScript(child);
+				value += declaration.getValue(child.getAttributes()
+						.getNamedItem("expr").getTextContent());
 			} else
 				value += child.getNodeValue();
 		}
@@ -394,7 +396,8 @@ public class Interpreter {
 	}
 
 	private void checkConditionAndExecute(Node node)
-			throws InterpreterException, ScriptException {
+			throws InterpreterException, ScriptException, DOMException,
+			IOException {
 		boolean conditionChecked = this.checkCond(node);
 		NodeList childs = node.getChildNodes();
 
@@ -423,15 +426,16 @@ public class Interpreter {
 		return nodeExecution.get(item.getNodeName()) != null;
 	}
 
-	private boolean checkCond(Node node) throws ScriptException {
+	private boolean checkCond(Node node) throws ScriptException, DOMException,
+			IOException {
 		NamedNodeMap attribute = node.getAttributes();
 		Node cond = (attribute.getLength() == 0) ? null : attribute
 				.getNamedItem("cond");
 
-		// return cond == null
-		// || variableVxml.evaluateScript(cond, getNodeScope(node))
-		// .equals("true");
-		return cond == null || declaration.evaluateScript(cond).equals("true");
+		return cond == null
+				|| declaration.evaluateScript(node,
+						DefaultInterpreterScriptContext.ANONYME_SCOPE).equals(
+						"true");
 
 	}
 
@@ -450,14 +454,15 @@ public class Interpreter {
 				.getNodeValue());
 	}
 
-	private Node phaseSelect(Node dialog) throws ScriptException {
+	private Node phaseSelect(Node dialog) throws ScriptException, DOMException,
+			IOException {
 		return (selectedItem != null && declaration.getValue(selectedItem)
 				.equals("undefined")) ? selectedItem
 				: unsatisfiedGuardCondition(dialog.getChildNodes());
 	}
 
 	private Node unsatisfiedGuardCondition(NodeList nodeList)
-			throws ScriptException {
+			throws ScriptException, DOMException, IOException {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 
@@ -471,8 +476,33 @@ public class Interpreter {
 		return null;
 	}
 
-	public void setSessionVariable() throws FileNotFoundException,
-			ScriptException {
-		// declaration.de
+	public void setSessionVariable(String sessionFileName)
+			throws FileNotFoundException, ScriptException {
+		declaration.declareVariable(new File(sessionFileName),
+				DefaultInterpreterScriptContext.SESSION_SCOPE);
+	}
+
+	public void resetDocumentScope() {
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
+
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
+
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
+	}
+
+	public void resetDialogScope() {
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
+
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
+
+	}
+
+	public void setLocation(String substring) {
+		declaration.setLocation(substring);
 	}
 }

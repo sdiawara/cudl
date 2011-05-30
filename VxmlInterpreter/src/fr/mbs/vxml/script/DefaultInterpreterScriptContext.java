@@ -33,65 +33,60 @@ public class DefaultInterpreterScriptContext extends SimpleScriptContext
 		int tmp = LOWEST_SCOPE;
 		while (tmp <= BIGEST_SCOPE) {
 			Bindings bindings = getBindings(tmp);
-			if (bindings.containsKey(name))
+			if (bindings.containsKey(name)) {
 				return bindings.get(name);
+			}
 			tmp += STEP;
 		}
 
-		return null;
+		return super.getAttribute(name);
 	}
 
 	@Override
 	public Object getAttribute(String name, int scope) {
 		checkName(name);
-		//System.err.println("getAttr " + name + "  " + scope);
-		switch (scope) {
-		case InterpreterScriptContext.SESSION_SCOPE:
-			return sessionScope.get(name);
-		case InterpreterScriptContext.APPLICATION_SCOPE:
-			return applicationScope.get(name);
-		case InterpreterScriptContext.DOCUMENT_SCOPE:
-			return documentScope.get(name);
-		case InterpreterScriptContext.DIALOG_SCOPE:
-			return dialogScope.get(name);
-		case InterpreterScriptContext.ANONYME_SCOPE:
-			return anonymeScope.get(name);
 
-		default:
-			return super.getAttribute(name, scope);
-		}
+		if (DefaultInterpreterScriptContext.SCOPES.contains(scope))
+			return getAttribute(name);
+		return super.getAttribute(name, scope);
 	}
 
 	@Override
 	public int getAttributesScope(String name) {
 		checkName(name);
+
 		if (anonymeScope.containsKey(name))
 			return ANONYME_SCOPE;
 		else if (dialogScope.containsKey(name))
-			return DIALOG_SCOPE;
+			return ANONYME_SCOPE;
 		else if (documentScope.containsKey(name))
-			return DOCUMENT_SCOPE;
+			return ANONYME_SCOPE;
 		else if (applicationScope.containsKey(name))
-			return APPLICATION_SCOPE;
+			return ANONYME_SCOPE;
 		else if (sessionScope.containsKey(name))
-			return SESSION_SCOPE;
+			return ANONYME_SCOPE;
 
 		return super.getAttributesScope(name);
 	}
 
 	@Override
 	public Bindings getBindings(int scope) {
-
+		// System.err.print("--->");
 		switch (scope) {
 		case InterpreterScriptContext.SESSION_SCOPE:
+			// System.err.println("SESSION_SCOPE");
 			return sessionScope;
 		case InterpreterScriptContext.APPLICATION_SCOPE:
+			// System.err.println("APPLICATION_SCOPE");
 			return applicationScope;
 		case InterpreterScriptContext.DOCUMENT_SCOPE:
+			// System.err.println("DOCUMENT_SCOPE");
 			return documentScope;
 		case InterpreterScriptContext.DIALOG_SCOPE:
+			// System.err.println("DIALOG_SCOPE");
 			return dialogScope;
 		case InterpreterScriptContext.ANONYME_SCOPE:
+			// System.err.println("ANONYME_SCOPE");
 			return anonymeScope;
 
 		default:
@@ -127,8 +122,6 @@ public class DefaultInterpreterScriptContext extends SimpleScriptContext
 
 	@Override
 	public void setAttribute(String name, Object value, int scope) {
-//		System.err.println("setAttribute(" + name + " , " + value + " , "
-//				+ scope + ")");
 		switch (scope) {
 		case InterpreterScriptContext.SESSION_SCOPE:
 			sessionScope.put(name, value);
@@ -155,7 +148,7 @@ public class DefaultInterpreterScriptContext extends SimpleScriptContext
 	public void setBindings(Bindings bindings, int scope) {
 		if (null == bindings)
 			throw new IllegalArgumentException("null binding");
-		
+
 		switch (scope) {
 		case InterpreterScriptContext.SESSION_SCOPE:
 			sessionScope = bindings;
@@ -168,7 +161,6 @@ public class DefaultInterpreterScriptContext extends SimpleScriptContext
 		case InterpreterScriptContext.ANONYME_SCOPE:
 			anonymeScope = bindings;
 		default:
-			//Maybe bad idea
 			throw new IllegalArgumentException("invalid scope for interpreter");
 		}
 	}

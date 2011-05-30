@@ -15,6 +15,7 @@
 
   <form id="myForm2">
     <block>
+      
       <if cond="typeof(myFactorial) != 'undefined'">
         <conf:fail reason="Document scope script myFactorial is still accessible when another document is entered"/>
       </if>
@@ -23,11 +24,11 @@
         <conf:fail reason="Document scope variable docVar1 is still accessible when another document is entered"/>
       </if>
 
-      <if cond="typeof(document.myMult) == 'undefined'">
+      <if cond="typeof(myMult) == 'undefined'">
         <conf:fail reason="Document scope script myMult hasn't been correctly defined"/>
       </if>
 
-      <if cond="typeof(document.docVar2) == 'undefined'">
+      <if cond="typeof(docVar2) == 'undefined'">
         <conf:fail reason="Document scope variable docVar2 hasn't been correctly defined"/>
       </if>
 

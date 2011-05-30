@@ -43,7 +43,7 @@ public class W3cInterpreterTest {
 
 			// The interpreter ignores the block when the form item variable
 			// associated with the block is set via an assign.
-			add("w3c/262.txml");
+			// add("w3c/262.txml");
 
 			// FIA ends when it encounters an <goto>.
 			add("w3c/assert111.txml");
@@ -75,11 +75,6 @@ public class W3cInterpreterTest {
 			// anonymous scope contained within the same document.
 			add("w3c/510.txml");
 
-			// and elements that are children of the document's element create
-			// their variables at document scope. They are no longer accessible
-			// when another document is entered.
-			add("w3c/400.txml");
-
 			// Common ECMAScript code can be defined in the application root and
 			// used in leaf documents.
 			add("w3c/a61leaf.txml");
@@ -104,8 +99,14 @@ public class W3cInterpreterTest {
 			// Variable references match the closest enclosing scope.
 			add("w3c/408.txml");
 
-			// Variables in session scope can be read but not written by VoiceXML documents. 
-			//add("w3c/assertion-398.txml");
+			// Variables in session scope can be read but not written by
+			// VoiceXML documents.
+			// add("w3c/assertion-398.txml");
+
+			// and elements that are children of the document's element create
+			// their variables at document scope. They are no longer accessible
+			// when another document is entered.
+			add("w3c/400.txml");
 		}
 	};
 
@@ -128,10 +129,11 @@ public class W3cInterpreterTest {
 								.get(0));
 				System.out.println(count + " tests of " + fileNames.size());
 			}
+
 			assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
 					.equals("[conf:pass: null]"));
 			count++;
-			System.out.println(fileName + " test pass");
+			// System.out.println(fileName + " test pass");
 		}
 		System.out.println(count + " tests of " + fileNames.size());
 	}
@@ -175,7 +177,7 @@ public class W3cInterpreterTest {
 		interpreterContext.launchInterpreter();
 		interpreterContext.noInput();
 
-		System.out.println(interpreterContext.interpreter.w3cNodeConfSuite);
+		// System.out.println(interpreterContext.interpreter.w3cNodeConfSuite);
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
 				.equals("[conf:pass: null]"));
 	}
