@@ -5,19 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.script.ScriptException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
-import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.utils.Prompt;
-
 
 public class InterpreterTest extends TestCase {
 
@@ -25,8 +19,7 @@ public class InterpreterTest extends TestCase {
 
 	@Test
 	public void testCallServiceNavigateUntilNextInteractionAndCollectsNavigationTraces()
-			throws IOException, SAXException, XPathExpressionException,
-			TransformerException, DOMException, ScriptException {
+			throws IOException, ScriptException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("new call");
@@ -74,7 +67,7 @@ public class InterpreterTest extends TestCase {
 
 	@Test
 	public void testNoInputAndNoMatchNavigatesUntilNextInteraction()
-			throws InterpreterException, SAXException, IOException, ScriptException {
+			throws IOException, ScriptException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("new call");
@@ -91,13 +84,13 @@ public class InterpreterTest extends TestCase {
 		interpreterContext.launchInterpreter();
 		interpreterContext.noInput();
 		interpreterContext.noMatch();
-			
+
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 	}
 
 	// @Test
 	// public void testDisconnectCallsTheCorrespondingEventManager()
-	// throws XPathExpressionException, IOException, SAXException,
+	// throws XPathExpressionException, IOException,
 	// TransformerException {
 	// List<String> expectedLogs = new ArrayList<String>();
 	// expectedLogs.add("LOG PHASE init");
@@ -157,7 +150,7 @@ public class InterpreterTest extends TestCase {
 	//
 	// @Test
 	// public void testNavigatorCollectsVxmlWhenOptionActivated()
-	// throws XPathExpressionException, IOException, SAXException,
+	// throws XPathExpressionException, IOException,
 	// TransformerException {
 	//
 	// DefinitionDeLEnvironnement.logPagesDirectory = "/tmp/test_log_pages/";
@@ -187,7 +180,7 @@ public class InterpreterTest extends TestCase {
 	//
 	// @Test
 	// public void testNavigationCollectsTransfertInformationButDoNotTransfer()
-	// throws XPathExpressionException, IOException, SAXException,
+	// throws XPathExpressionException, IOException,
 	// TransformerException {
 	// DefinitionDeLEnvironnement.urlServeurVoicexml =
 	// buildUrlServeurVoiceXml("test/fr/olm/app3900plus/vxmlbrowsing/pagesTransfert/");
@@ -207,7 +200,7 @@ public class InterpreterTest extends TestCase {
 	//
 	// @Test
 	// public void testTransferOKSimulatesTransferOnTransferPage()
-	// throws XPathExpressionException, IOException, SAXException,
+	// throws XPathExpressionException, IOException,
 	// TransformerException {
 	// DefinitionDeLEnvironnement.urlServeurVoicexml =
 	// buildUrlServeurVoiceXml("test/fr/olm/app3900plus/vxmlbrowsing/pagesTransfert/");
@@ -229,7 +222,7 @@ public class InterpreterTest extends TestCase {
 	//
 	// @Test
 	// public void testTransferKOSimulatesBadTransferOnTransferPage()
-	// throws XPathExpressionException, IOException, SAXException,
+	// throws XPathExpressionException, IOException,
 	// TransformerException {
 	// DefinitionDeLEnvironnement.urlServeurVoicexml =
 	// buildUrlServeurVoiceXml("test/fr/olm/app3900plus/vxmlbrowsing/pagesTransfert/");

@@ -10,11 +10,8 @@ import java.util.List;
 import javax.script.ScriptException;
 
 import org.junit.Test;
-import org.w3c.dom.DOMException;
-import org.xml.sax.SAXException;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
-import fr.mbs.vxml.interpreter.execption.InterpreterException;
 
 public class W3cInterpreterTest {
 	private InterpreterContext interpreterContext;
@@ -107,12 +104,35 @@ public class W3cInterpreterTest {
 			// their variables at document scope. They are no longer accessible
 			// when another document is entered.
 			add("w3c/400.txml");
+
+			// If specified, the value of the attribute is evaluated and serves
+			// as the form item variable's initial value.
+			add("w3c/234.txml");
+
+			// When declaring the same variable multiple times with different
+			// initial values in the same scope, declarations will apply in
+			// document order.
+			add("w3c/513.txml");
+
+			// When expr is set to a valid expression in an assign, the named
+			// variable is set correctly.
+			add("w3c/514.txml");
+
+			// "session", "application", "document", and "dialog" are not
+			// reserved words.
+			add("w3c/406.txml");
+
+			// Each scope contains a predefined variable whose name is the same
+			// as the scope that refers to the scope itself.
+			add("w3c/405.txml");
+			
+			//FIXME: ADD normalization to scripe 
+			//add("w3c/399main.txml");
 		}
 	};
 
 	@Test
-	public void w3cIRTest() throws SAXException, IOException,
-			InterpreterException, DOMException, ScriptException {
+	public void w3cIRTest() throws IOException, ScriptException {
 		int count = 0;
 		for (Iterator<String> iterator = fileNames.iterator(); iterator
 				.hasNext();) {
@@ -139,8 +159,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3cManual1() throws SAXException, IOException,
-			InterpreterException, DOMException, ScriptException {
+	public void w3cManual1() throws IOException, ScriptException {
 		// If the last main FIA loop did not result in a goto nextitem
 		// and there is no form item which is eligible to be visited
 		// then an implicit exit is generated.
@@ -153,8 +172,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3cVariableScope() throws SAXException, IOException,
-			InterpreterException, DOMException, ScriptException {
+	public void w3cVariableScope() throws IOException, ScriptException {
 		// If the last main FIA loop did not result in a goto nextitem
 		// and there is no form item which is eligible to be visited
 		// then an implicit exit is generated.
@@ -167,7 +185,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test()
-	public void w3cDefaultValueIsUndefined() throws SAXException, IOException,
+	public void w3cDefaultValueIsUndefined() throws IOException,
 			ScriptException {
 		// The default value of the attribute is ECMAScript undefined.
 		// The file (w3c/235.txml) has been modified to adapt to interpret the

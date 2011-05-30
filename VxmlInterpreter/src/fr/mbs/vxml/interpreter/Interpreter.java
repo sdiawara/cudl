@@ -10,7 +10,6 @@ import java.util.Properties;
 
 import javax.script.ScriptException;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -35,9 +34,9 @@ public class Interpreter {
 	private List<String> traceLog = new ArrayList<String>();
 	private List<String> traceStat = new ArrayList<String>();
 	private List<Prompt> prompts = new ArrayList<Prompt>();
+	private Properties currentDialogProperties = new Properties();
 
 	private boolean nextItemSelectGuard = false;
-	private Properties currentDialogProperties = new Properties();
 
 	private Hashtable<String, NodeExecutor> nodeExecution = new Hashtable<String, NodeExecutor>() {
 		{
@@ -71,7 +70,7 @@ public class Interpreter {
 			});
 			put("prompt", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException,
-						DOMException, IOException {
+						IOException {
 					collectPrompt(node);
 
 				}
@@ -98,7 +97,7 @@ public class Interpreter {
 			});
 			put("script", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException,
-						DOMException, IOException {
+						IOException {
 					declaration.evaluateScript(node,
 							DefaultInterpreterScriptContext.ANONYME_SCOPE);
 				}
@@ -110,8 +109,7 @@ public class Interpreter {
 				}
 			});
 			put("assign", new NodeExecutor() {
-				public void execute(Node node) throws DOMException,
-						ScriptException {
+				public void execute(Node node) throws ScriptException {
 					assignVariableValue(node);
 				}
 			});
@@ -123,7 +121,7 @@ public class Interpreter {
 			});
 			put("if", new NodeExecutor() {
 				public void execute(Node node) throws InterpreterException,
-						ScriptException, DOMException, IOException {
+						ScriptException, IOException {
 					checkConditionAndExecute(node);
 				}
 			});
@@ -151,8 +149,7 @@ public class Interpreter {
 
 			});
 			put("log", new NodeExecutor() {
-				public void execute(Node node) throws DOMException,
-						ScriptException {
+				public void execute(Node node) throws ScriptException {
 					collectTrace(node);
 				}
 			});
@@ -166,7 +163,7 @@ public class Interpreter {
 	};
 
 	public void interpretDialog(Node dialog) throws InterpreterException,
-			ScriptException, DOMException, IOException {
+			ScriptException, IOException {
 
 		// PHASE INITIALIZATION
 		NodeList nodeList = dialog.getChildNodes();
@@ -215,7 +212,7 @@ public class Interpreter {
 	}
 
 	public void declareVariable(NodeList nodeList, int scope)
-			throws DOMException, ScriptException, IOException {
+			throws ScriptException, IOException {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals("var"))
@@ -229,7 +226,7 @@ public class Interpreter {
 	}
 
 	public void execute(Node node) throws InterpreterException,
-			ScriptException, DOMException, IOException {
+			ScriptException, IOException {
 		NodeList child = node.getChildNodes();
 		for (int i = 0; i < child.getLength(); i++) {
 			Node node1 = child.item(i);
@@ -250,8 +247,7 @@ public class Interpreter {
 		}
 	}
 
-	private void collectPrompt(Node node) throws ScriptException, DOMException,
-			IOException {
+	private void collectPrompt(Node node) throws ScriptException, IOException {
 		Prompt p = new Prompt();
 		if (node.getNodeName().equals("prompt")) {
 			NamedNodeMap attributes = node.getAttributes();
@@ -316,8 +312,8 @@ public class Interpreter {
 		}
 	}
 
-	private void addPromptWithValue(Node value, Prompt p) throws DOMException,
-			ScriptException, IOException {
+	private void addPromptWithValue(Node value, Prompt p)
+			throws ScriptException, IOException {
 		p.tts += declaration.evaluateScript(value,
 				DefaultInterpreterScriptContext.ANONYME_SCOPE);
 	}
@@ -331,8 +327,7 @@ public class Interpreter {
 		}
 	}
 
-	private void assignVariableValue(Node node1) throws DOMException,
-			ScriptException {
+	private void assignVariableValue(Node node1) throws ScriptException {
 		Node expr = node1.getAttributes().getNamedItem("expr");
 		declaration.setValue(node1, expr.getNodeValue(),
 				DefaultInterpreterScriptContext.ANONYME_SCOPE);
@@ -369,10 +364,10 @@ public class Interpreter {
 		return traceStat;
 	}
 
-	private void collectTrace(Node node) throws DOMException, ScriptException {
+	private void collectTrace(Node node) throws ScriptException {
 		String value = getNodeValue(node);
 		traceLog.add(value);
-		System.err.println("LOG :"+value);
+		System.err.println("LOG :" + value);
 		for (int j = 0; j < node.getAttributes().getLength(); j++) {
 			traceStat.add("[" + node.getAttributes().item(j).getNodeName()
 					+ ":" + node.getAttributes().item(j).getNodeValue() + "] "
@@ -396,8 +391,7 @@ public class Interpreter {
 	}
 
 	private void checkConditionAndExecute(Node node)
-			throws InterpreterException, ScriptException, DOMException,
-			IOException {
+			throws InterpreterException, ScriptException, IOException {
 		boolean conditionChecked = this.checkCond(node);
 		NodeList childs = node.getChildNodes();
 
@@ -422,12 +416,39 @@ public class Interpreter {
 		return prompts;
 	}
 
+	public void setSessionVariable(File session) throws FileNotFoundException,
+			ScriptException {
+		declaration.declareVariable(session,
+				DefaultInterpreterScriptContext.SESSION_SCOPE);
+	}
+
+	public void resetDocumentScope() {
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
+	}
+
+	public void resetDialogScope() {
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
+
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
+
+	}
+
+	public void setLocation(String substring) {
+		declaration.setLocation(substring);
+	}
+
 	private boolean isAnExecutableItem(Node item) {
 		return nodeExecution.get(item.getNodeName()) != null;
 	}
 
-	private boolean checkCond(Node node) throws ScriptException, DOMException,
-			IOException {
+	private boolean checkCond(Node node) throws ScriptException, IOException {
 		NamedNodeMap attribute = node.getAttributes();
 		Node cond = (attribute.getLength() == 0) ? null : attribute
 				.getNamedItem("cond");
@@ -454,15 +475,14 @@ public class Interpreter {
 				.getNodeValue());
 	}
 
-	private Node phaseSelect(Node dialog) throws ScriptException, DOMException,
-			IOException {
+	private Node phaseSelect(Node dialog) throws ScriptException, IOException {
 		return (selectedItem != null && declaration.getValue(selectedItem)
 				.equals("undefined")) ? selectedItem
 				: unsatisfiedGuardCondition(dialog.getChildNodes());
 	}
 
 	private Node unsatisfiedGuardCondition(NodeList nodeList)
-			throws ScriptException, DOMException, IOException {
+			throws ScriptException, IOException {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 
@@ -476,33 +496,8 @@ public class Interpreter {
 		return null;
 	}
 
-	public void setSessionVariable(String sessionFileName)
-			throws FileNotFoundException, ScriptException {
-		declaration.declareVariable(new File(sessionFileName),
-				DefaultInterpreterScriptContext.SESSION_SCOPE);
-	}
-
-	public void resetDocumentScope() {
+	public void resetApplicationScope() {
 		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
-
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
-
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
-	}
-
-	public void resetDialogScope() {
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
-
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
-
-	}
-
-	public void setLocation(String substring) {
-		declaration.setLocation(substring);
+				.resetScopeBinding(DefaultInterpreterScriptContext.APPLICATION_SCOPE);
 	}
 }

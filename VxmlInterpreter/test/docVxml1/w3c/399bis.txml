@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" application="w3c/399rootbis.txml" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+  <form id="myForm2">
+    <block>
+      <if cond="typeof(application.myFactorial) != 'undefined'">
+        <conf:fail reason="Application scope script myFactorial is still accessible when another application is entered"/>
+      </if>
+
+      <if cond="typeof(application.applVar1) != 'undefined'">
+        <conf:fail reason="Application scope variable applVar1 is still accessible when another application is entered"/>
+      </if>
+
+      <if cond="typeof(application.myMult) == 'undefined'">
+        <conf:fail reason="Application scope script myMult hasn't been correctly defined"/>
+      </if>
+
+      <if cond="typeof(application.applVar2) == 'undefined'">
+        <conf:fail reason="Application scope variable applVar2 hasn't been correctly defined"/>
+      </if>
+
+      <if cond="application.applVar2 != 3">
+        <conf:fail reason="Application scope variable applVar2 hasn't been correctly initialized"/>
+      <else/>
+        <conf:pass/>
+      </if>
+    </block>
+  </form>
+</vxml>

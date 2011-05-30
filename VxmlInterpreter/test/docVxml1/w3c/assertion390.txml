@@ -18,6 +18,7 @@
   </script>
 
   <form>
+<!--  <assign name="document.x" expr="1"/> -->
     <block>
       <if cond="y == x">
          <conf:pass/>

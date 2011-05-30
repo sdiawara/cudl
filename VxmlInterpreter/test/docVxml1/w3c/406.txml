@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+    <catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+
+    <form>
+        <block>
+            <var name="session" expr="'sessvar'"/>
+            <var name="application" expr="'applvar'"/>
+            <var name="document" expr="'docvar'"/>
+            <var name="dialog" expr="'dialogvar'"/>
+            <var name="anonymous" expr="'anonvar'"/>
+
+            <if cond='typeof(session) == "string" &amp;&amp; typeof(application) == "string" &amp;&amp; typeof(document) == "string" &amp;&amp; typeof(dialog) == "string" &amp;&amp; typeof(anonymous) == "string"'>
+                <!-- do nothing, fall through to next block -->
+            <else/>
+                <conf:fail expr="'failed, part 1'"/>
+            </if>
+        </block>
+
+        <block>
+            <if cond='typeof(session) == "object" &amp;&amp; typeof(application) == "object" &amp;&amp; typeof(document) == "object" &amp;&amp; typeof(dialog) == "object"'>
+                <conf:pass/>
+            <else/>
+                <conf:fail expr="'failed, part 2'"/>
+            </if>
+        </block>
+
+    </form>
+
+</vxml>
+
+ 
+

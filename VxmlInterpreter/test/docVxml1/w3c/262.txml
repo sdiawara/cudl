@@ -6,8 +6,8 @@
     <block name="block1">
         <assign name="block2" expr="1" />
     </block>
-    <block name="block2">
-        <conf:fail expr="'Block executed'"/>
+    <block name="block2" >
+        <conf:fail reason="'Block executed'"/>
     </block>
     <block name="block3">
         <conf:pass/>

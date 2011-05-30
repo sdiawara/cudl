@@ -4,20 +4,21 @@
 <vxml xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance" version="2.0">
 
 <form id="form0">
-  <field name="a">
+  <field name="b" expr="2">
   <conf:grammar utterance="alpha"/>
   <conf:noinput/>
-  
-  <filled>
-   </filled>
   <noinput>
-      <if cond="a == undefined">
-        <conf:pass/>
-      <else/>
-        <conf:fail reason="field result variable should be undefined by default"/>
-      </if>
+      <conf:fail reason="field should have been ignored."/>
   </noinput>
   </field>
+
+  <block>
+    <if cond="b == 2">
+      <conf:pass/>
+    <else/>
+      <conf:fail reason="field result variable not given value by expr attribute"/>
+    </if>
+  </block>
 
 </form>
 

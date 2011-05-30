@@ -30,6 +30,18 @@ public final class InterpreterVariableDeclaration {
 		engine = manager.getEngineByName("ecmascript");
 		context = new DefaultInterpreterScriptContext();
 		dialogItemName = new Hashtable<Node, String>();
+		addVariableNormalized();
+	}
+
+	private void addVariableNormalized() {
+		try {
+			engine.eval("session = new Object();", context);
+			engine.eval("application = new Object();", context);
+			engine.eval("document = new Object();", context);
+			engine.eval("dialog = new Object();", context);
+		} catch (ScriptException e) {
+			throw new RuntimeException("Vxml interpreter internal error");
+		}
 	}
 
 	public void declareDialogItem(Node formItem) throws ScriptException {
@@ -46,7 +58,10 @@ public final class InterpreterVariableDeclaration {
 				.getTextContent();
 
 		context.getBindings(DefaultInterpreterScriptContext.DOCUMENT_SCOPE)
-				.put(nodeName, nodeValue);
+				.put(nodeName, engine.eval(nodeValue, context));
+
+		engine.eval(getNormalizationScript(nodeName,
+				DefaultInterpreterScriptContext.DOCUMENT_SCOPE), context);
 
 		dialogItemName.put(formItem, nodeName);
 	}
@@ -63,6 +78,7 @@ public final class InterpreterVariableDeclaration {
 		// System.err.println(nodeValue);
 		context.getBindings(scope).put(nodeName,
 				engine.eval(nodeValue, context));
+		engine.eval(getNormalizationScript(nodeName, scope), context);
 	}
 
 	public void declareVariable(File file, int scope)
@@ -76,22 +92,33 @@ public final class InterpreterVariableDeclaration {
 		NamedNodeMap attributes = script.getAttributes();
 		if (script.getNodeName().equals("script")) {
 			if (null != attributes && attributes.getNamedItem("src") != null) {
-				System.err.println(attributes.getNamedItem("src")
-						.getTextContent());
-				File remoteFile = RemoteFileAccess.getRemoteFile(location + "/", attributes.getNamedItem("src").getTextContent());
-				val = engine.eval(new FileReader(remoteFile));
-				System.err.println("path "+remoteFile.getCanonicalPath());
+				// System.err.println(attributes.getNamedItem("src")
+				// .getTextContent());
+				File remoteFile = RemoteFileAccess.getRemoteFile(
+						location + "/", attributes.getNamedItem("src")
+								.getTextContent());
+				val = engine.eval(new FileReader(remoteFile), context
+						.getBindings(scope));
+				// System.err.println("path " + remoteFile.getCanonicalPath());
 			} else {
 				val = engine.eval(script.getTextContent(), context
 						.getBindings(scope));
+			
+				//engine.eval(getNormalizationScript(script.getTextContent()+"", scope), context);
 			}
 		} else if (script.getNodeName().equals("value")) {
 			val = engine.eval(attributes.getNamedItem("expr").getTextContent(),
 					context);
+			// System.err.println("value ("
+			// + attributes.getNamedItem("expr").getTextContent() + ")= "
+			// + val);
 		} else {
-			val = engine.eval(script.getAttributes().getNamedItem("cond")
-					.getTextContent(), context)
+			val = engine.eval(attributes.getNamedItem("cond").getTextContent(),
+					context)
 					+ "";
+			// System.err.println("cond ("
+			// + attributes.getNamedItem("cond").getTextContent() + ")= "
+			// + val);
 		}
 
 		return val;
@@ -105,9 +132,11 @@ public final class InterpreterVariableDeclaration {
 				.getNamedItem("name");
 
 		if (namedItem == null) {
-			context.getBindings(scope).put(dialogItemName.get(node), engine.eval(value,context));
+			context.getBindings(scope).put(dialogItemName.get(node),
+					engine.eval(value, context));
 		} else {
-			context.getBindings(scope).put(namedItem.getNodeValue(), engine.eval(value,context));
+			context.getBindings(scope).put(namedItem.getNodeValue(),
+					engine.eval(value, context));
 		}
 	}
 
@@ -124,7 +153,7 @@ public final class InterpreterVariableDeclaration {
 
 	public Object getValue(String name) throws ScriptException {
 		Object eval = engine.eval(name, context);
-		System.err.println("get("+name+")= "+eval);
+		// System.err.println("get(" + name + ")= " + eval);
 		return (null == eval) ? "undefined" : eval;
 	}
 
@@ -134,5 +163,27 @@ public final class InterpreterVariableDeclaration {
 
 	public void setLocation(String substring) {
 		this.location = substring;
+	}
+
+	private String getNormalizationScript(String name, int scope) {
+		String scopeName;
+		switch (scope) {
+		case DefaultInterpreterScriptContext.APPLICATION_SCOPE:
+			scopeName = "application";
+			break;
+		case DefaultInterpreterScriptContext.DOCUMENT_SCOPE:
+			scopeName = "document";
+			break;
+		case DefaultInterpreterScriptContext.DIALOG_SCOPE:
+			scopeName = "dialog";
+			break;
+		case DefaultInterpreterScriptContext.SESSION_SCOPE:
+			scopeName = "session";
+			break;
+		default:
+			scopeName = "";
+		}
+		
+		return "".equals(scopeName) ? "" : scopeName + "." + name + "=" + name;
 	}
 }

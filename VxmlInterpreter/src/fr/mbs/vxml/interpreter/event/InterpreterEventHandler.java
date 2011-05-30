@@ -8,10 +8,8 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
@@ -22,28 +20,28 @@ import fr.mbs.vxml.utils.Utils;
 public class InterpreterEventHandler implements InterpreterListener {
 
 	public void noInput(InterpreterEvent interpreterEvent)
-			throws ScriptException, DOMException, IOException {
+			throws ScriptException, IOException {
 		handle(interpreterEvent, "noinput");
 	}
 
 	@Override
 	public void NoMatch(InterpreterEvent interpreterEvent)
-			throws ScriptException, DOMException, IOException {
+			throws ScriptException, IOException {
 		handle(interpreterEvent, "nomatch");
 	}
 
 	@Override
-	public void error(InterpreterEvent interpreterEvent) throws ScriptException, DOMException, IOException {
+	public void error(InterpreterEvent interpreterEvent) throws ScriptException, IOException {
 		handle(interpreterEvent, "error");
 	}
 
 	@Override
-	public void help(InterpreterEvent interpreterEvent) throws ScriptException, DOMException, IOException {
+	public void help(InterpreterEvent interpreterEvent) throws ScriptException, IOException {
 		handle(interpreterEvent, "help");
 	}
 
 	private void handle(EventObject interpreterEvent, String eventName)
-			throws ScriptException, DOMException, IOException {
+			throws ScriptException, IOException {
 		InterpreterContext context = (InterpreterContext) interpreterEvent
 				.getSource();
 
@@ -56,15 +54,9 @@ public class InterpreterEventHandler implements InterpreterListener {
 			context.interpreter.execute(catchList.get(0));
 		} catch (InterpreterException e) {
 
-			try {
+			
 				context.executionHandler(e);
-			} catch (SAXException e1) {
-				// TODO Auto-generated catch block
-				throw new RuntimeException(e1);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				throw new RuntimeException(e1);
-			}
+			
 		}
 	}
 

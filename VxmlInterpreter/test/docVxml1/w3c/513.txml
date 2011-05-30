@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+	<catch>
+		<conf:fail expr="'catch-all caught ' + _event"/>
+	</catch>
+	<form id="myForm">
+		<block>
+			<var name="var1" expr="1"/>
+			<if cond="var1== 1">
+				<conf:comment> First value assigned in document order </conf:comment>
+				<else/>
+				<conf:fail reason="error on document order evaluation on first var declaration"/>
+			</if>
+			<var name="var1" expr="2"/>
+			<if cond="var1== 2">
+				<conf:comment> Second value assigned in document order </conf:comment>
+				<else/>
+				<conf:fail reason="error on document order evaluation on second var declaration "/>
+			</if>
+			<var name="var1" expr="3"/>
+			<if cond="var1== 3">
+				<conf:comment> Third value assigned in document order </conf:comment>
+				<conf:pass/>
+				<else/>
+				<conf:fail reason="error on document order evaluation on third var declaration "/>
+			</if>
+		</block>
+	</form>
+</vxml>

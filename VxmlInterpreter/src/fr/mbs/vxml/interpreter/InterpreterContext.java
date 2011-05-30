@@ -8,11 +8,9 @@ import java.util.Vector;
 
 import javax.script.ScriptException;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.xml.XmlPage;
@@ -40,22 +38,29 @@ public class InterpreterContext extends WebClient {
 	private String currentFileName;
 	private String currentRootFileName;
 
-	public InterpreterContext(String fileName) throws SAXException,
-			IOException, DOMException, ScriptException {
+	public InterpreterContext(String fileName, File session)
+			throws IOException, ScriptException {
 		System.err.println(fileName);
 		interpreter.setLocation(fileName
 				.substring(0, fileName.lastIndexOf("/") == -1 ? 0 : fileName
 						.lastIndexOf("/")));
 		setPageCreator(new VxmlDefaultPageCreator());
+
+		if (null != session)
+			interpreter.setSessionVariable(session);
 		buildDocument(fileName);
 		interpreterListeners.add(new InterpreterEventHandler());
 	}
 
-	public void launchInterpreter() throws SAXException, IOException,
-			DOMException, ScriptException {
+	public InterpreterContext(String fileName) throws IOException,
+			ScriptException {
+		this(fileName, null);
+	}
+
+	public void launchInterpreter() throws IOException, ScriptException {
 		try {
-			interpreter
-					.setSessionVariable("/home/sdiawara/workspace/cudl/VxmlInterpreter/src/js/session.js");
+			// interpreter
+			// .setSessionVariable("/home/sdiawara/workspace/cudl/VxmlInterpreter/src/js/session.js");
 			interpreter.interpretDialog(currentDialog);
 			field = interpreter.selectedItem;
 			interpreter.selectedItem = null;
@@ -76,8 +81,8 @@ public class InterpreterContext extends WebClient {
 		interpreterListeners.remove(interpreterListener);
 	}
 
-	public void executionHandler(InterpreterException e) throws SAXException,
-			IOException, DOMException, ScriptException {
+	public void executionHandler(InterpreterException e) throws IOException,
+			ScriptException {
 		if (e instanceof GotoException) {
 			GotoException gotoException = (GotoException) e;
 			String next = gotoException.next;
@@ -101,11 +106,11 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void noInput() throws ScriptException, DOMException, IOException {
+	public void noInput() throws ScriptException, IOException {
 		fireNoInput();
 	}
 
-	public void noMatch() throws ScriptException, DOMException, IOException {
+	public void noMatch() throws ScriptException, IOException {
 		fireNoMatch();
 	}
 
@@ -131,8 +136,9 @@ public class InterpreterContext extends WebClient {
 	}
 
 	private void declareRootScopeVariableIfNeed(String textContent)
-			throws DOMException, ScriptException, IOException {
+			throws ScriptException, IOException {
 		if (!textContent.equals(currentRootFileName)) {
+			interpreter.resetApplicationScope();
 			interpreter.declareVariable(rootDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes(),
 					DefaultInterpreterScriptContext.APPLICATION_SCOPE);
@@ -151,8 +157,7 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	private void fireNoInput() throws ScriptException, DOMException,
-			IOException {
+	private void fireNoInput() throws ScriptException, IOException {
 		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
 		for (Iterator<InterpreterListener> iterator = interpreterListeners
 				.iterator(); iterator.hasNext();) {
@@ -161,8 +166,7 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	private void fireNoMatch() throws ScriptException, DOMException,
-			IOException {
+	private void fireNoMatch() throws ScriptException, IOException {
 		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
 		for (Iterator<InterpreterListener> iterator = interpreterListeners
 				.iterator(); iterator.hasNext();) {
