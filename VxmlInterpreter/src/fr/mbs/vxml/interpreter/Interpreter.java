@@ -1,7 +1,5 @@
 package fr.mbs.vxml.interpreter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -27,7 +25,7 @@ import fr.mbs.vxml.utils.Prompt;
 import fr.mbs.vxml.utils.VxmlElementType;
 
 public class Interpreter {
-	private InterpreterVariableDeclaration declaration = new InterpreterVariableDeclaration();
+	private InterpreterVariableDeclaration declaration;
 	public Node selectedItem;
 	public List<String> w3cNodeConfSuite = new ArrayList<String>();
 
@@ -50,7 +48,6 @@ public class Interpreter {
 					throw new ExitException();
 				}
 			});
-
 			// Just for W3C test
 			put("conf:fail", new NodeExecutor() {
 				public void execute(Node node) {
@@ -113,7 +110,6 @@ public class Interpreter {
 					assignVariableValue(node);
 				}
 			});
-
 			put("clear", new NodeExecutor() {
 				public void execute(Node node) {
 					clearVariable(node);
@@ -162,6 +158,10 @@ public class Interpreter {
 		}
 	};
 
+	public Interpreter() throws IOException, ScriptException {
+		declaration = new InterpreterVariableDeclaration();
+	}
+
 	public void interpretDialog(Node dialog) throws InterpreterException,
 			ScriptException, IOException {
 
@@ -186,6 +186,7 @@ public class Interpreter {
 
 			String nodeName = selectedItem.getNodeName();
 			if (nodeName.equals("field")) {
+				System.err.println("WAIT FOR USER INPUT");
 				execute(selectedItem);
 				return;
 			} else if (nodeName.equals("record")) {
@@ -194,6 +195,7 @@ public class Interpreter {
 				declaration.setValue(selectedItem, "'defined'",
 						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 			} else if (nodeName.equals("transfer")) {
+
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
 				declaration.setValue(selectedItem, "'defined'",
@@ -416,12 +418,6 @@ public class Interpreter {
 		return prompts;
 	}
 
-	public void setSessionVariable(File session) throws FileNotFoundException,
-			ScriptException {
-		declaration.declareVariable(session,
-				DefaultInterpreterScriptContext.SESSION_SCOPE);
-	}
-
 	public void resetDocumentScope() {
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
@@ -438,10 +434,6 @@ public class Interpreter {
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
 
-	}
-
-	public void setLocation(String substring) {
-		declaration.setLocation(substring);
 	}
 
 	private boolean isAnExecutableItem(Node item) {

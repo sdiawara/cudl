@@ -2,7 +2,6 @@ package fr.mbs.vxml.interpreter;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -22,11 +21,11 @@ import fr.mbs.vxml.interpreter.execption.GotoException;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.interpreter.execption.SubmitException;
 import fr.mbs.vxml.script.DefaultInterpreterScriptContext;
+import fr.mbs.vxml.utils.InterpreterRequierement;
 import fr.mbs.vxml.utils.Utils;
 import fr.mbs.vxml.utils.VxmlDefaultPageCreator;
 
 public class InterpreterContext extends WebClient {
-	public final static String FILE_DIR = "/test/docVxml1/";
 	private Document currentdDocument;
 	private Node currentDialog;
 	private Document rootDocument;
@@ -41,13 +40,7 @@ public class InterpreterContext extends WebClient {
 	public InterpreterContext(String fileName, File session)
 			throws IOException, ScriptException {
 		System.err.println(fileName);
-		interpreter.setLocation(fileName
-				.substring(0, fileName.lastIndexOf("/") == -1 ? 0 : fileName
-						.lastIndexOf("/")));
 		setPageCreator(new VxmlDefaultPageCreator());
-
-		if (null != session)
-			interpreter.setSessionVariable(session);
 		buildDocument(fileName);
 		interpreterListeners.add(new InterpreterEventHandler());
 	}
@@ -59,8 +52,6 @@ public class InterpreterContext extends WebClient {
 
 	public void launchInterpreter() throws IOException, ScriptException {
 		try {
-			// interpreter
-			// .setSessionVariable("/home/sdiawara/workspace/cudl/VxmlInterpreter/src/js/session.js");
 			interpreter.interpretDialog(currentDialog);
 			field = interpreter.selectedItem;
 			interpreter.selectedItem = null;
@@ -116,7 +107,6 @@ public class InterpreterContext extends WebClient {
 
 	private void buildDocument(String fileName) throws ScriptException,
 			IOException {
-
 		String url = tackWeelFormedUrl(fileName);
 		System.err.println(url);
 		XmlPage page = getPage(url);
@@ -181,13 +171,10 @@ public class InterpreterContext extends WebClient {
 			return relativePath;
 		}
 
-		if (null != currentFileName && currentFileName.startsWith("http://")) {
-			URL tempUrl = new URL(currentFileName);
-			return tempUrl.getProtocol() + "://" + tempUrl.getHost() + "/"
-					+ relativePath;
+		if (null != InterpreterRequierement.url) {
+			return InterpreterRequierement.url + "/" + relativePath;
 		}
 
-		return "file://" + new File(".").getCanonicalPath().toString()
-				+ FILE_DIR + relativePath;
+		return relativePath;
 	}
 }

@@ -1,7 +1,6 @@
 package fr.mbs.vxml.script;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Hashtable;
@@ -15,6 +14,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import fr.mbs.vxml.utils.InterpreterRequierement;
 import fr.mbs.vxml.utils.RemoteFileAccess;
 
 public final class InterpreterVariableDeclaration {
@@ -23,9 +23,8 @@ public final class InterpreterVariableDeclaration {
 	private ScriptEngineManager manager;
 	private ScriptEngine engine;
 	private InterpreterScriptContext context;
-	private String location;
 
-	public InterpreterVariableDeclaration() {
+	public InterpreterVariableDeclaration() throws IOException, ScriptException {
 		manager = new ScriptEngineManager();
 		engine = manager.getEngineByName("ecmascript");
 		context = new DefaultInterpreterScriptContext();
@@ -33,14 +32,21 @@ public final class InterpreterVariableDeclaration {
 		addVariableNormalized();
 	}
 
-	private void addVariableNormalized() {
+	private void addVariableNormalized() throws IOException, ScriptException {
 		try {
 			engine.eval("session = new Object();", context);
+			File remoteFile = RemoteFileAccess.getRemoteFile(
+					InterpreterRequierement.sessionFileName, "");
+			
+			if (null != remoteFile)
+				engine.eval(new FileReader(remoteFile), context);
+
 			engine.eval("application = new Object();", context);
 			engine.eval("document = new Object();", context);
 			engine.eval("dialog = new Object();", context);
 		} catch (ScriptException e) {
-			throw new RuntimeException("Vxml interpreter internal error");
+			throw new ScriptException("Vxml interpreter internal error "
+					+ e.toString());
 		}
 	}
 
@@ -78,12 +84,7 @@ public final class InterpreterVariableDeclaration {
 		// System.err.println(nodeValue);
 		context.getBindings(scope).put(nodeName,
 				engine.eval(nodeValue, context));
-		engine.eval(getNormalizationScript(nodeName, scope), context);
-	}
-
-	public void declareVariable(File file, int scope)
-			throws FileNotFoundException, ScriptException {
-		engine.eval(new FileReader(file), context.getBindings(scope));
+		// engine.eval(getNormalizationScript(nodeName, scope), context);
 	}
 
 	public Object evaluateScript(Node script, int scope) throws DOMException,
@@ -95,16 +96,17 @@ public final class InterpreterVariableDeclaration {
 				// System.err.println(attributes.getNamedItem("src")
 				// .getTextContent());
 				File remoteFile = RemoteFileAccess.getRemoteFile(
-						location + "/", attributes.getNamedItem("src")
-								.getTextContent());
+						InterpreterRequierement.url + "/", attributes
+								.getNamedItem("src").getTextContent());
 				val = engine.eval(new FileReader(remoteFile), context
 						.getBindings(scope));
 				// System.err.println("path " + remoteFile.getCanonicalPath());
 			} else {
 				val = engine.eval(script.getTextContent(), context
 						.getBindings(scope));
-			
-				//engine.eval(getNormalizationScript(script.getTextContent()+"", scope), context);
+
+				// engine.eval(getNormalizationScript(script.getTextContent()+"",
+				// scope), context);
 			}
 		} else if (script.getNodeName().equals("value")) {
 			val = engine.eval(attributes.getNamedItem("expr").getTextContent(),
@@ -161,10 +163,6 @@ public final class InterpreterVariableDeclaration {
 		context.getBindings(scope).clear();
 	}
 
-	public void setLocation(String substring) {
-		this.location = substring;
-	}
-
 	private String getNormalizationScript(String name, int scope) {
 		String scopeName;
 		switch (scope) {
@@ -183,7 +181,7 @@ public final class InterpreterVariableDeclaration {
 		default:
 			scopeName = "";
 		}
-		
+
 		return "".equals(scopeName) ? "" : scopeName + "." + name + "=" + name;
 	}
 }

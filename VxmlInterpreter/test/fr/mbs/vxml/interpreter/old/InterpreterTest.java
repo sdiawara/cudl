@@ -1,5 +1,6 @@
 package fr.mbs.vxml.interpreter.old;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,15 +9,23 @@ import javax.script.ScriptException;
 
 import junit.framework.TestCase;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
+import fr.mbs.vxml.utils.InterpreterRequierement;
 import fr.mbs.vxml.utils.Prompt;
 
 public class InterpreterTest extends TestCase {
 
 	private InterpreterContext interpreterContext;
 
+	
+	@Before
+	public void setUp() throws IOException {
+		InterpreterRequierement.url = "file://" + new File(".").getCanonicalPath()
+				+ "/test/docVxml1/";
+	}
 	@Test
 	public void testCallServiceNavigateUntilNextInteractionAndCollectsNavigationTraces()
 			throws IOException, ScriptException {

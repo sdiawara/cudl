@@ -3,6 +3,7 @@ package fr.mbs.vxml.interpreter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -12,13 +13,21 @@ import java.util.TreeMap;
 
 import javax.script.ScriptException;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import fr.mbs.vxml.utils.InterpreterRequierement;
 import fr.mbs.vxml.utils.Prompt;
 
 public class InterpreterTest {
 	private Map<String, String> varExcepted = new TreeMap<String, String>();
 	private InterpreterContext interpreterContext;
+
+	@Before
+	public void setUp() throws IOException {
+		InterpreterRequierement.url = "file://" + new File(".").getCanonicalPath()
+				+ "/test/docVxml1/";
+	}
 
 	@Test
 	public void testLogTrace() throws IOException, ScriptException {

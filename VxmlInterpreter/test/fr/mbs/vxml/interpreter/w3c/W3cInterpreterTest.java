@@ -2,6 +2,7 @@ package fr.mbs.vxml.interpreter.w3c;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,9 +10,11 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
+import fr.mbs.vxml.utils.InterpreterRequierement;
 
 public class W3cInterpreterTest {
 	private InterpreterContext interpreterContext;
@@ -131,6 +134,12 @@ public class W3cInterpreterTest {
 		}
 	};
 
+	
+	@Before
+	public void setUp() throws IOException {
+		InterpreterRequierement.url = "file://" + new File(".").getCanonicalPath()
+				+ "/test/docVxml1/";
+	}
 	@Test
 	public void w3cIRTest() throws IOException, ScriptException {
 		int count = 0;
