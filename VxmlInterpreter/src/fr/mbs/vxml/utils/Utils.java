@@ -6,6 +6,8 @@ import org.w3c.dom.NodeList;
 import java.lang.String;
 
 public class Utils {
+	public static Node lastNodeVisited;
+
 	public static Node searchDialogByName(NodeList nodeList, String id) {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);

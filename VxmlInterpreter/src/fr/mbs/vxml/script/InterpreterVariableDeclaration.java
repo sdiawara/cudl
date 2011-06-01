@@ -34,16 +34,42 @@ public final class InterpreterVariableDeclaration {
 
 	private void addVariableNormalized() throws IOException, ScriptException {
 		try {
-			engine.eval("session = new Object();", context);
+			engine
+					.eval(
+							"session = new Object(); ",
+							context
+									.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
 			File remoteFile = RemoteFileAccess.getRemoteFile(
 					InterpreterRequierement.sessionFileName, "");
-			
-			if (null != remoteFile)
-				engine.eval(new FileReader(remoteFile), context);
 
-			engine.eval("application = new Object();", context);
-			engine.eval("document = new Object();", context);
-			engine.eval("dialog = new Object();", context);
+			if (null != remoteFile) {
+				engine
+						.eval(
+								new FileReader(remoteFile),
+								context
+										.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
+				engine
+						.eval(
+								"session = new Object(); session.connection = connection; ",
+								context
+										.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
+			}
+
+			engine
+					.eval(
+							"application = new Object();",
+							context
+									.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
+			engine
+					.eval(
+							"document = new Object();",
+							context
+									.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
+			engine
+					.eval(
+							"dialog = new Object();",
+							context
+									.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
 		} catch (ScriptException e) {
 			throw new ScriptException("Vxml interpreter internal error "
 					+ e.toString());
@@ -81,7 +107,6 @@ public final class InterpreterVariableDeclaration {
 		Node value = attributes.getNamedItem("expr");
 		String nodeValue = (null == value) ? "undefined" : value
 				.getTextContent();
-		// System.err.println(nodeValue);
 		context.getBindings(scope).put(nodeName,
 				engine.eval(nodeValue, context));
 		// engine.eval(getNormalizationScript(nodeName, scope), context);
@@ -102,25 +127,25 @@ public final class InterpreterVariableDeclaration {
 						.getBindings(scope));
 				// System.err.println("path " + remoteFile.getCanonicalPath());
 			} else {
-				val = engine.eval(script.getTextContent(), context
+				val = engine.eval(getReplaceBindingName(script.getTextContent()), context
 						.getBindings(scope));
 
 				// engine.eval(getNormalizationScript(script.getTextContent()+"",
 				// scope), context);
 			}
 		} else if (script.getNodeName().equals("value")) {
-			val = engine.eval(attributes.getNamedItem("expr").getTextContent(),
+			val = engine.eval(getReplaceBindingName(attributes.getNamedItem("expr").getTextContent()),
 					context);
 			// System.err.println("value ("
 			// + attributes.getNamedItem("expr").getTextContent() + ")= "
 			// + val);
 		} else {
-			val = engine.eval(attributes.getNamedItem("cond").getTextContent(),
+			val = engine.eval(getReplaceBindingName(attributes.getNamedItem("cond").getTextContent()),
 					context)
 					+ "";
-			// System.err.println("cond ("
-			// + attributes.getNamedItem("cond").getTextContent() + ")= "
-			// + val);
+//			System.err.println("cond ("
+//					+ attributes.getNamedItem("cond").getTextContent() + ")= "
+//					+ val);
 		}
 
 		return val;
@@ -154,12 +179,13 @@ public final class InterpreterVariableDeclaration {
 	}
 
 	public Object getValue(String name) throws ScriptException {
-		Object eval = engine.eval(name, context);
+		Object eval = engine.eval(getReplaceBindingName(name), context);
 		// System.err.println("get(" + name + ")= " + eval);
 		return (null == eval) ? "undefined" : eval;
 	}
 
 	public void resetScopeBinding(int scope) {
+		System.err.println("clear scope " + scope);
 		context.getBindings(scope).clear();
 	}
 
@@ -183,5 +209,10 @@ public final class InterpreterVariableDeclaration {
 		}
 
 		return "".equals(scopeName) ? "" : scopeName + "." + name + "=" + name;
+	}
+	
+	private String getReplaceBindingName(String name) {
+		return name.replaceAll(
+				"session\\.|application\\.|document\\.|dialog\\.", "");
 	}
 }

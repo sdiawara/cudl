@@ -28,8 +28,9 @@ public class DefaultInterpreterScriptContext extends SimpleScriptContext
 
 	@Override
 	public Object getAttribute(String name) {
+		
 		checkName(name);
-
+		
 		int tmp = LOWEST_SCOPE;
 		while (tmp <= BIGEST_SCOPE) {
 			Bindings bindings = getBindings(tmp);
@@ -40,6 +41,14 @@ public class DefaultInterpreterScriptContext extends SimpleScriptContext
 		}
 
 		return super.getAttribute(name);
+	}
+
+	private String getRealName(String name) {
+		if (name.startsWith("session.") || name.startsWith("application.")
+				|| name.startsWith("document.") || name.startsWith("dialog."))
+			return name.substring(name.indexOf(".") + 1);
+
+		return name;
 	}
 
 	@Override

@@ -128,18 +128,31 @@ public class W3cInterpreterTest {
 			// Each scope contains a predefined variable whose name is the same
 			// as the scope that refers to the scope itself.
 			add("w3c/405.txml");
-			
-			//FIXME: ADD normalization to scripe 
-			//add("w3c/399main.txml");
+
+			// FIXME: ADD normalization to scripe
+			add("w3c/399main.txml");
+
+			// A element not specifying a 'bridge' attribute is executed as a
+			// blind transfer.
+			add("w3c/294.txml");
+
+			// Upon a successful blind transfer, a
+			// 'connection.disconnect.transfer' event is thrown and the transfer
+			// name variable remains undefined.
+			add("w3c/298.txml");
+
+			// A element specifying a 'cond' attribute that evaluates to false
+			// upon selection of the element by the FIA is not executed.
+			add("w3c/293.txml");
 		}
 	};
 
-	
 	@Before
 	public void setUp() throws IOException {
-		InterpreterRequierement.url = "file://" + new File(".").getCanonicalPath()
-				+ "/test/docVxml1/";
+		InterpreterRequierement.url = "file://"
+				+ new File(".").getCanonicalPath() + "/test/docVxml1/";
 	}
+
 	@Test
 	public void w3cIRTest() throws IOException, ScriptException {
 		int count = 0;
@@ -202,7 +215,7 @@ public class W3cInterpreterTest {
 
 		interpreterContext = new InterpreterContext("w3c/235.txml");
 		interpreterContext.launchInterpreter();
-		interpreterContext.noInput();
+		interpreterContext.event("noinput");
 
 		// System.out.println(interpreterContext.interpreter.w3cNodeConfSuite);
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)

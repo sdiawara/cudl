@@ -2,7 +2,6 @@ package fr.mbs.vxml.interpreter.event;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,48 +14,22 @@ import fr.mbs.vxml.interpreter.InterpreterContext;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.utils.Utils;
 
-
-
 public class InterpreterEventHandler implements InterpreterListener {
 
-	public void noInput(InterpreterEvent interpreterEvent)
-			throws ScriptException, IOException {
-		handle(interpreterEvent, "noinput");
-	}
-
 	@Override
-	public void NoMatch(InterpreterEvent interpreterEvent)
-			throws ScriptException, IOException {
-		handle(interpreterEvent, "nomatch");
-	}
-
-	@Override
-	public void error(InterpreterEvent interpreterEvent) throws ScriptException, IOException {
-		handle(interpreterEvent, "error");
-	}
-
-	@Override
-	public void help(InterpreterEvent interpreterEvent) throws ScriptException, IOException {
-		handle(interpreterEvent, "help");
-	}
-
-	private void handle(EventObject interpreterEvent, String eventName)
+	public void doEvent(InterpreterEvent interpreterEvent)
 			throws ScriptException, IOException {
 		InterpreterContext context = (InterpreterContext) interpreterEvent
 				.getSource();
 
-		List<Node> catchList = searchEvent(eventName,
-				context.field);
+		List<Node> catchList = searchEvent(interpreterEvent.type, context.field);
 		removeUnlessCond(catchList);
 		try {
 			// FIXME: take the first with a correct event counter
 			// a counter who is ≤ at currentCounter
 			context.interpreter.execute(catchList.get(0));
 		} catch (InterpreterException e) {
-
-			
-				context.executionHandler(e);
-			
+			context.executionHandler(e);
 		}
 	}
 
@@ -67,7 +40,6 @@ public class InterpreterEventHandler implements InterpreterListener {
 				catchList.remove(node);
 			}
 		}
-
 	}
 
 	private List<Node> searchEvent(String eventName, Node parent) {

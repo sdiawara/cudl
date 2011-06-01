@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import fr.mbs.vxml.interpreter.execption.DisconnectException;
+import fr.mbs.vxml.interpreter.execption.EventException;
 import fr.mbs.vxml.interpreter.execption.ExitException;
 import fr.mbs.vxml.interpreter.execption.FilledException;
 import fr.mbs.vxml.interpreter.execption.GotoException;
@@ -55,8 +56,9 @@ public class Interpreter {
 					NamedNodeMap attributes = node.getAttributes();
 					if (attributes == null)
 						return;
-					System.err.println(node.getAttributes().getNamedItem(
-							"reason").getTextContent());
+					if (node.getAttributes().getNamedItem("reason") != null)
+						System.err.println(node.getAttributes().getNamedItem(
+								"reason").getTextContent());
 				}
 			});
 
@@ -195,7 +197,7 @@ public class Interpreter {
 				declaration.setValue(selectedItem, "'defined'",
 						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 			} else if (nodeName.equals("transfer")) {
-
+				doTransferCall();
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
 				declaration.setValue(selectedItem, "'defined'",
@@ -211,6 +213,18 @@ public class Interpreter {
 			// +i+++" "+currentNodeVariables);
 			// TODO: PHASE PROCESS
 		}
+	}
+
+	private void doTransferCall() throws ScriptException, IOException,
+			EventException {
+		throw new EventException(
+				isBlindTransfer(selectedItem) ? "connection.disconnect.transfer"
+						: "connection.disconnect.hangup");
+	}
+
+	private boolean isBlindTransfer(Node selectedItem2) {
+		Node namedItem = selectedItem2.getAttributes().getNamedItem("bridge");
+		return namedItem == null || namedItem.getNodeValue().equals("false");
 	}
 
 	public void declareVariable(NodeList nodeList, int scope)

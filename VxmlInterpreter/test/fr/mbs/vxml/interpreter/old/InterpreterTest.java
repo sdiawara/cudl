@@ -91,8 +91,8 @@ public class InterpreterTest extends TestCase {
 		interpreterContext = new InterpreterContext(
 				"oldtestfile/VxmlGlobalServletService");
 		interpreterContext.launchInterpreter();
-		interpreterContext.noInput();
-		interpreterContext.noMatch();
+		interpreterContext.event("noinput");
+		interpreterContext.event("nomatch");
 
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 	}

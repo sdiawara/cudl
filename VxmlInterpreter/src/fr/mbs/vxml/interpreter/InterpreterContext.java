@@ -2,8 +2,6 @@ package fr.mbs.vxml.interpreter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Vector;
 
 import javax.script.ScriptException;
 
@@ -17,6 +15,7 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import fr.mbs.vxml.interpreter.event.InterpreterEvent;
 import fr.mbs.vxml.interpreter.event.InterpreterEventHandler;
 import fr.mbs.vxml.interpreter.event.InterpreterListener;
+import fr.mbs.vxml.interpreter.execption.EventException;
 import fr.mbs.vxml.interpreter.execption.GotoException;
 import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.interpreter.execption.SubmitException;
@@ -31,7 +30,7 @@ public class InterpreterContext extends WebClient {
 	private Document rootDocument;
 	private NodeList dialogs;
 	public Interpreter interpreter = new Interpreter();
-	private Vector<InterpreterListener> interpreterListeners = new Vector<InterpreterListener>();
+	private InterpreterListener interpreterListener;
 
 	public Node field;
 	private String currentFileName;
@@ -42,7 +41,7 @@ public class InterpreterContext extends WebClient {
 		System.err.println(fileName);
 		setPageCreator(new VxmlDefaultPageCreator());
 		buildDocument(fileName);
-		interpreterListeners.add(new InterpreterEventHandler());
+		interpreterListener = new InterpreterEventHandler();
 	}
 
 	public InterpreterContext(String fileName) throws IOException,
@@ -60,18 +59,6 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public synchronized void addInterpreterListener(
-			InterpreterListener interpreterListener) {
-		if (interpreterListeners.contains(interpreterListener))
-			return;
-		interpreterListeners.add(interpreterListener);
-	}
-
-	public synchronized void removeInterpreterListener(
-			InterpreterListener interpreterListener) {
-		interpreterListeners.remove(interpreterListener);
-	}
-
 	public void executionHandler(InterpreterException e) throws IOException,
 			ScriptException {
 		if (e instanceof GotoException) {
@@ -87,22 +74,23 @@ public class InterpreterContext extends WebClient {
 				interpreter.resetDocumentScope();
 				buildDocument(next);
 			}
-
 			launchInterpreter();
 		} else if (e instanceof SubmitException) {
 			interpreter.resetDocumentScope();
 			buildDocument(((SubmitException) e).next);
 			interpreter.selectedItem = null;
 			launchInterpreter();
+		} else if (e instanceof EventException) {
+			field = interpreter.selectedItem;
+			interpreter.selectedItem = null;
+			EventException eventException = (EventException) e;
+			interpreterListener.doEvent(new InterpreterEvent(this,
+					eventException.type));
 		}
 	}
 
-	public void noInput() throws ScriptException, IOException {
-		fireNoInput();
-	}
-
-	public void noMatch() throws ScriptException, IOException {
-		fireNoMatch();
+	public void event(String eventType) throws ScriptException, IOException {
+		interpreterListener.doEvent(new InterpreterEvent(this, eventType));
 	}
 
 	private void buildDocument(String fileName) throws ScriptException,
@@ -143,25 +131,6 @@ public class InterpreterContext extends WebClient {
 					"vxml").item(0).getChildNodes(),
 					DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 			currentFileName = tackWeelFormedUrl(fileName);
-
-		}
-	}
-
-	private void fireNoInput() throws ScriptException, IOException {
-		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
-		for (Iterator<InterpreterListener> iterator = interpreterListeners
-				.iterator(); iterator.hasNext();) {
-			InterpreterListener interpreterListener = iterator.next();
-			interpreterListener.noInput(interpreterEvent);
-		}
-	}
-
-	private void fireNoMatch() throws ScriptException, IOException {
-		InterpreterEvent interpreterEvent = new InterpreterEvent(this);
-		for (Iterator<InterpreterListener> iterator = interpreterListeners
-				.iterator(); iterator.hasNext();) {
-			InterpreterListener interpreterListener = iterator.next();
-			interpreterListener.NoMatch(interpreterEvent);
 		}
 	}
 
