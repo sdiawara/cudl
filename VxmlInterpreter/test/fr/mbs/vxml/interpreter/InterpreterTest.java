@@ -314,6 +314,15 @@ public class InterpreterTest {
 
 		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
 	}
+	
+	@Test(expected=ScriptException.class)
+	public void WhenRootChangeLastRootVariableIsNotLongerAccessible() throws IOException,
+			ScriptException {
+		interpreterContext = new InterpreterContext("rootChangeVariable.vxml");
+		interpreterContext.launchInterpreter();
+	}
+
+	
 
 	@Test
 	public void comparerTwoVariableInDifferentScope() throws IOException,

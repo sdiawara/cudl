@@ -8,5 +8,4 @@ import javax.script.ScriptException;
 public interface InterpreterListener extends EventListener {
 	public void doEvent(InterpreterEvent interpreterEvent)
 			throws ScriptException, IOException;
-
 }

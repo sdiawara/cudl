@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
 
+import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -34,42 +36,17 @@ public final class InterpreterVariableDeclaration {
 
 	private void addVariableNormalized() throws IOException, ScriptException {
 		try {
-			engine
-					.eval(
-							"session = new Object(); ",
-							context
-									.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
+			declarareScope(InterpreterScriptContext.SESSION_SCOPE);
 			File remoteFile = RemoteFileAccess.getRemoteFile(
 					InterpreterRequierement.sessionFileName, "");
 
 			if (null != remoteFile) {
-				engine
-						.eval(
-								new FileReader(remoteFile),
-								context
-										.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
-				engine
-						.eval(
-								"session = new Object(); session.connection = connection; ",
-								context
-										.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
+				engine.eval(new FileReader(remoteFile));
 			}
 
-			engine
-					.eval(
-							"application = new Object();",
-							context
-									.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
-			engine
-					.eval(
-							"document = new Object();",
-							context
-									.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
-			engine
-					.eval(
-							"dialog = new Object();",
-							context
-									.getBindings(DefaultInterpreterScriptContext.SESSION_SCOPE));
+			declarareScope(InterpreterScriptContext.APPLICATION_SCOPE);
+			declarareScope(InterpreterScriptContext.DOCUMENT_SCOPE);
+			declarareScope(InterpreterScriptContext.DIALOG_SCOPE);
 		} catch (ScriptException e) {
 			throw new ScriptException("Vxml interpreter internal error "
 					+ e.toString());
@@ -89,11 +66,8 @@ public final class InterpreterVariableDeclaration {
 		String nodeValue = (null == value) ? "undefined" : value
 				.getTextContent();
 
-		context.getBindings(DefaultInterpreterScriptContext.DOCUMENT_SCOPE)
-				.put(nodeName, engine.eval(nodeValue, context));
-
-		engine.eval(getNormalizationScript(nodeName,
-				DefaultInterpreterScriptContext.DOCUMENT_SCOPE), context);
+		getBindings(InterpreterScriptContext.DOCUMENT_SCOPE).put(nodeName,
+				engine.eval(nodeValue, context));
 
 		dialogItemName.put(formItem, nodeName);
 	}
@@ -107,9 +81,8 @@ public final class InterpreterVariableDeclaration {
 		Node value = attributes.getNamedItem("expr");
 		String nodeValue = (null == value) ? "undefined" : value
 				.getTextContent();
-		context.getBindings(scope).put(nodeName,
-				engine.eval(nodeValue, context));
-		// engine.eval(getNormalizationScript(nodeName, scope), context);
+
+		getBindings(scope).put(nodeName, engine.eval(nodeValue, context));
 	}
 
 	public Object evaluateScript(Node script, int scope) throws DOMException,
@@ -118,34 +91,23 @@ public final class InterpreterVariableDeclaration {
 		NamedNodeMap attributes = script.getAttributes();
 		if (script.getNodeName().equals("script")) {
 			if (null != attributes && attributes.getNamedItem("src") != null) {
-				// System.err.println(attributes.getNamedItem("src")
-				// .getTextContent());
 				File remoteFile = RemoteFileAccess.getRemoteFile(
 						InterpreterRequierement.url + "/", attributes
 								.getNamedItem("src").getTextContent());
-				val = engine.eval(new FileReader(remoteFile), context
-						.getBindings(scope));
-				// System.err.println("path " + remoteFile.getCanonicalPath());
+				val = engine.eval(new FileReader(remoteFile),
+						getBindings(scope));
 			} else {
-				val = engine.eval(getReplaceBindingName(script.getTextContent()), context
-						.getBindings(scope));
-
-				// engine.eval(getNormalizationScript(script.getTextContent()+"",
-				// scope), context);
+				val = engine.eval(
+						getReplaceBindingName(script.getTextContent()),
+						getBindings(scope));
 			}
 		} else if (script.getNodeName().equals("value")) {
-			val = engine.eval(getReplaceBindingName(attributes.getNamedItem("expr").getTextContent()),
-					context);
-			// System.err.println("value ("
-			// + attributes.getNamedItem("expr").getTextContent() + ")= "
-			// + val);
+			val = engine.eval(getReplaceBindingName(attributes.getNamedItem(
+					"expr").getTextContent()), context);
 		} else {
-			val = engine.eval(getReplaceBindingName(attributes.getNamedItem("cond").getTextContent()),
-					context)
+			val = engine.eval(getReplaceBindingName(attributes.getNamedItem(
+					"cond").getTextContent()), context)
 					+ "";
-//			System.err.println("cond ("
-//					+ attributes.getNamedItem("cond").getTextContent() + ")= "
-//					+ val);
 		}
 
 		return val;
@@ -153,16 +115,17 @@ public final class InterpreterVariableDeclaration {
 
 	public void setValue(Node node, String value, int scope)
 			throws ScriptException {
+
 		NamedNodeMap attributes = node.getAttributes();
 		Node namedItem;
 		namedItem = (null == attributes) ? null : attributes
 				.getNamedItem("name");
 
 		if (namedItem == null) {
-			context.getBindings(scope).put(dialogItemName.get(node),
+			getBindings(scope).put(dialogItemName.get(node),
 					engine.eval(value, context));
 		} else {
-			context.getBindings(scope).put(namedItem.getNodeValue(),
+			getBindings(scope).put(namedItem.getNodeValue(),
 					engine.eval(value, context));
 		}
 	}
@@ -180,39 +143,53 @@ public final class InterpreterVariableDeclaration {
 
 	public Object getValue(String name) throws ScriptException {
 		Object eval = engine.eval(getReplaceBindingName(name), context);
-		// System.err.println("get(" + name + ")= " + eval);
 		return (null == eval) ? "undefined" : eval;
 	}
 
 	public void resetScopeBinding(int scope) {
-		System.err.println("clear scope " + scope);
-		context.getBindings(scope).clear();
+		System.err.println("clear scope " + getScopeName(scope));
+		if (scope <= 90)
+			getBindings(scope).clear();
+		try {
+			// This section never raise exception
+			declarareScope(scope);
+		} catch (ScriptException e) {
+		}
 	}
 
-	private String getNormalizationScript(String name, int scope) {
+	private void declarareScope(int scope) throws ScriptException {
+		engine.eval(getScopeName(scope) + " = new Object();",
+				getBindings(scope));
+	}
+
+	private String getScopeName(int scope) {
 		String scopeName;
 		switch (scope) {
-		case DefaultInterpreterScriptContext.APPLICATION_SCOPE:
+		case InterpreterScriptContext.APPLICATION_SCOPE:
 			scopeName = "application";
 			break;
-		case DefaultInterpreterScriptContext.DOCUMENT_SCOPE:
+		case InterpreterScriptContext.DOCUMENT_SCOPE:
 			scopeName = "document";
 			break;
-		case DefaultInterpreterScriptContext.DIALOG_SCOPE:
+		case InterpreterScriptContext.DIALOG_SCOPE:
 			scopeName = "dialog";
 			break;
-		case DefaultInterpreterScriptContext.SESSION_SCOPE:
+		case InterpreterScriptContext.SESSION_SCOPE:
 			scopeName = "session";
 			break;
 		default:
-			scopeName = "";
+			scopeName = "global";
 		}
 
-		return "".equals(scopeName) ? "" : scopeName + "." + name + "=" + name;
+		return scopeName;
 	}
-	
+
 	private String getReplaceBindingName(String name) {
 		return name.replaceAll(
 				"session\\.|application\\.|document\\.|dialog\\.", "");
+	}
+
+	private Bindings getBindings(int scope) {
+		return context.getBindings(scope);
 	}
 }

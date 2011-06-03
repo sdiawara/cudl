@@ -9,6 +9,7 @@ import javax.script.ScriptException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.omg.CORBA.portable.ApplicationException;
 
 public class ScriptTest {
 	ScriptEngineManager engineManager = new ScriptEngineManager();
@@ -21,15 +22,19 @@ public class ScriptTest {
 	private DefaultInterpreterScriptContext context;
 
 	@Before
-	public void setup() {
+	public void setup() throws ScriptException {
 		context = new DefaultInterpreterScriptContext();
 		anonyme = context.getBindings(InterpreterScriptContext.ANONYME_SCOPE);
 		dialog = context.getBindings(InterpreterScriptContext.DIALOG_SCOPE);
+		engine.eval("dialog = new Object()", dialog);
 		document = context.getBindings(InterpreterScriptContext.DOCUMENT_SCOPE);
+		engine.eval("document = new Object()", document);
 		appli = context.getBindings(InterpreterScriptContext.APPLICATION_SCOPE);
+		engine.eval("application = new Object()", appli);
 		session = context.getBindings(InterpreterScriptContext.SESSION_SCOPE);
+		engine.eval("session = new Object()", session);
 	}
-	
+
 	@Test(expected = ScriptException.class)
 	public void onlyDeclarationBindingContain() throws ScriptException {
 		anonyme.put("x", "toto");
@@ -54,7 +59,6 @@ public class ScriptTest {
 						System.err.println("this scope session not contains x");
 						throw new ScriptException(e3);
 					}
-
 				}
 			}
 
@@ -83,7 +87,7 @@ public class ScriptTest {
 		assertEquals("session", engine.eval("println(x);x", context));
 	}
 
-	@Test(expected=ScriptException.class)
+	@Test(expected = ScriptException.class)
 	public void whenScripScopeChangeTheScripIsNoLongerAccessible()
 			throws ScriptException {
 		engine

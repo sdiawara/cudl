@@ -221,5 +221,4 @@ public class W3cInterpreterTest {
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
 				.equals("[conf:pass: null]"));
 	}
-
 }
