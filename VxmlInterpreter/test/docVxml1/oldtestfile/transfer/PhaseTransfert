@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<vxml xml:lang="fr" xmlns="http://www.w3.org/2001/vxml" version="2.0">
+  
+    <property name="com.francetelecom.cvmx.useaudiotelbridge" value="true" />    
+   
+  <!-- Constantes de retour du reroutage -->
+  <var name="RES_REROUT_OK" expr="'0'" />
+  <var name="RES_REROUT_NOANSWER" expr="'2'" />
+  <var name="RES_REROUT_BUSY" expr="'3'" />
+   <form>
+    <block>
+        <log>LOG PHASE transfert</log>
+    </block>
+   <transfer name="resultTransfert" dest="sup:4700810C810106830783105506911808" bridge="true"  connecttimeout="200s">
+          <filled>
+            <var name="transferResult" expr="pf_transfer_result()" />
+            <var name="currentState" expr="'EffectueRoutage'" />
+            <var name="toState" expr="'compteRenduRoutage'" />
+            <var name="callReason" expr="'normal'" />
+           <submit next="FinTransfertKO" namelist="currentState toState callReason resultTransfert" method="post" ></submit>
+      </filled>
+  </transfer>
+      <catch event="connection.disconnect.hangup">
+         <var name="currentState" expr="'EffectueRoutage'" />
+         <var name="toState" expr="'compteRenduRoutage'" />
+         <var name="callReason" expr="'normal'" />
+         <var name="resultTransfert" expr="'OK'" />
+         <submit next="FinTransfert" namelist="currentState toState callReason resultTransfert" method="post" ></submit>
+      </catch>      
+    <catch event="connection.disconnect.transfer">
+        <var name="currentState" expr="'EffectueRoutage'" />
+        <var name="toState" expr="'compteRenduRoutage'" />
+        <var name="callReason" expr="'normal'" />
+        <var name="transferResult" expr="pf_transfer_result()" />
+        <submit next="FinTransfert" namelist="currentState toState callReason resultTransfert" method="post" ></submit>
+    </catch>
+      
+   </form>
+</vxml>

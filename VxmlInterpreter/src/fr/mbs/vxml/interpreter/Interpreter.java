@@ -159,6 +159,7 @@ public class Interpreter {
 			});
 		}
 	};
+	public String transfertDestination;
 
 	public Interpreter() throws IOException, ScriptException {
 		declaration = new InterpreterVariableDeclaration();
@@ -190,7 +191,7 @@ public class Interpreter {
 			if (nodeName.equals("field")) {
 				System.err.println("WAIT FOR USER INPUT");
 				execute(selectedItem);
-				return;
+				// return;
 			} else if (nodeName.equals("record")) {
 			} else if (nodeName.equals("object")) {
 			} else if (nodeName.equals("subdialog")) {
@@ -206,17 +207,19 @@ public class Interpreter {
 				declaration
 						.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
 			}
-			// FIXME: remove 0
 
-			// variables.get(selectedItem)+"]"+" n°"
-			// System.out.println("After selection ["+
-			// +i+++" "+currentNodeVariables);
 			// TODO: PHASE PROCESS
 		}
 	}
 
 	private void doTransferCall() throws ScriptException, IOException,
 			EventException {
+		
+		Node namedItem = selectedItem.getAttributes().getNamedItem("dest");
+		transfertDestination = namedItem == null?selectedItem.getAttributes().getNamedItem("destexpr").getNodeValue():namedItem.getNodeValue();
+		// FIXME: add w3c for more fonctionnalité
+		
+		System.err.println("transfer----->" + selectedItem+"\t"+transfertDestination);
 		throw new EventException(
 				isBlindTransfer(selectedItem) ? "connection.disconnect.transfer"
 						: "connection.disconnect.hangup");
@@ -248,9 +251,9 @@ public class Interpreter {
 			Node node1 = child.item(i);
 			NodeExecutor executor = nodeExecution.get(node1.getNodeName());
 
-			if (node1.getNodeName().equals("filled")) {
-				return;
-			}
+			// if (node1.getNodeName().equals("filled")) {
+			// return;
+			// }
 
 			if (null != executor) {
 				executor.execute(node1);
@@ -505,5 +508,16 @@ public class Interpreter {
 	public void resetApplicationScope() {
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.APPLICATION_SCOPE);
+	}
+
+	public boolean raccrochage() {
+		return false;
+	}
+
+	public void utterance(String string, String string2) throws ScriptException {
+		declaration.evaluateScript("lastresult$[0].utterance =" + string,
+				InterpreterScriptContext.APPLICATION_SCOPE);
+		declaration.evaluateScript("lastresult$[0].inputmode =" + string2,
+				InterpreterScriptContext.APPLICATION_SCOPE);
 	}
 }

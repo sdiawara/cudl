@@ -68,13 +68,13 @@ public class DefaultInterpreterScriptContext extends SimpleScriptContext
 		if (anonymeScope.containsKey(name))
 			return ANONYME_SCOPE;
 		else if (dialogScope.containsKey(name))
-			return DIALOG_SCOPE;
+			return ANONYME_SCOPE;
 		else if (documentScope.containsKey(name))
-			return DOCUMENT_SCOPE;
+			return ANONYME_SCOPE;
 		else if (applicationScope.containsKey(name)) {
-			return APPLICATION_SCOPE;
+			return ANONYME_SCOPE;
 		} else if (sessionScope.containsKey(name))
-			return SESSION_SCOPE;
+			return ANONYME_SCOPE;
 
 		return super.getAttributesScope(name);
 	}

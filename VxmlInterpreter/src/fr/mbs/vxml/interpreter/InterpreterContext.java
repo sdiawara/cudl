@@ -80,16 +80,20 @@ public class InterpreterContext extends WebClient {
 			buildDocument(((SubmitException) e).next);
 			interpreter.selectedItem = null;
 			launchInterpreter();
-		} else if (e instanceof EventException) {
-			field = interpreter.selectedItem;
-			interpreter.selectedItem = null;
-			EventException eventException = (EventException) e;
-			interpreterListener.doEvent(new InterpreterEvent(this,
-					eventException.type));
 		}
+		// else if (e instanceof EventException) {
+		// System.err.println("-->"+interpreter.selectedItem);
+		// field = interpreter.selectedItem;
+		// interpreter.selectedItem = null;
+		// EventException eventException = (EventException) e;
+		// interpreterListener.doEvent(new InterpreterEvent(this,
+		// eventException.type));
+		// }
 	}
 
 	public void event(String eventType) throws ScriptException, IOException {
+		field = interpreter.selectedItem;
+		// interpreter.selectedItem = null;
 		interpreterListener.doEvent(new InterpreterEvent(this, eventType));
 	}
 
@@ -145,5 +149,17 @@ public class InterpreterContext extends WebClient {
 		}
 
 		return relativePath;
+	}
+
+	// we assume that the user is in a context where the word he utters is
+	// recognized if it is not the case we use the function nomatch
+	public void talk(String string) throws ScriptException, IOException {
+		try {
+			interpreter.utterance(string,"'voice'");
+			interpreter.execute(Utils.serachItem(interpreter.selectedItem,
+					"filled"));
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
 	}
 }

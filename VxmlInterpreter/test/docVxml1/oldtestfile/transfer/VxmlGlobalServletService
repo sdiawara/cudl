@@ -1,0 +1,62 @@
+<?xml version = "1.0" encoding="UTF-8"?>
+
+<vxml xml:lang="fr" xmlns="http://www.w3.org/2001/vxml" version="2.0">
+<form>
+    <block>
+        <log>LOG PHASE init</log>
+    </block>
+
+	<script><![CDATA[ 
+            // function used to concat all NBest results in one string
+            // format used is utterance1 <score1>| utterance2 <score2>|...
+            function getResultString()
+            {
+			var len = application.lastresult$.length;
+			var result="";
+			// iterate through array
+			for (var i = 0; i < len; i++) 
+			{			
+                result += application.lastresult$[i].utterance + String("<") +Math.round(application.lastresult$[i].confidence * 100) + String(">|");
+			}
+			result = result.substr(0,result.length -1);
+			return result;
+         }
+        ]]></script>
+
+    <!-- events management -->
+    
+	<catch event="connection.disconnect.hangup">
+            <var name="currentState"  expr="'InitDial'"></var>
+            <var name="toState"  expr="'InitDial'"></var>
+            <var name="callReason"  expr="'catchedEvent'"></var>
+            <var name="event"  expr="'connection.disconnect.hangup'"></var>
+            <submit next="VxmlSS3900InitDialSV1" namelist="currentState toState callReason event" />
+        </catch>
+
+	<catch event="error.*">
+            <var name="currentState"  expr="'InitDial'"></var>
+            <var name="toState"  expr="'error'"></var>
+            <var name="callReason"  expr="'catchedEvent'"></var>
+            <var name="event"  expr="'error.*'"></var>
+            <submit next="VxmlSS3900InitDialSV1" namelist="currentState toState callReason event" />
+        </catch>
+
+<!-- Add object tag -->
+
+<block>
+<!-- no grammaire -->
+    
+</block>
+
+  
+<block>
+<var name="currentState"  expr="'InitDial'"></var>
+<var name="toState"  expr="''"></var>
+<var name="callReason"  expr="'normal'"></var>
+<submit next="PhaseTransfert" namelist="currentState toState callReason" method="post" />
+</block>
+
+</form>
+
+</vxml>
+

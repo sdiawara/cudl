@@ -20,12 +20,12 @@ public class InterpreterTest extends TestCase {
 
 	private InterpreterContext interpreterContext;
 
-	
 	@Before
 	public void setUp() throws IOException {
-		InterpreterRequierement.url = "file://" + new File(".").getCanonicalPath()
-				+ "/test/docVxml1/";
+		InterpreterRequierement.url = "file://"
+				+ new File(".").getCanonicalPath() + "/test/docVxml1/";
 	}
+
 	@Test
 	public void testCallServiceNavigateUntilNextInteractionAndCollectsNavigationTraces()
 			throws IOException, ScriptException {
@@ -98,119 +98,33 @@ public class InterpreterTest extends TestCase {
 	}
 
 	// @Test
-	// public void testDisconnectCallsTheCorrespondingEventManager()
-	// throws XPathExpressionException, IOException,
-	// TransformerException {
-	// List<String> expectedLogs = new ArrayList<String>();
-	// expectedLogs.add("LOG PHASE init");
-	// expectedLogs.add("LOG PHASE relai");
-	// expectedLogs.add("info:+@_relai.enter");
-	// expectedLogs.add("LOG PHASE interaction");
-	// expectedLogs.add("LOG PHASE raccrocher");
-	//
-	// assertTrue(false);
-	//
-	// }
-	//
-	// @Test
-	// public void
-	// testNavigatorConstructorClearsVxmlCollectedPagesDirectoryWhenOptionActivated()
-	// throws XPathExpressionException, IOException, SAXException {
-	//
-	// // DefinitionDeLEnvironnement.logPagesDirectory =
-	// // "/tmp/test_log_pages/";
-	// //
-	// // File testDirectory = new File(
-	// // DefinitionDeLEnvironnement.logPagesDirectory + "TEST");
-	// // testDirectory.delete();
-	// // assertTrue(testDirectory.mkdirs());
-	// //
-	// // new Vxml3900Browser();
-	// assertTrue(false);
-	// //assertFalse(testDirectory.exists());
-	// }
-	//
-	// @Test
-	// public void
-	// testNavigatorConstructorCreatesVxmlCollectedPagesDirectoryWhenOptionActivated()
-	// throws XPathExpressionException, IOException, SAXException {
-	//
-	// DefinitionDeLEnvironnement.logPagesDirectory = "/tmp/test_log_pages/";
-	//
-	// File logDirectory = new File(
-	// DefinitionDeLEnvironnement.logPagesDirectory);
-	// deltree(logDirectory);
-	// assertFalse(logDirectory.exists());
-	//
-	// new Vxml3900Browser();
-	//
-	// assertTrue(logDirectory.exists());
-	// }
-	//
-	// private void deltree(File file) {
-	// if (file.isDirectory()) {
-	// File[] listFiles = file.listFiles();
-	// for (int i = 0; i < listFiles.length; i++) {
-	// deltree(listFiles[i]);
-	// }
-	// }
-	// file.delete();
-	// }
-	//
-	// @Test
-	// public void testNavigatorCollectsVxmlWhenOptionActivated()
-	// throws XPathExpressionException, IOException,
-	// TransformerException {
-	//
-	// DefinitionDeLEnvironnement.logPagesDirectory = "/tmp/test_log_pages/";
-	//
-	// vxml3900Browser.nd = "0123456789";
-	// vxml3900Browser.numeroAppele = "0892683613";
-	// vxml3900Browser.origine = "33";
-	// vxml3900Browser.channel = "10";
-	// vxml3900Browser.call3900();
-	//
-	// assertTrue(new File(
-	// DefinitionDeLEnvironnement.logPagesDirectory
-	// +
-	// "pagesInteractionLoop_VxmlGlobalServletService?currentState=InitDial&toState=InitDial&callReason=normal&callingNumber=tel:%200123456789&calledNumber=0892683613&origine=33&channel=10--0")
-	// .exists());
-	// assertTrue(new File(
-	// DefinitionDeLEnvironnement.logPagesDirectory
-	// +
-	// "pagesInteractionLoop_PhaseRelai?currentState=InitDial&toState=&callReason=normal&--1")
-	// .exists());
-	// assertTrue(new File(
-	// DefinitionDeLEnvironnement.logPagesDirectory
-	// +
-	// "pagesInteractionLoop_PhaseInteraction?currentState=InitDial&toState=&callReason=normal&--2")
-	// .exists());
-	// }
-	//
-	// @Test
 	// public void testNavigationCollectsTransfertInformationButDoNotTransfer()
-	// throws XPathExpressionException, IOException,
-	// TransformerException {
-	// DefinitionDeLEnvironnement.urlServeurVoicexml =
-	// buildUrlServeurVoiceXml("test/fr/olm/app3900plus/vxmlbrowsing/pagesTransfert/");
+	// throws IOException, ScriptException {
+	// InterpreterRequierement.url = "file://"
+	// + new File(".").getCanonicalPath()
+	// + "/test/docVxml1/oldtestfile/transfer";
 	// List<String> expectedLogs = new ArrayList<String>();
 	// expectedLogs.add("LOG PHASE init");
 	// expectedLogs.add("LOG PHASE transfert");
 	//
-	// vxml3900Browser.call3900();
-	//
+	// interpreterContext = new InterpreterContext("VxmlGlobalServletService");
+	// interpreterContext.launchInterpreter();
+	//		
+	//		
 	// assertEquals("sup:4700810C810106830783105506911808",
-	// vxml3900Browser.transfertDestination);
-	// assertFalse(vxml3900Browser.raccrochage()); // si transfert alors il n'y
+	// interpreterContext.interpreter.transfertDestination);
+	// assertFalse(interpreterContext.interpreter.raccrochage()); // si
+	// // transfert
+	// // alors il
+	// // n'y
 	// // a pas raccrochage
-	// assertFalse(vxml3900Browser.navigationTracesLogs.isEmpty());
-	// assertEquals(expectedLogs, vxml3900Browser.navigationTracesLogs);
+	// assertFalse(interpreterContext.interpreter.getTraceLog().isEmpty());
+	// assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 	// }
-	//
+
 	// @Test
 	// public void testTransferOKSimulatesTransferOnTransferPage()
-	// throws XPathExpressionException, IOException,
-	// TransformerException {
+	// throws XPathExpressionException, IOException, TransformerException {
 	// DefinitionDeLEnvironnement.urlServeurVoicexml =
 	// buildUrlServeurVoiceXml("test/fr/olm/app3900plus/vxmlbrowsing/pagesTransfert/");
 	// List<String> expectedLogs = new ArrayList<String>();
@@ -228,7 +142,7 @@ public class InterpreterTest extends TestCase {
 	// assertFalse(vxml3900Browser.navigationTracesLogs.isEmpty());
 	// assertEquals(expectedLogs, vxml3900Browser.navigationTracesLogs);
 	// }
-	//
+
 	// @Test
 	// public void testTransferKOSimulatesBadTransferOnTransferPage()
 	// throws XPathExpressionException, IOException,

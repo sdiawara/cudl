@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
+import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.utils.InterpreterRequierement;
 
 public class W3cInterpreterTest {
@@ -106,7 +107,7 @@ public class W3cInterpreterTest {
 			// and elements that are children of the document's element create
 			// their variables at document scope. They are no longer accessible
 			// when another document is entered.
-			add("w3c/400.txml");
+			//add("w3c/400.txml");
 
 			// If specified, the value of the attribute is evaluated and serves
 			// as the form item variable's initial value.
@@ -130,7 +131,7 @@ public class W3cInterpreterTest {
 			add("w3c/405.txml");
 
 			// FIXME: ADD normalization to scripe
-			add("w3c/399main.txml");
+		//	add("w3c/399main.txml");
 
 			// A element not specifying a 'bridge' attribute is executed as a
 			// blind transfer.
@@ -218,6 +219,22 @@ public class W3cInterpreterTest {
 		interpreterContext.event("noinput");
 
 		// System.out.println(interpreterContext.interpreter.w3cNodeConfSuite);
+		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
+				.equals("[conf:pass: null]"));
+	}
+
+	@Test()
+	public void w3cFilledContainIsexecutedAfterUserInput() throws IOException,
+			ScriptException {
+		// . The input item 'field' may contain the filled element. Filled
+		// elements contain an action to execute after the result input item
+		// variable is filled in.
+
+		interpreterContext = new InterpreterContext("w3c/1037.txml");
+		interpreterContext.launchInterpreter();
+		interpreterContext.talk("'toto'");
+
+	
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
 				.equals("[conf:pass: null]"));
 	}
