@@ -27,7 +27,7 @@ import fr.mbs.vxml.utils.VxmlDefaultPageCreator;
 public class InterpreterContext extends WebClient {
 	private Document currentdDocument;
 	private Node currentDialog;
-	private Document rootDocument;
+	public Document rootDocument;
 	private NodeList dialogs;
 	public Interpreter interpreter = new Interpreter();
 	private InterpreterListener interpreterListener;
@@ -38,7 +38,6 @@ public class InterpreterContext extends WebClient {
 
 	public InterpreterContext(String fileName, File session)
 			throws IOException, ScriptException {
-		System.err.println(fileName);
 		setPageCreator(new VxmlDefaultPageCreator());
 		buildDocument(fileName);
 		interpreterListener = new InterpreterEventHandler();
@@ -80,20 +79,13 @@ public class InterpreterContext extends WebClient {
 			buildDocument(((SubmitException) e).next);
 			interpreter.selectedItem = null;
 			launchInterpreter();
+		} else if (e instanceof EventException) {
+			event(((EventException) e).type);
 		}
-		// else if (e instanceof EventException) {
-		// System.err.println("-->"+interpreter.selectedItem);
-		// field = interpreter.selectedItem;
-		// interpreter.selectedItem = null;
-		// EventException eventException = (EventException) e;
-		// interpreterListener.doEvent(new InterpreterEvent(this,
-		// eventException.type));
-		// }
 	}
 
 	public void event(String eventType) throws ScriptException, IOException {
 		field = interpreter.selectedItem;
-		// interpreter.selectedItem = null;
 		interpreterListener.doEvent(new InterpreterEvent(this, eventType));
 	}
 
@@ -113,7 +105,9 @@ public class InterpreterContext extends WebClient {
 			XmlPage rootPage = getPage(rootUrl);
 			rootDocument = rootPage.getXmlDocument();
 			declareRootScopeVariableIfNeed(rootUrl);
-		}
+		} else
+			interpreter.resetApplicationScope();
+
 		declareDocumentScopeVariableIfNeed(fileName);
 	}
 
@@ -139,6 +133,9 @@ public class InterpreterContext extends WebClient {
 	}
 
 	private String tackWeelFormedUrl(String relativePath) throws IOException {
+
+		// URL target = new URL(new URL(currentFileName),relativePath);
+
 		if (relativePath.startsWith("http://")
 				|| relativePath.startsWith("file://")) {
 			return relativePath;
@@ -155,7 +152,7 @@ public class InterpreterContext extends WebClient {
 	// recognized if it is not the case we use the function nomatch
 	public void talk(String string) throws ScriptException, IOException {
 		try {
-			interpreter.utterance(string,"'voice'");
+			interpreter.utterance(string, "'voice'");
 			interpreter.execute(Utils.serachItem(interpreter.selectedItem,
 					"filled"));
 		} catch (InterpreterException e) {

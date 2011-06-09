@@ -4,6 +4,7 @@
 <form>
 	   <block> 
 		<var name="block_0_scope_var" expr="toto='variable de global'; 'variable de block'"/>
+		<assign name="block_0_scope_var" expr="'variable de '"/>
 		<prompt><value expr="block_0_scope_var"/></prompt>
    </block>
    <block> 

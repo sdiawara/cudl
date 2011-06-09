@@ -1,0 +1,25 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" application="w3c/a74-var-root.txml"
+   xmlns="http://www.w3.org/2001/vxml"
+   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 74: 
+  If a transition occurs as the result of a submit between an 
+  application leaf document and its own application root document 
+  the application root document's variables must be re-initialized. -->
+
+  <catch>
+    <conf:fail expr="'a74-var-leaf caught unexpected event:' + _event" />
+  </catch>
+
+  <form>
+    <block>
+      <conf:comment>Assign new value to 'rootvar' before transitioning to
+        verify variable initialization in a74-var-root.</conf:comment>
+      <assign name="rootvar" expr="8" />
+      <submit next="w3c/a74-var-root.txml" />
+    </block>
+  </form>
+</vxml>
+

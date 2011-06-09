@@ -16,7 +16,7 @@
   <form>
     <block>
        <var name="x" expr="session.connection.protocol.name"/>
-       <assign name="session.connection.protocol.name" expr="'hibrad'"/>
+       <!-- <assign name="session.connection.protocol.name" expr="'hibrad'"/> -->
 
       <if cond="session.connection.protocol.name == x">
         <conf:pass/>

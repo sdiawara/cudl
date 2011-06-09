@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import fr.mbs.vxml.interpreter.InterpreterContext;
-import fr.mbs.vxml.interpreter.execption.InterpreterException;
 import fr.mbs.vxml.utils.InterpreterRequierement;
 
 public class W3cInterpreterTest {
@@ -44,7 +43,7 @@ public class W3cInterpreterTest {
 
 			// The interpreter ignores the block when the form item variable
 			// associated with the block is set via an assign.
-			// add("w3c/262.txml");
+			add("w3c/262.txml");
 
 			// FIA ends when it encounters an <goto>.
 			add("w3c/assert111.txml");
@@ -57,20 +56,9 @@ public class W3cInterpreterTest {
 			// FIA ends when it encounters an <submit>.
 			add("w3c/assert112.txml");
 
-			// FIA ends when it encounters an <exit>.
-			// add("w3c/assert113.txml");
-
 			// FIA ends when it encounters an <return>.
 			// FIXME: Implemeent dialog
 			add("w3c/assert114.txml");
-
-			// The next dialog is determined by the previous dialog.
-			add("w3c/assert_48_1.txml");
-
-			// Application root document variables are available for use by the
-			// leaf document.
-
-			add("w3c/a59leaf.txml");
 
 			// A variable declared at document scope is accessible within an
 			// anonymous scope contained within the same document.
@@ -102,12 +90,12 @@ public class W3cInterpreterTest {
 
 			// Variables in session scope can be read but not written by
 			// VoiceXML documents.
-			// add("w3c/assertion-398.txml");
+			add("w3c/assertion-398.txml");
 
 			// and elements that are children of the document's element create
 			// their variables at document scope. They are no longer accessible
 			// when another document is entered.
-			//add("w3c/400.txml");
+			// add("w3c/400.txml");
 
 			// If specified, the value of the attribute is evaluated and serves
 			// as the form item variable's initial value.
@@ -131,7 +119,7 @@ public class W3cInterpreterTest {
 			add("w3c/405.txml");
 
 			// FIXME: ADD normalization to scripe
-		//	add("w3c/399main.txml");
+			// add("w3c/399main.txml");
 
 			// A element not specifying a 'bridge' attribute is executed as a
 			// blind transfer.
@@ -145,7 +133,95 @@ public class W3cInterpreterTest {
 			// A element specifying a 'cond' attribute that evaluates to false
 			// upon selection of the element by the FIA is not executed.
 			add("w3c/293.txml");
+
+			// If a URI does not refer to a document, the current document is
+			// assumed.
+			add("w3c/a11.txml");
+
+			// If a URI does not refer to a dialog, the first dialog is assumed.
+			add("w3c/a12a.txml");
+
+			// An application root document's variables are defined and
+			// reachable via the application scope upon the loading of a
+			// document that specifies it as the application root.
+			add("w3c/a24.txml");
+
+			// An application root document's variables are not reinitialized as
+			// the user transitions between documents that both specify it as
+			// the application root.
+			add("w3c/a25a.txml");
+
+			// An application root document's variables are no longer reachable
+			// from the application scope when the user transitions to a
+			// document not in that application.
+			add("w3c/a26a.txml");
+
+			// The platform can throw a semantic error upon encountering an
+			// error in VoiceXML semantics.
+			// FIXME: add semantic error in vxml.
+			// add("w3c/a32.txml");
+
+			// A document may have var elements.
+			add("w3c/42.txml");
+
+			// A document may have script elements.
+			add("w3c/assert_43_1.txml");
+
+			// A document may have property elements.
+			add("w3c/assert_44_1.txml");
+
+			// A document may have catch elements.
+			add("w3c/assert_45_1.txml");
+
+			// The next dialog is determined by the previous dialog.
+			add("w3c/assert_48_1.txml");
+
+			// The interpreter supports having an application root document and
+			// an application leaf document.
+			add("w3c/a56-leaf.txml");
+
+			// When a leaf document causes a root document to be loaded, none of
+			// the dialogs in the root document are executed.
+			add("w3c/a58-leaf.txml");
+
+			// Application root document variables are available for use by the
+			// leaf document.
+			add("w3c/a59leaf.txml");
+
+			// Application root catch handlers are default handlers for leaf
+			// documents.
+			// FIXME
+			// add("w3c/a62-leaf.txml");
+
+			// When transitioning between two leaf documents that both specify
+			// the same application fully resolved URI then the transition must
+			// preserve the application root document's variables for use by the
+			// second leaf document.
+			add("w3c/a72-var-driver.txml");
+
+			// A transition from an application leaf document to its own
+			// application root document caused by a 'goto' must preserve the
+			// application root document's variables for use by the root
+			// document.
+			// FIXME : GOTO
+			// add("w3c/a73-var-driver.txml");
+			// ADD file
+			// add("w3c/a75-var-driver.txml");
+
+			// If a transition occurs as the result of a submit between an
+			// application leaf document and its own application root document
+			// the application root document's variables must be re-initialized
+			add("w3c/a74-var-driver.txml");
+
+			// If a transition occurs from an application root document to a
+			// different application root document it must initialize the new
+			// application root document and use the new application root
+			// document's variables.
+			add("w3c/a76-var-driver.txml");
+			
+			
 		}
+
 	};
 
 	@Before
@@ -154,8 +230,11 @@ public class W3cInterpreterTest {
 				+ new File(".").getCanonicalPath() + "/test/docVxml1/";
 	}
 
-	@Test
+	@Test()
 	public void w3cIRTest() throws IOException, ScriptException {
+
+		InterpreterRequierement.sessionFileName = "file://"
+				+ new File(".").getCanonicalPath() + "/session.js";
 		int count = 0;
 		for (Iterator<String> iterator = fileNames.iterator(); iterator
 				.hasNext();) {
@@ -234,7 +313,6 @@ public class W3cInterpreterTest {
 		interpreterContext.launchInterpreter();
 		interpreterContext.talk("'toto'");
 
-	
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
 				.equals("[conf:pass: null]"));
 	}

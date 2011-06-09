@@ -1,0 +1,20 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+   xmlns="http://www.w3.org/2001/vxml"
+   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 72: 
+  When transitioning between two leaf documents that both 
+  specify the same application fully resolved URI then the 
+  transition must preserve the application root document's 
+  variables for use by the second leaf document. -->
+
+  <var name="rootvar" expr="7" />
+
+  <catch>
+    <conf:fail expr="'root caught unexpected event:' + _event" />
+  </catch>
+
+</vxml>
+

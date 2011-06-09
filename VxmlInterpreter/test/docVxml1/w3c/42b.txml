@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<var name="null1"/>
+<var name="str1" expr="'hello, world'"/>
+<var name="int1" expr="1"/>
+<var name="bool1" expr="true"/>
+<var name="float1" expr="3.14"/>
+<var name="arr1" expr="new Array(1, 2, 'three')"/> 
+<var name="hash1" expr="new Object()"/>
+<var name="func1" expr="new Function()"/>
+
+  <catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+
+  <form>
+    <block>
+      <conf:pass/>
+    </block>
+  </form>
+</vxml>

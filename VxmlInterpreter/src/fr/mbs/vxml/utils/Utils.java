@@ -11,7 +11,11 @@ public class Utils {
 	public static Node searchDialogByName(NodeList nodeList, String id) {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
-			Node namedItem = node.getAttributes().getNamedItem("id");
+			NamedNodeMap attributes = node.getAttributes();
+			Node namedItem = null;
+			if (null != attributes) {
+				namedItem = attributes.getNamedItem("id");
+			}
 			if (namedItem != null && namedItem.getNodeValue().equals(id)) {
 				return node;
 			}

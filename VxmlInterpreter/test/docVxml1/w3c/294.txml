@@ -15,9 +15,7 @@
 <form>
    <transfer name="xfer" dest="tel:+18005551212"> 
      <filled>
-     
-       <conf:fail reason="Should never reach this point."/>
-       
+          <conf:fail reason="Should never reach this point."/>
      </filled>
    </transfer>
 

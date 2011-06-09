@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import javax.script.ScriptException;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -23,6 +24,7 @@ import fr.mbs.vxml.script.DefaultInterpreterScriptContext;
 import fr.mbs.vxml.script.InterpreterScriptContext;
 import fr.mbs.vxml.script.InterpreterVariableDeclaration;
 import fr.mbs.vxml.utils.Prompt;
+import fr.mbs.vxml.utils.Utils;
 import fr.mbs.vxml.utils.VxmlElementType;
 
 public class Interpreter {
@@ -61,7 +63,6 @@ public class Interpreter {
 								"reason").getTextContent());
 				}
 			});
-
 			put("filled", new NodeExecutor() {
 				public void execute(Node node) throws FilledException {
 					throw new FilledException();
@@ -86,7 +87,8 @@ public class Interpreter {
 			});
 			put("return", new NodeExecutor() {
 				public void execute(Node node) {
-					System.err.println("TODO: implement return interpretation");
+					// System.err.println("TODO: implement return interpretation");
+					// throw
 				}
 			});
 			put("disconnect", new NodeExecutor() {
@@ -157,6 +159,12 @@ public class Interpreter {
 					throw new ExitException();
 				}
 			});
+
+			put("throw", new NodeExecutor() {
+				public void execute(Node node) throws EventException, DOMException {
+					throw new EventException(node.getAttributes().getNamedItem("event").getNodeValue());
+				}
+			});
 		}
 	};
 	public String transfertDestination;
@@ -186,22 +194,25 @@ public class Interpreter {
 			}
 
 			// Exécuter l'élément de formulaire.
-
 			String nodeName = selectedItem.getNodeName();
 			if (nodeName.equals("field")) {
 				System.err.println("WAIT FOR USER INPUT");
 				execute(selectedItem);
-				// return;
 			} else if (nodeName.equals("record")) {
 			} else if (nodeName.equals("object")) {
 			} else if (nodeName.equals("subdialog")) {
-				declaration.setValue(selectedItem, "'defined'",
+				execute(Utils.searchDialogByName(selectedItem.getParentNode()
+						.getParentNode().getChildNodes(), selectedItem
+						.getAttributes().getNamedItem("src").getNodeValue()
+						.replace("#", "")));
+				declaration.setValue(selectedItem, "new Object()",
 						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 			} else if (nodeName.equals("transfer")) {
+				//throw new TransferException();
 				doTransferCall();
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
-				declaration.setValue(selectedItem, "'defined'",
+				declaration.setValue(selectedItem, "new Object()",
 						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 				execute(selectedItem);
 				declaration
@@ -214,12 +225,13 @@ public class Interpreter {
 
 	private void doTransferCall() throws ScriptException, IOException,
 			EventException {
-		
+
 		Node namedItem = selectedItem.getAttributes().getNamedItem("dest");
-		transfertDestination = namedItem == null?selectedItem.getAttributes().getNamedItem("destexpr").getNodeValue():namedItem.getNodeValue();
+		transfertDestination = namedItem == null ? selectedItem.getAttributes()
+				.getNamedItem("destexpr").getNodeValue() : namedItem
+				.getNodeValue();
 		// FIXME: add w3c for more fonctionnalité
-		
-		System.err.println("transfer----->" + selectedItem+"\t"+transfertDestination);
+		System.err.println("dest " + transfertDestination);
 		throw new EventException(
 				isBlindTransfer(selectedItem) ? "connection.disconnect.transfer"
 						: "connection.disconnect.hangup");
@@ -251,10 +263,6 @@ public class Interpreter {
 			Node node1 = child.item(i);
 			NodeExecutor executor = nodeExecution.get(node1.getNodeName());
 
-			// if (node1.getNodeName().equals("filled")) {
-			// return;
-			// }
-
 			if (null != executor) {
 				executor.execute(node1);
 			}
@@ -283,9 +291,9 @@ public class Interpreter {
 				Node bargeinType = attributes.getNamedItem("bargeintype");
 				if (bargeinType != null) {
 					p.bargeinType = bargeinType.getNodeValue();
-				} else if (currentDialogProperties.get("bargeintype") != null) {
-					p.bargeinType = currentDialogProperties
-							.getProperty("bargeintype");
+				} else if (getCurrentDialogProperties().get("bargeintype") != null) {
+					p.bargeinType = getCurrentDialogProperties().getProperty(
+							"bargeintype");
 				}
 			}
 
@@ -416,8 +424,9 @@ public class Interpreter {
 
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node item = childs.item(i);
-			if (isAnExecutableItem(item)) { // FIXME: Déplacer dans VxmlElement
-				// la fonction isAnExecutableItem
+			if (isAnExecutableItem(item)) {
+				// FIXME: Déplacer dans VxmlElement la fonction
+				// isAnExecutableItem
 				if (conditionChecked) {
 					nodeExecution.get(item.getNodeName()).execute(item);
 				}
@@ -479,9 +488,9 @@ public class Interpreter {
 	}
 
 	private void collectProperty(NamedNodeMap attributes) {
-		currentDialogProperties.put(attributes.getNamedItem("name")
-				.getNodeValue(), attributes.getNamedItem("value")
-				.getNodeValue());
+		getCurrentDialogProperties().put(
+				attributes.getNamedItem("name").getNodeValue(),
+				attributes.getNamedItem("value").getNodeValue());
 	}
 
 	private Node phaseSelect(Node dialog) throws ScriptException, IOException {
@@ -508,10 +517,13 @@ public class Interpreter {
 	public void resetApplicationScope() {
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.APPLICATION_SCOPE);
-	}
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
+		declaration
+				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
 
-	public boolean raccrochage() {
-		return false;
 	}
 
 	public void utterance(String string, String string2) throws ScriptException {
@@ -519,5 +531,13 @@ public class Interpreter {
 				InterpreterScriptContext.APPLICATION_SCOPE);
 		declaration.evaluateScript("lastresult$[0].inputmode =" + string2,
 				InterpreterScriptContext.APPLICATION_SCOPE);
+	}
+
+	public void setCurrentDialogProperties(Properties currentDialogProperties) {
+		this.currentDialogProperties = currentDialogProperties;
+	}
+
+	public Properties getCurrentDialogProperties() {
+		return currentDialogProperties;
 	}
 }

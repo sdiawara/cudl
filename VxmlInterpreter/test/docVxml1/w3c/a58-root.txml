@@ -1,0 +1,21 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+   xmlns="http://www.w3.org/2001/vxml"
+   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 58: 
+  When a leaf document causes a root document to be loaded, 
+  none of the dialogs in the root document are executed. -->
+
+  <catch>
+    <conf:fail expr="'root caught unexpected event:' + _event" />
+  </catch>
+
+  <form>
+    <block>
+      <conf:fail reason="attempted to execute form in root" />
+    </block>
+  </form>  
+</vxml>
+

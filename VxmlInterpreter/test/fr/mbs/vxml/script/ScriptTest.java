@@ -9,7 +9,6 @@ import javax.script.ScriptException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.omg.CORBA.portable.ApplicationException;
 
 public class ScriptTest {
 	ScriptEngineManager engineManager = new ScriptEngineManager();

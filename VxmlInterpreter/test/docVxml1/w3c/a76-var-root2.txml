@@ -1,0 +1,32 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+   xmlns="http://www.w3.org/2001/vxml"
+   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 76: 
+  If a transition occurs from an application root document to 
+  a different application root document it must initialize 
+  the new application root document and use the new application 
+  root document's variables. -->
+
+  <var name="rootvar" expr="8" />
+
+  <catch>
+    <conf:fail expr="'root caught unexpected event:' + _event" />
+  </catch>
+
+  <form>
+    <block>
+      <conf:comment>Verify that the value of 'rootvar' is what's defined
+        in this document, rather than the value of 'rootvar' in the 
+        previous root</conf:comment>
+      <if cond="rootvar == 8">
+        <conf:pass />
+      <else/>
+        <conf:fail expr="'a76-var-root2 has unexpected value for rootvar: ' + rootvar" />
+      </if>
+    </block>
+  </form>
+</vxml>
+
