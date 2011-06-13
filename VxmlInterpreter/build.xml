@@ -14,7 +14,6 @@
 	<property name="deploy.dir" location="deploy" />
 	<property name="test.dir" location="test" />
 	<property name="test.build.dir" location="${test.dir}/classes" />
-	<property name="bin.dir" location="bin" />
 	<property name="test.report.dir" location="testreport" />
 	<property name="ant.build.javac.source" value="1.6" />
 	<property name="ant.build.javac.target" value="1.6" />
@@ -39,7 +38,6 @@
 		<delete dir="${deploy.dir}" />
 	</target>
 
-
 	<target name="makedir">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${deploy.dir}" />
@@ -47,18 +45,26 @@
 		<mkdir dir="${test.build.dir}" />
 	</target>
 
-	<target name="compile" depends="clean,  makedir" description="Compile source" >
-		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="src.classpath" debug="on" optimize="off" deprecation="on" includeantruntime="false">
+	<target name="compile" depends="makedir" description="Compile source" >
+		<javac srcdir="${src.dir}" destdir="${build.dir}" 
+			classpathref="src.classpath" 
+			debug="on" optimize="off" 
+			deprecation="on" includeantruntime="false">
 		</javac>
 	</target>
 
-	<target name="compile.test" depends="clean,  makedir, compile" description="Compile unit tests" >
-		<javac srcdir="${test.dir}" destdir="${test.build.dir}" classpathref="test.classpath" debug="on" optimize="off" deprecation="on" includeantruntime="false">
+	<target name="compile.test" depends="compile">
+		<!-- Compile unit tests -->
+		<javac srcdir="${test.dir}" destdir="${test.build.dir}" 
+			classpathref="test.classpath" 
+			debug="on" optimize="off" 
+			deprecation="on" includeantruntime="false">
 		</javac>
 	</target>
 
 	<target name="jar" depends="compile" description="Generate jar file" >
-		<jar jarfile="${deploy.dir}\mbs-vxml-interpreter.jar" basedir="${bin.dir}" />
+		<jar jarfile="${deploy.dir}\cudl.jar" 
+			basedir="${build.dir}" />
 	</target>
 
 	<target name="test" depends="compile.test" description="Launch unit tests" >
