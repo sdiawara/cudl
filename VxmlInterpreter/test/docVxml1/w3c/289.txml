@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+<catch event="connection.disconnect.transfer">
+  <conf:pass/>
+</catch>
+
+<catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+
+<form>
+   <transfer bridge="false" dest="tel:+18005551212">
+     <filled>
+       <conf:fail reason="filled on blind xfer"/>
+     </filled>
+   </transfer>
+
+   <block>
+    <conf:fail reason="block"/>
+   </block>
+</form>
+
+</vxml>

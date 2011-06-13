@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ --> 
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+ xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+
+
+<!-- busy condition with bridge transfer
+
+Test environment requirements:
+
+1. Valid destination address
+2. Destination is busy
+
+NOTE: This test can be automated if you identify a telephone number that's always busy.
+-->
+<form>
+   <transfer name="xfer" dest="tel:+18005551212" bridge="true"> 
+     <filled>
+     
+       <if cond="xfer == 'busy'">
+         <conf:comment>The destination was busy as expected.</conf:comment>
+         <conf:pass/>
+       <else/>
+         <conf:fail expr="'expected busy, but xfer = ' + xfer"/>
+       </if>
+     </filled>
+   </transfer>
+</form>
+</vxml>

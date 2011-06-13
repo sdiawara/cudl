@@ -24,6 +24,8 @@ import fr.mbs.vxml.utils.InterpreterRequierement;
 import fr.mbs.vxml.utils.Utils;
 import fr.mbs.vxml.utils.VxmlDefaultPageCreator;
 
+
+
 public class InterpreterContext extends WebClient {
 	private Document currentdDocument;
 	private Node currentDialog;
@@ -52,7 +54,6 @@ public class InterpreterContext extends WebClient {
 		try {
 			interpreter.interpretDialog(currentDialog);
 			field = interpreter.selectedItem;
-			interpreter.selectedItem = null;
 		} catch (InterpreterException e) {
 			executionHandler(e);
 		}
@@ -70,7 +71,6 @@ public class InterpreterContext extends WebClient {
 			} else {
 				interpreter.resetDocumentScope();
 				interpreter.selectedItem = null;
-				interpreter.resetDocumentScope();
 				buildDocument(next);
 			}
 			launchInterpreter();
@@ -105,9 +105,9 @@ public class InterpreterContext extends WebClient {
 			XmlPage rootPage = getPage(rootUrl);
 			rootDocument = rootPage.getXmlDocument();
 			declareRootScopeVariableIfNeed(rootUrl);
-		} else
+		} else if (!url.equals(currentRootFileName)) {
 			interpreter.resetApplicationScope();
-
+		}
 		declareDocumentScopeVariableIfNeed(fileName);
 	}
 
@@ -157,6 +157,70 @@ public class InterpreterContext extends WebClient {
 					"filled"));
 		} catch (InterpreterException e) {
 			executionHandler(e);
+		}
+	}
+
+	public void destinationHangup() throws ScriptException, IOException {
+		try {
+			interpreter.destinationHangup();
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
+	}
+
+	public void callerHangDestination() throws ScriptException, IOException {
+		try {
+			interpreter.callerHangDestination();
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
+	}
+
+	public void blindTransferSuccess() throws ScriptException, IOException {
+		try {
+			interpreter.blindTransferSuccess();
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
+	}
+
+	public void callerHangup() throws IOException, ScriptException {
+		try {
+			interpreter.callerHangup();
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
+	}
+
+	public void noAnswer() throws ScriptException, IOException {
+		try {
+			interpreter.noAnswer();
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
+	}
+
+	public void maxTimeDisconnect() throws ScriptException, IOException {
+		try {
+			interpreter.maxTimeDisconnect();
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
+	}
+
+	public void destinationBusy() throws ScriptException, IOException {
+		try {
+			interpreter.destinationBusy();
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
+	}
+	
+	public void networkBusy() throws ScriptException, IOException {
+		try {
+			interpreter.networkBusy();
+		} catch (InterpreterException e) {
+			//executionHandler(e);
 		}
 	}
 }

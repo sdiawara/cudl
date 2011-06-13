@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ --> 
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+ xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+
+<!-- Verify that form item variable is ECMAScript undefined
+     when connection.disconnect.hangup is thrown when the 
+     originator hangs up.     
+
+Test environment requirements:
+
+1. Valid destination address
+2. Destination is available to accept incoming calls
+3. Destination answers incoming call
+4. Originator hangs up.
+
+-->
+
+<catch event="connection.disconnect.hangup">
+  <if cond="xfer == undefined">
+   <conf:pass/>
+  <else/>
+    <conf:fail expr="'caught ' + _event + ', but xfer = ' + xfer"/>
+ </if>
+</catch>
+
+<catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+
+<form>
+   <transfer name="xfer" dest="tel:+18005551212" bridge="true"> 
+     <filled>
+       <conf:fail reason="Should never get to this point."/>
+     </filled>
+   </transfer>
+
+  <block>
+    <conf:fail reason="block after transfer"/>
+  </block>
+</form>
+</vxml>

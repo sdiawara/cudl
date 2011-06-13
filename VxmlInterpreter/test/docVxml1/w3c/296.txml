@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ --> 
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+ xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+
+
+<!-- maxtime condition with bridge transfer
+
+Test environment requirements:
+
+1. Valid destination address
+2. Destination is available to accept incoming calls
+3. Destination answers incoming call
+4. Destination does not disconnect before platform reaches maxtime value
+-->
+<form>
+   <transfer name="xfer" dest="tel:+18005551212" bridge="true" maxtime="5s"> 
+     <filled>
+       <conf:comment>xfer = <value expr="xfer"/></conf:comment>
+       <if cond="xfer == 'maxtime_disconnect'">
+         <conf:pass />
+       <else/>
+         <conf:fail expr="'expected maxtime_disconnect; got ' + xfer"/>
+       </if>
+     </filled>
+   </transfer>
+</form>
+</vxml>

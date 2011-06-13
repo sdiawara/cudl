@@ -7,8 +7,6 @@ import java.util.List;
 
 import javax.script.ScriptException;
 
-import org.omg.CORBA.CTX_RESTRICT_SCOPE;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -25,7 +23,6 @@ public class InterpreterEventHandler implements InterpreterListener {
 				.getSource();
 
 		List<Node> catchList = searchEvent(interpreterEvent.type, context.field);
-		// addRootHandler(interpreterEvent.type, catchList, context.field);
 		removeUnlessCond(catchList);
 		try {
 			// FIXME: take the first with a correct event counter
@@ -33,21 +30,6 @@ public class InterpreterEventHandler implements InterpreterListener {
 			context.interpreter.execute(catchList.get(0));
 		} catch (InterpreterException e) {
 			context.executionHandler(e);
-		}
-	}
-
-	private void addRootHandler(String event, List<Node> catchList, Node node) {
-		Node item = node.getOwnerDocument().getElementsByTagName("vxml")
-				.item(0);
-		NamedNodeMap attributes = item.getAttributes();
-		Node namedItem = null;
-		if (null != attributes) {
-			namedItem = attributes.getNamedItem("application");
-		}
-		if (null != namedItem) {
-			System.err.println("---->" + searchEvent(event, item) + " " + item
-					+ " " + event);
-			catchList.addAll(searchEvent(event, node));
 		}
 	}
 

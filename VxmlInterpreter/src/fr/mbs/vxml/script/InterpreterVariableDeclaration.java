@@ -41,7 +41,7 @@ public final class InterpreterVariableDeclaration {
 	public InterpreterVariableDeclaration() throws IOException, ScriptException {
 		manager = new ScriptEngineManager();
 		engine = manager.getEngineByName("ecmascript");
-		// System.err.println(engine.getClass().getName());
+		System.err.println(engine.getClass().getName());
 		context = new DefaultInterpreterScriptContext();
 		dialogItemName = new Hashtable<Node, String>();
 		addVariableNormalized();
@@ -108,7 +108,7 @@ public final class InterpreterVariableDeclaration {
 		String nodeValue = (null == value) ? "undefined" : value
 				.getTextContent();
 
-		// System.err.println(nodeName + "   =" + nodeValue + scope);
+		System.err.println(nodeName + "   =" + nodeValue + scope);
 		getBindings(scope).put(nodeName,
 				engine.eval(getReplaceBindingName(nodeValue), context));
 	}
@@ -158,8 +158,6 @@ public final class InterpreterVariableDeclaration {
 			getBindings(scope).put(dialogItemName.get(node),
 					engine.eval(value, context));
 		} else {
-			System.err.println(namedItem.getNodeValue() + " = "
-					+ value);
 			engine.eval(getReplaceBindingName(namedItem.getNodeValue() + " = "
 					+ value), context);
 		}
@@ -182,8 +180,8 @@ public final class InterpreterVariableDeclaration {
 	}
 
 	public void resetScopeBinding(int scope) {
-		// System.err.println("clear scope " + getScopeName(scope) + " scope="
-		// + scope);
+		System.err.println("clear scope " + getScopeName(scope) + " scope="
+				+ scope);
 		if (scope <= 90)
 			getBindings(scope).clear();
 		try {

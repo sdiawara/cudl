@@ -121,18 +121,63 @@ public class W3cInterpreterTest {
 			// FIXME: ADD normalization to scripe
 			// add("w3c/399main.txml");
 
+			// A VoiceXML document can initiate a transfer to another entity
+			// using the tag, such that the Interpreter remains connected to the
+			// original caller and interpretation resumes upon termination of
+			// the transfer.
+			add("w3c/288.txml");
+
+			// A VoiceXML document can initiate a transfer to another entity
+			// using the tag, such that the Interpreter disconnects from the
+			// caller immediately upon attempting the transfer and continues
+			// execution as it would under termination of the Session.
+			add("w3c/289.txml");
+
+			// A bridged transfer can contain speech grammars such that the
+			// interpreter listens to the original caller for the duration of
+			// the transfer, terminating the transfer as soon as a spoken
+			// utterance matches an active speech grammar.
+			add("w3c/290.txml");
+
+			// A element specifying a 'cond' attribute that evaluates to false
+			// upon selection of the element by the FIA is not executed.
+			add("w3c/293.txml");
+
 			// A element not specifying a 'bridge' attribute is executed as a
 			// blind transfer.
 			add("w3c/294.txml");
+
+			// A bridged transfer specifying a 'connecttimeout' attribute with a
+			// W3C time specification will terminate a transfer attempt if the
+			// destination entity cannot be connected to within that period of
+			// time.
+			add("w3c/295.txml");
+
+			// A bridged transfer specifying a 'maxtime' attribute with a W3C
+			// time specification will terminate a transfer after that period of
+			// time has elapsed after connecting to the destination entity if it
+			// has not already been terminated for other reasons.
+			add("w3c/296.txml");
 
 			// Upon a successful blind transfer, a
 			// 'connection.disconnect.transfer' event is thrown and the transfer
 			// name variable remains undefined.
 			add("w3c/298.txml");
 
-			// A element specifying a 'cond' attribute that evaluates to false
-			// upon selection of the element by the FIA is not executed.
-			add("w3c/293.txml");
+			// If the originating caller hangs up during a bridged transfer, a
+			// 'connection.disconnect.hangup' event is thrown and the transfer
+			// name variable remains undefined.
+			add("w3c/300.txml");
+
+			// If the Interpreter is unable to connect to the destination entity
+			// when attempting a transfer because it is busy, the transfer name
+			// variable is filled with the value 'busy'.
+			add("w3c/301.txml");
+
+			// If the Interpreter is unable to connect to the destination entity
+			// when attempting a transfer because network is busy, the transfer
+			// name variable is filled with the value 'network_busy'.
+			add("w3c/302.txml");
 
 			// If a URI does not refer to a document, the current document is
 			// assumed.
@@ -218,8 +263,6 @@ public class W3cInterpreterTest {
 			// application root document and use the new application root
 			// document's variables.
 			add("w3c/a76-var-driver.txml");
-			
-			
 		}
 
 	};
@@ -244,16 +287,36 @@ public class W3cInterpreterTest {
 
 			interpreterContext.launchInterpreter();
 
-			if (!(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
-					.equals("[conf:pass: null]"))) {
-				System.out
-						.println(interpreterContext.interpreter.w3cNodeConfSuite
-								.get(0));
+			String tmp = interpreterContext.interpreter.w3cNodeConfSuite.get(0);
+			System.out.println("tmp =" + tmp);
+			if (tmp.contains("transfer")) {
+				if (tmp.contains("blind"))
+					interpreterContext.blindTransferSuccess();
+				else if (fileName.endsWith("288.txml")) {
+					interpreterContext.destinationHangup();
+				} else if (fileName.endsWith("290.txml")) {
+					interpreterContext.callerHangDestination();
+				} else if (fileName.endsWith("300.txml")) {
+					interpreterContext.callerHangup();
+				} else if (fileName.endsWith("295.txml")) {
+					interpreterContext.noAnswer();
+				} else if (fileName.endsWith("296.txml")) {
+					interpreterContext.maxTimeDisconnect();
+				} else if (fileName.endsWith("301.txml")) {
+					interpreterContext.destinationBusy();
+				} else if (fileName.endsWith("302.txml")) {
+					interpreterContext.networkBusy();
+				}
+
+				tmp = interpreterContext.interpreter.w3cNodeConfSuite.get(1);
+			}
+
+			if (!(tmp.equals("[conf:pass: null]"))) {
+				System.out.println(tmp);
 				System.out.println(count + " tests of " + fileNames.size());
 			}
 
-			assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
-					.equals("[conf:pass: null]"));
+			assertTrue(tmp.equals("[conf:pass: null]"));
 			count++;
 			// System.out.println(fileName + " test pass");
 		}

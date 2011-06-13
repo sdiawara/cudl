@@ -34,6 +34,7 @@ public class Interpreter {
 
 	private List<String> traceLog = new ArrayList<String>();
 	private List<String> traceStat = new ArrayList<String>();
+
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 	private Properties currentDialogProperties = new Properties();
 
@@ -161,8 +162,10 @@ public class Interpreter {
 			});
 
 			put("throw", new NodeExecutor() {
-				public void execute(Node node) throws EventException, DOMException {
-					throw new EventException(node.getAttributes().getNamedItem("event").getNodeValue());
+				public void execute(Node node) throws EventException,
+						DOMException {
+					throw new EventException(node.getAttributes().getNamedItem(
+							"event").getNodeValue());
 				}
 			});
 		}
@@ -187,6 +190,11 @@ public class Interpreter {
 
 		// Boucle principale
 
+		mainLoop(dialog);
+	}
+
+	private void mainLoop(Node dialog) throws ScriptException, IOException,
+			InterpreterException, TransferException {
 		while (true) {
 			// PHASE SELECTION
 			if ((selectedItem = phaseSelect(dialog)) == null) {
@@ -208,8 +216,14 @@ public class Interpreter {
 				declaration.setValue(selectedItem, "new Object()",
 						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 			} else if (nodeName.equals("transfer")) {
-				//throw new TransferException();
-				doTransferCall();
+				w3cNodeConfSuite.add("transfer "
+						+ (isBlindTransfer(selectedItem) ? "blind" : "bridge"));
+				Node namedItem = selectedItem.getAttributes().getNamedItem(
+						"dest");
+				transfertDestination = namedItem == null ? selectedItem
+						.getAttributes().getNamedItem("destexpr")
+						.getNodeValue() : namedItem.getNodeValue();
+				throw new TransferException();
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
 				declaration.setValue(selectedItem, "new Object()",
@@ -218,23 +232,44 @@ public class Interpreter {
 				declaration
 						.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
 			}
-
-			// TODO: PHASE PROCESS
 		}
 	}
 
-	private void doTransferCall() throws ScriptException, IOException,
-			EventException {
+	public void blindTransferSuccess() throws ScriptException, IOException,
+			InterpreterException {
+		throw new EventException("connection.disconnect.transfer");
+	}
 
-		Node namedItem = selectedItem.getAttributes().getNamedItem("dest");
-		transfertDestination = namedItem == null ? selectedItem.getAttributes()
-				.getNamedItem("destexpr").getNodeValue() : namedItem
-				.getNodeValue();
-		// FIXME: add w3c for more fonctionnalité
-		System.err.println("dest " + transfertDestination);
-		throw new EventException(
-				isBlindTransfer(selectedItem) ? "connection.disconnect.transfer"
-						: "connection.disconnect.hangup");
+	public void destinationHangup() throws ScriptException,
+			InterpreterException, IOException {
+		declaration.setValue(selectedItem, "'far_end_disconnect'",
+				DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
+		mainLoop(selectedItem.getParentNode());
+	}
+
+	public void callerHangDestination() throws ScriptException, IOException,
+			InterpreterException {
+		setTransferResultAndExecute("'near_end_disconnect'");
+	}
+
+	private void setTransferResultAndExecute(String transferResult)
+			throws ScriptException, InterpreterException, IOException {
+		declaration.setValue(selectedItem, transferResult,
+				DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
+		try {
+			execute(selectedItem);
+		} catch (FilledException e) {
+			execute(Utils.serachItem(selectedItem, "filled"));
+		}
+	}
+
+	public void callerHangup() throws EventException {
+		throw new EventException("connection.disconnect.hangup");
+	}
+
+	public void noAnswer() throws ScriptException, InterpreterException,
+			IOException {
+		setTransferResultAndExecute("'noanswer'");
 	}
 
 	private boolean isBlindTransfer(Node selectedItem2) {
@@ -539,5 +574,20 @@ public class Interpreter {
 
 	public Properties getCurrentDialogProperties() {
 		return currentDialogProperties;
+	}
+
+	public void maxTimeDisconnect() throws ScriptException,
+			InterpreterException, IOException {
+		setTransferResultAndExecute("'maxtime_disconnect'");
+	}
+
+	public void destinationBusy() throws ScriptException, InterpreterException,
+			IOException {
+		setTransferResultAndExecute("'busy'");
+	}
+
+	public void networkBusy() throws ScriptException, InterpreterException,
+			IOException {
+		setTransferResultAndExecute("'network_busy'");
 	}
 }
