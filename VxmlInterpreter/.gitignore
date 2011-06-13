@@ -1,0 +1,4 @@
+build/
+tempremotefile
+test/classes/
+testreport/
