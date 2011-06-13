@@ -2,12 +2,13 @@
 <project name="VxmlInterpreter" default="compile">
 
   <property name="src.dir" location="src" />
-  <property name="test.dir" location="test" />
+  <property name="test.src.dir" location="test" />
   <property name="target.dir" location="target" />
+
   <property name="build.dir" location="${target.dir}/build" />
-  <property name="deploy.dir" location="${target.dir}" />
   <property name="test.build.dir" location="${target.dir}/test" />
   <property name="test.report.dir" location="${target.dir}/testreport" />
+
   <property name="ant.build.javac.source" value="1.6" />
   <property name="ant.build.javac.target" value="1.6" />
 
@@ -24,19 +25,14 @@
     <pathelement location="${test.build.dir}" />
   </path>
 
-  <target name="clean" description="Clean project" >
-    <delete dir="${target.dir}" />
-  </target>
-
-  <target name="makedir">
+  <target name="prepare">
     <mkdir dir="${target.dir}" />
     <mkdir dir="${build.dir}" />
-    <mkdir dir="${deploy.dir}" />
-    <mkdir dir="${test.report.dir}" />
     <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${test.report.dir}" />
   </target>
 
-  <target name="compile" depends="makedir" description="Compile source" >
+  <target name="compile" depends="prepare" description="Compile source" >
     <javac srcdir="${src.dir}" destdir="${build.dir}" 
       classpathref="src.classpath" 
       debug="on" optimize="off" 
@@ -46,16 +42,11 @@
 
   <target name="compile.test" depends="compile">
     <!-- Compile unit tests -->
-    <javac srcdir="${test.dir}" destdir="${test.build.dir}" 
+    <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" 
       classpathref="test.classpath" 
       debug="on" optimize="off" 
       deprecation="on" includeantruntime="false">
     </javac>
-  </target>
-
-  <target name="jar" depends="compile" description="Generate jar file" >
-    <jar jarfile="${deploy.dir}\cudl.jar" 
-      basedir="${build.dir}" />
   </target>
 
   <target name="test" depends="compile.test" description="Launch unit tests" >
@@ -63,11 +54,20 @@
       <classpath refid="test.classpath" />
       <formatter type="xml" />
       <batchtest todir="${test.report.dir}">
-        <fileset dir="${test.dir}">
-          <include name="**/*.java" />
+        <fileset dir="${test.src.dir}">
+          <include name="**/*Test.java" />
         </fileset>
       </batchtest> 
     </junit>
+  </target>
+
+  <target name="jar" depends="compile" description="Generate jar file" >
+    <jar jarfile="${target.dir}\cudl.jar" 
+      basedir="${build.dir}" />
+  </target>
+
+  <target name="clean" description="Clean project" >
+    <delete dir="${target.dir}" />
   </target>
 
 </project>
