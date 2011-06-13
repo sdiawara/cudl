@@ -1,5 +1,2 @@
-build
+target
 tempremotefile
-test/classes
-testreport
-deploy
