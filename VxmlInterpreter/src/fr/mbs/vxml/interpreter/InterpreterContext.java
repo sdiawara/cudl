@@ -24,8 +24,6 @@ import fr.mbs.vxml.utils.InterpreterRequierement;
 import fr.mbs.vxml.utils.Utils;
 import fr.mbs.vxml.utils.VxmlDefaultPageCreator;
 
-
-
 public class InterpreterContext extends WebClient {
 	private Document currentdDocument;
 	private Node currentDialog;
@@ -150,9 +148,20 @@ public class InterpreterContext extends WebClient {
 
 	// we assume that the user is in a context where the word he utters is
 	// recognized if it is not the case we use the function nomatch
-	public void talk(String string) throws ScriptException, IOException {
+	public void talk(String sentence) throws ScriptException, IOException {
 		try {
-			interpreter.utterance(string, "'voice'");
+			interpreter.utterance(sentence, "'voice'");
+			interpreter.execute(Utils.serachItem(interpreter.selectedItem,
+					"filled"));
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
+	}
+
+	public void push(String dtmf) throws ScriptException, IOException {
+		try {
+			System.err.println(currentFileName+" \t"+"saisi dtmf  " + dtmf + "---->");
+			interpreter.utterance(dtmf, "'dtmf'");
 			interpreter.execute(Utils.serachItem(interpreter.selectedItem,
 					"filled"));
 		} catch (InterpreterException e) {
@@ -215,12 +224,12 @@ public class InterpreterContext extends WebClient {
 			executionHandler(e);
 		}
 	}
-	
+
 	public void networkBusy() throws ScriptException, IOException {
 		try {
 			interpreter.networkBusy();
 		} catch (InterpreterException e) {
-			//executionHandler(e);
+			executionHandler(e);
 		}
 	}
 }

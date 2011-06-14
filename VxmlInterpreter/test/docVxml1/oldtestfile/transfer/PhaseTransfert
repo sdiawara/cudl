@@ -13,7 +13,7 @@
     </block>
    <transfer name="resultTransfert" dest="sup:4700810C810106830783105506911808" bridge="true"  connecttimeout="200s">
           <filled>
-            <var name="transferResult" expr="pf_transfer_result()" />
+            <var name="transferResult" expr="''" />
             <var name="currentState" expr="'EffectueRoutage'" />
             <var name="toState" expr="'compteRenduRoutage'" />
             <var name="callReason" expr="'normal'" />

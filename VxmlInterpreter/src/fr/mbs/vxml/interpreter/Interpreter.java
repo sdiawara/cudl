@@ -590,4 +590,8 @@ public class Interpreter {
 			IOException {
 		setTransferResultAndExecute("'network_busy'");
 	}
+
+	public boolean raccrochage() {
+		return transfertDestination == null;
+	}
 }
