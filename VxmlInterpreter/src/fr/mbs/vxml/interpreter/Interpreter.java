@@ -39,6 +39,7 @@ public class Interpreter {
 	private Properties currentDialogProperties = new Properties();
 
 	private boolean nextItemSelectGuard = false;
+	private boolean hangup;
 
 	private Hashtable<String, NodeExecutor> nodeExecution = new Hashtable<String, NodeExecutor>() {
 		{
@@ -155,8 +156,10 @@ public class Interpreter {
 				}
 			});
 			put("exit", new NodeExecutor() {
+
 				public void execute(Node node) throws ExitException {
 					w3cNodeConfSuite.add("Just for exit");
+					hangup = true;
 					throw new ExitException();
 				}
 			});
@@ -592,6 +595,6 @@ public class Interpreter {
 	}
 
 	public boolean raccrochage() {
-		return transfertDestination == null;
+		return transfertDestination == null && hangup;
 	}
 }

@@ -20,6 +20,7 @@ import org.w3c.dom.Node;
 
 import fr.mbs.vxml.utils.InterpreterRequierement;
 import fr.mbs.vxml.utils.RemoteFileAccess;
+import fr.mbs.vxml.utils.SessionFileCreator;
 
 public final class InterpreterVariableDeclaration {
 	private Map<Node, String> dialogItemName;
@@ -50,9 +51,15 @@ public final class InterpreterVariableDeclaration {
 	private void addVariableNormalized() throws IOException, ScriptException {
 		try {
 			declarareScope(InterpreterScriptContext.SESSION_SCOPE);
-			File remoteFile = RemoteFileAccess.getRemoteFile(
-					InterpreterRequierement.sessionFileName, "");
+//			File remoteFile = RemoteFileAccess.getRemoteFile(
+//					InterpreterRequierement.sessionFileName, "");
 
+//			if (null != remoteFile) {
+//				engine.eval(new FileReader(remoteFile),
+//						getBindings(InterpreterScriptContext.SESSION_SCOPE));
+//			}
+
+			File remoteFile = SessionFileCreator.get3900DefaultSession();
 			if (null != remoteFile) {
 				engine.eval(new FileReader(remoteFile),
 						getBindings(InterpreterScriptContext.SESSION_SCOPE));
