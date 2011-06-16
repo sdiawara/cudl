@@ -28,7 +28,7 @@ public class InterpreterTest {
 	@Before
 	public void setUp() throws IOException {
 		InterpreterRequierement.url = "file://" + new File(".").getCanonicalPath()
-				+ "/test/docVxml1/";
+				+ "/test/docVxml/";
 	}
 
 	@Test

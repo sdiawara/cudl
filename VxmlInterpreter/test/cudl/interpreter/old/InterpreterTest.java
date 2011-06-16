@@ -24,7 +24,7 @@ public class InterpreterTest extends TestCase {
 	@Before
 	public void setUp() throws IOException {
 		InterpreterRequierement.url = "file://"
-				+ new File(".").getCanonicalPath() + "/test/docVxml1/";
+				+ new File(".").getCanonicalPath() + "/test/docVxml/";
 	}
 
 	@Test
@@ -103,7 +103,7 @@ public class InterpreterTest extends TestCase {
 			throws IOException, ScriptException {
 		InterpreterRequierement.url = "file://"
 				+ new File(".").getCanonicalPath()
-				+ "/test/docVxml1/oldtestfile/transfer";
+				+ "/test/docVxml/oldtestfile/transfer";
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("LOG PHASE transfert");
@@ -128,7 +128,7 @@ public class InterpreterTest extends TestCase {
 			throws IOException, ScriptException {
 		InterpreterRequierement.url = "file://"
 				+ new File(".").getCanonicalPath()
-				+ "/test/docVxml1/oldtestfile/transfer";
+				+ "/test/docVxml/oldtestfile/transfer";
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("LOG PHASE transfert");
@@ -154,7 +154,7 @@ public class InterpreterTest extends TestCase {
 			throws IOException, ScriptException {
 		InterpreterRequierement.url = "file://"
 				+ new File(".").getCanonicalPath()
-				+ "/test/docVxml1/oldtestfile/transfer";
+				+ "/test/docVxml/oldtestfile/transfer";
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("LOG PHASE transfert");

@@ -271,7 +271,7 @@ public class W3cInterpreterTest {
 	@Before
 	public void setUp() throws IOException {
 		InterpreterRequierement.url = "file://"
-				+ new File(".").getCanonicalPath() + "/test/docVxml1/";
+				+ new File(".").getCanonicalPath() + "/test/docVxml/";
 	}
 
 	@Test()
