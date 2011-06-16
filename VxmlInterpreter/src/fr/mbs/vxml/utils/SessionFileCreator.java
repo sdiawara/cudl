@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class SessionFileCreator {
-	private static List<String> session = new ArrayList<String>() {
+	private List<String> session = new ArrayList<String>() {
 		{
 
 			add("session = new Object();");
@@ -22,7 +21,7 @@ public class SessionFileCreator {
 			add("connection.protocol.isdnvn6 =  new Object();");
 			add("connection.protocol.version  =  '1.0';");
 			add("connection.local.uri  =  'tel:0892683613';");
-			add("connection.remote.uri  =  'tel:%200400000400';");
+			add("connection.remote.uri  =  'tel:0400000400';");
 			add("connection.connectionid  =  'CON1642389';");
 			add("connection.protocol.isdnvn6['channel']  =  'vipB07_1';");
 			add("connection.protocol.isdnvn6['evt']  =  't3.incoming';");
@@ -36,31 +35,24 @@ public class SessionFileCreator {
 		}
 	};
 
-	public static File get3900DefaultSession() throws IOException {
-		File session = new File("defaultSession");
-		FileWriter fileWriter = new FileWriter(session);
+	public File get3900DefaultSession() throws IOException {
+		File sessionFile = new File("defaultSession");
+		FileWriter fileWriter = new FileWriter(sessionFile);
 
-		for (Iterator iterator = SessionFileCreator.session.iterator(); iterator
-				.hasNext();) {
+		for (Iterator<String> iterator = session.iterator(); iterator.hasNext();) {
 			String script = (String) iterator.next();
+			String caller = InterpreterRequierement.connectionRemoteUri;
+
+			if (script.startsWith("connection.remote.uri")) {
+				if (caller != null
+						&& script.startsWith("connection.remote.uri")) {
+					script = "connection.remote.uri ='tel:" + caller + "';";
+				}
+			}
+
 			fileWriter.write(script);
 		}
 		fileWriter.close();
-		return session;
+		return sessionFile;
 	}
-	
-	public static File getSessionWithNumber(String caller, String called) throws IOException {
-		File session = new File("defaultSession");
-		FileWriter fileWriter = new FileWriter(session);
-
-		for (Iterator iterator = SessionFileCreator.session.iterator(); iterator
-				.hasNext();) {
-			String script = (String) iterator.next();
-			fileWriter.write(script);
-		}
-		fileWriter.close();
-		return session;
-	}
-	
-
 }

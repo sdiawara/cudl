@@ -42,7 +42,6 @@ public final class InterpreterVariableDeclaration {
 	public InterpreterVariableDeclaration() throws IOException, ScriptException {
 		manager = new ScriptEngineManager();
 		engine = manager.getEngineByName("ecmascript");
-		System.err.println(engine.getClass().getName());
 		context = new DefaultInterpreterScriptContext();
 		dialogItemName = new Hashtable<Node, String>();
 		addVariableNormalized();
@@ -51,18 +50,11 @@ public final class InterpreterVariableDeclaration {
 	private void addVariableNormalized() throws IOException, ScriptException {
 		try {
 			declarareScope(InterpreterScriptContext.SESSION_SCOPE);
-//			File remoteFile = RemoteFileAccess.getRemoteFile(
-//					InterpreterRequierement.sessionFileName, "");
-
-//			if (null != remoteFile) {
-//				engine.eval(new FileReader(remoteFile),
-//						getBindings(InterpreterScriptContext.SESSION_SCOPE));
-//			}
-
-			File remoteFile = SessionFileCreator.get3900DefaultSession();
-			if (null != remoteFile) {
-				engine.eval(new FileReader(remoteFile),
+			File sessionFile = new SessionFileCreator().get3900DefaultSession();
+			if (null != sessionFile) {
+				engine.eval(new FileReader(sessionFile),
 						getBindings(InterpreterScriptContext.SESSION_SCOPE));
+				sessionFile.delete();
 			}
 
 			declarareScope(InterpreterScriptContext.APPLICATION_SCOPE);

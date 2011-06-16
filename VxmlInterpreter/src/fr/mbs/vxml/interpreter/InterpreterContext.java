@@ -89,7 +89,7 @@ public class InterpreterContext extends WebClient {
 
 	private void buildDocument(String fileName) throws ScriptException,
 			IOException {
-		String url = tackWeelFormedUrl(fileName);
+		String url = tackWeelFormedUrl(fileName).replaceAll("#", "%23");
 		System.err.println(url);
 		XmlPage page = getPage(url);
 		currentdDocument = page.getXmlDocument();
@@ -160,7 +160,8 @@ public class InterpreterContext extends WebClient {
 
 	public void push(String dtmf) throws ScriptException, IOException {
 		try {
-			System.err.println(currentFileName+" \t"+"saisi dtmf  " + dtmf + "---->");
+			System.err.println(currentFileName + " \t" + "saisi dtmf  " + dtmf
+					+ "---->");
 			interpreter.utterance(dtmf, "'dtmf'");
 			interpreter.execute(Utils.serachItem(interpreter.selectedItem,
 					"filled"));

@@ -37,7 +37,7 @@ public class InterpreterTest extends TestCase {
 		expectedLogs.add("LOG PHASE interaction");
 
 		List<String> expectedStats = new ArrayList<String>();
-		expectedStats.add("[label:stats] new call");
+		expectedStats.add("new call");
 
 		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
 		Prompt expectedPrompt;
@@ -69,7 +69,7 @@ public class InterpreterTest extends TestCase {
 
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 		assertEquals(expectedStats, interpreterContext.interpreter
-				.getTraceStat());
+				.getTracetWithLabel("stats"));
 		assertEquals(expectedPrompts, interpreterContext.interpreter
 				.getPrompts());
 	}

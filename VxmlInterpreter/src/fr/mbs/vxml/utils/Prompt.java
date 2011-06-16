@@ -14,7 +14,7 @@ public class Prompt {
 	// Pascal 2009/007/29
 	public String bargeinType ="";
 	public String tts="";
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof Prompt) {

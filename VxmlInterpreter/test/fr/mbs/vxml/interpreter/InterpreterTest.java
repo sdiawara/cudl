@@ -38,12 +38,12 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello 3");
 
 		List<String> traceStat = new ArrayList<String>();
-		traceStat.add("[label:stats] LOG Hello");
+		traceStat.add("LOG Hello");
 
 		interpreterContext = new InterpreterContext("shello2.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
+		assertEquals(traceStat, interpreterContext.interpreter.getTracetWithLabel("stats"));
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
@@ -54,13 +54,13 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello 1");
 
 		List<String> traceStat = new ArrayList<String>();
-		traceStat.add("[label:stats] LOG Hello");
+		traceStat.add("LOG Hello");
 
 		interpreterContext = new InterpreterContext("shelloExit.vxml");
 		interpreterContext.launchInterpreter();
 
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
-		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
+		assertEquals(traceStat, interpreterContext.interpreter.getTracetWithLabel("stats"));
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello 3");
 
 		List<String> traceStat = new ArrayList<String>();
-		traceStat.add("[label:stats] LOG Hello");
+		traceStat.add("LOG Hello");
 
 		varExcepted = new TreeMap<String, String>();
 		varExcepted.put("block_0", "defined");
@@ -85,7 +85,7 @@ public class InterpreterTest {
 		interpreterContext = new InterpreterContext("shelloVar.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
+		assertEquals(traceStat, interpreterContext.interpreter.getTracetWithLabel("stats"));
 		// sertEquals(varExcepted, interpreterContext.interpreter.getVar());
 
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
@@ -136,7 +136,7 @@ public class InterpreterTest {
 				"shelloWith_if_elseif_and_else.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertTrue(interpreterContext.interpreter.getTraceStat().isEmpty());
+		assertTrue(interpreterContext.interpreter.getTracetWithLabel("stats").isEmpty());
 
 		System.err.println(traceLog);
 		System.err.println(interpreterContext.interpreter.getTraceLog());
@@ -153,7 +153,7 @@ public class InterpreterTest {
 		interpreterContext = new InterpreterContext("manyBlocks.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertTrue(interpreterContext.interpreter.getTraceStat().isEmpty());
+		assertTrue(interpreterContext.interpreter.getTracetWithLabel("stats").isEmpty());
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 
@@ -169,7 +169,7 @@ public class InterpreterTest {
 		interpreterContext = new InterpreterContext("goto.vxml");
 		interpreterContext.launchInterpreter();
 
-		assertTrue(interpreterContext.interpreter.getTraceStat().isEmpty());
+		assertTrue(interpreterContext.interpreter.getTracetWithLabel("stats").isEmpty());
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	}
 

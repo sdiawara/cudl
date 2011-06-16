@@ -3,6 +3,7 @@ package fr.mbs.vxml.interpreter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -23,6 +24,7 @@ import fr.mbs.vxml.interpreter.execption.SubmitException;
 import fr.mbs.vxml.script.DefaultInterpreterScriptContext;
 import fr.mbs.vxml.script.InterpreterScriptContext;
 import fr.mbs.vxml.script.InterpreterVariableDeclaration;
+import fr.mbs.vxml.utils.Log;
 import fr.mbs.vxml.utils.Prompt;
 import fr.mbs.vxml.utils.Utils;
 import fr.mbs.vxml.utils.VxmlElementType;
@@ -32,8 +34,7 @@ public class Interpreter {
 	public Node selectedItem;
 	public List<String> w3cNodeConfSuite = new ArrayList<String>();
 
-	private List<String> traceLog = new ArrayList<String>();
-	private List<String> traceStat = new ArrayList<String>();
+	private List<Log> logs = new ArrayList<Log>();
 
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 	private Properties currentDialogProperties = new Properties();
@@ -422,28 +423,43 @@ public class Interpreter {
 	}
 
 	public List<String> getTraceLog() {
-		return traceLog;
+		List<String> labeledLog = new ArrayList<String>();
+		for (Iterator<Log> iterator = logs.iterator(); iterator.hasNext();) {
+			labeledLog.add(((Log) iterator.next()).value);
+		}
+
+		return labeledLog;
 	}
 
-	public List<String> getTraceStat() {
-		return traceStat;
+	public List<String> getTracetWithLabel(String... label) {
+		List<String> labeledLog = new ArrayList<String>();
+		for (Iterator<Log> iterator = logs.iterator(); iterator.hasNext();) {
+			Log log = (Log) iterator.next();
+			for (int i = 0; i < label.length; i++) {
+				if (log.label.equals(label[i])) {
+					labeledLog.add(log.value);
+				}
+			}
+		}
+		return labeledLog;
 	}
 
 	private void collectTrace(Node node) throws ScriptException {
-		String value = getNodeValue(node);
-		traceLog.add(value);
-		System.err.println("LOG :" + value);
-		for (int j = 0; j < node.getAttributes().getLength(); j++) {
-			traceStat.add("[" + node.getAttributes().item(j).getNodeName()
-					+ ":" + node.getAttributes().item(j).getNodeValue() + "] "
-					+ node.getTextContent());
+		Log log = new Log();
+		NamedNodeMap attributes = node.getAttributes();
+		if (attributes != null) {
+			Node label = attributes.getNamedItem("label");
+			if (label != null)
+				log.label = label.getNodeValue();
 		}
+		log.value = getNodeValue(node);
+		System.err.println("LOG :" + log.value);
+		logs.add(log);
 	}
 
 	private String getNodeValue(Node node) throws ScriptException {
 		NodeList childs = node.getChildNodes();
 		String value = "";
-
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
 			if ("value".equals(child.getNodeName())) {
