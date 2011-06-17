@@ -143,7 +143,7 @@ public final class InterpreterVariableDeclaration {
 
 	public Object evaluateScript(String script, int scope)
 			throws ScriptException {
-		return engine.eval(script, getBindings(scope));
+		return engine.eval(script, context);
 	}
 
 	public void setValue(Node node, String value, int scope)

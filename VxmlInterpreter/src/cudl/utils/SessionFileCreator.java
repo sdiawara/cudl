@@ -42,12 +42,22 @@ public class SessionFileCreator {
 		for (Iterator<String> iterator = session.iterator(); iterator.hasNext();) {
 			String script = (String) iterator.next();
 			String caller = InterpreterRequierement.connectionRemoteUri;
+			String called = InterpreterRequierement.connectionLocalUri;
+			String origin = InterpreterRequierement.connectionOrigin;
 
-			if (script.startsWith("connection.remote.uri")) {
-				if (caller != null
-						&& script.startsWith("connection.remote.uri")) {
-					script = "connection.remote.uri ='tel:" + caller + "';";
-				}
+			if (caller != null && script.startsWith("connection.remote.uri")) {
+				script = "connection.remote.uri ='tel:" + caller + "';";
+			}
+
+			if (called != null && script.startsWith("connection.local.uri")) {
+				script = "connection.local.uri ='tel:" + called + "';";
+			}
+
+			if (origin != null
+					&& script
+							.startsWith("connection.protocol.isdnvn6['lastsup']")) {
+				script = "connection.protocol.isdnvn6['lastsup']  ='4700830E8307839098720051018A01"
+						+ origin + "8800';";
 			}
 
 			fileWriter.write(script);

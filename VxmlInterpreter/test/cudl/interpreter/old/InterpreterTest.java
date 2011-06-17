@@ -16,7 +16,6 @@ import cudl.interpreter.InterpreterContext;
 import cudl.utils.InterpreterRequierement;
 import cudl.utils.Prompt;
 
-
 public class InterpreterTest extends TestCase {
 
 	private InterpreterContext interpreterContext;
@@ -71,8 +70,11 @@ public class InterpreterTest extends TestCase {
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 		assertEquals(expectedStats, interpreterContext.interpreter
 				.getTracetWithLabel("stats"));
+		System.err.println(expectedPrompts);
+		System.err.println(interpreterContext.interpreter.getPrompts());
 		assertEquals(expectedPrompts, interpreterContext.interpreter
 				.getPrompts());
+		assertFalse(interpreterContext.interpreter.raccrochage());
 	}
 
 	@Test
@@ -96,6 +98,7 @@ public class InterpreterTest extends TestCase {
 		interpreterContext.event("nomatch");
 
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
+		assertFalse(interpreterContext.interpreter.raccrochage());
 	}
 
 	@Test
@@ -121,6 +124,7 @@ public class InterpreterTest extends TestCase {
 		// a pas raccrochage
 		assertFalse(interpreterContext.interpreter.getTraceLog().isEmpty());
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
+		assertFalse(interpreterContext.interpreter.raccrochage());
 	}
 
 	@Test
@@ -140,13 +144,16 @@ public class InterpreterTest extends TestCase {
 
 		assertEquals("sup:4700810C810106830783105506911808",
 				interpreterContext.interpreter.transfertDestination);
-		assertFalse(interpreterContext.interpreter.raccrochage()); // si
+		// si
 		// transfert
 		// alors il
 		// n'y
 		// a pas raccrochage
 		assertFalse(interpreterContext.interpreter.getTraceLog().isEmpty());
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
+		System.err.println(interpreterContext.interpreter.raccrochage()
+				+ "   ---->");
+		assertTrue(interpreterContext.interpreter.raccrochage());
 	}
 
 	@Test
@@ -166,7 +173,7 @@ public class InterpreterTest extends TestCase {
 
 		assertEquals("sup:4700810C810106830783105506911808",
 				interpreterContext.interpreter.transfertDestination);
-		assertFalse(interpreterContext.interpreter.raccrochage());
+		assertTrue(interpreterContext.interpreter.raccrochage());
 		assertFalse(interpreterContext.interpreter.getTraceLog().isEmpty());
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 	}

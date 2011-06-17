@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+   <block>
+        <log label="stats">LOG Hello</log>
+              <log>LOG Hello 1</log>
+        <exit/>
+         <log>LOG Hello 1 affter exit</log>
+      </block>
+    
+     <block>
+        <log >LOG Hello 2</log>    
+     </block>
+     <block>
+        <log>LOG Hello 3</log> 
+    </block>
+   <block> 
+   
+   </block>  
+   </form>
+</vxml>

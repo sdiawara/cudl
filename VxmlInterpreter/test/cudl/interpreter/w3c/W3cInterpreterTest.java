@@ -16,7 +16,6 @@ import org.junit.Test;
 import cudl.interpreter.InterpreterContext;
 import cudl.utils.InterpreterRequierement;
 
-
 public class W3cInterpreterTest {
 	private InterpreterContext interpreterContext;
 	private List<String> fileNames = new ArrayList<String>() {
@@ -264,6 +263,42 @@ public class W3cInterpreterTest {
 			// application root document and use the new application root
 			// document's variables.
 			add("w3c/a76-var-driver.txml");
+
+			// While executing a filled, if a throw is encountered the remaining
+			// filled actions are skipped.
+			add("w3c/assert1148.txml");
+
+			// . The input item 'field' may contain the filled element. Filled
+			// elements contain an action to execute after the result input item
+			// variable is filled in.
+			add("w3c/1037.txml");
+
+			// The default value of the attribute is ECMAScript undefined.
+			add("w3c/235.txml");
+
+			// When the interpreter executes a disconnect element, it must drop
+			// the call.
+			add("w3c/552.txml");
+
+			// The use of the log element has no side-effects on interpretation.
+			add("w3c/562.txml");
+
+			// When the namelist attribute of the clear element specifies a
+			// specific set of one or more form item variables, only those form
+			// items are cleared.
+			// add("w3c/518.txml");
+
+			// When the namelist attribute of the clear element is omitted, all
+			// form items in the current form are cleared.
+			// add("w3c/519.txml");
+
+			// A form may contain form items, which are subdivided into input
+			// items ( <field>, <record>, <transfer>, <object>, <subdialog>) and
+			// control items (<block> and <initial>).
+			add("w3c/assert93.txml");
+
+			// A form may contain <var> elements.
+			add("w3c/assert96.txml");
 		}
 
 	};
@@ -335,49 +370,5 @@ public class W3cInterpreterTest {
 		interpreterContext.launchInterpreter();
 
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());
-	}
-
-	@Test
-	public void w3cVariableScope() throws IOException, ScriptException {
-		// If the last main FIA loop did not result in a goto nextitem
-		// and there is no form item which is eligible to be visited
-		// then an implicit exit is generated.
-
-		// Read file
-		interpreterContext = new InterpreterContext("w3c/assert165.txml");
-		interpreterContext.launchInterpreter();
-
-		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());
-	}
-
-	@Test()
-	public void w3cDefaultValueIsUndefined() throws IOException,
-			ScriptException {
-		// The default value of the attribute is ECMAScript undefined.
-		// The file (w3c/235.txml) has been modified to adapt to interpret the
-		// tests
-
-		interpreterContext = new InterpreterContext("w3c/235.txml");
-		interpreterContext.launchInterpreter();
-		interpreterContext.event("noinput");
-
-		// System.out.println(interpreterContext.interpreter.w3cNodeConfSuite);
-		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
-				.equals("[conf:pass: null]"));
-	}
-
-	@Test()
-	public void w3cFilledContainIsexecutedAfterUserInput() throws IOException,
-			ScriptException {
-		// . The input item 'field' may contain the filled element. Filled
-		// elements contain an action to execute after the result input item
-		// variable is filled in.
-
-		interpreterContext = new InterpreterContext("w3c/1037.txml");
-		interpreterContext.launchInterpreter();
-		interpreterContext.talk("'toto'");
-
-		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.get(0)
-				.equals("[conf:pass: null]"));
 	}
 }

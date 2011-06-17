@@ -29,7 +29,6 @@ import cudl.utils.Prompt;
 import cudl.utils.Utils;
 import cudl.utils.VxmlElementType;
 
-
 public class Interpreter {
 	private InterpreterVariableDeclaration declaration;
 	public Node selectedItem;
@@ -42,6 +41,7 @@ public class Interpreter {
 
 	private boolean nextItemSelectGuard = false;
 	private boolean hangup;
+	private List<Node> grammarW3c = new ArrayList<Node>();
 
 	private Hashtable<String, NodeExecutor> nodeExecution = new Hashtable<String, NodeExecutor>() {
 		{
@@ -53,6 +53,38 @@ public class Interpreter {
 				public void execute(Node node) throws ExitException {
 					w3cNodeConfSuite.add(node.toString());
 					throw new ExitException();
+				}
+			});
+
+			put("conf:grammar", new NodeExecutor() {
+				public void execute(Node node) throws ExitException {
+					grammarW3c.add(node);
+				}
+			});
+
+			put("noinput", new NodeExecutor() {
+				public void execute(Node node) throws ExitException,
+						InterpreterException {
+					throw new EventException("noinput");
+				}
+			});
+
+			put("conf:speech", new NodeExecutor() {
+				public void execute(Node node) throws ScriptException,
+						InterpreterException, IOException {
+
+					String nodeValue = node.getAttributes().getNamedItem(
+							"value").getNodeValue();
+					for (Iterator<Node> grammarIterator = grammarW3c.iterator(); grammarIterator
+							.hasNext();) {
+						Node grammar = (Node) grammarIterator.next();
+						String grammarUtterance = grammar.getAttributes()
+								.getNamedItem("utterance").getNodeValue();
+						if (grammarUtterance.contains(nodeValue)) {
+							utterance("'" + nodeValue + "'", "'voice'");
+
+						}
+					}
 				}
 			});
 			// Just for W3C test
@@ -96,8 +128,8 @@ public class Interpreter {
 				}
 			});
 			put("disconnect", new NodeExecutor() {
-				public void execute(Node node) throws DisconnectException {
-					throw new DisconnectException();
+				public void execute(Node node) throws InterpreterException {
+					throw new EventException("connection.disconnect.hangup");
 				}
 			});
 			put("script", new NodeExecutor() {
@@ -120,6 +152,7 @@ public class Interpreter {
 			});
 			put("clear", new NodeExecutor() {
 				public void execute(Node node) {
+					
 					clearVariable(node);
 				}
 			});
@@ -162,6 +195,7 @@ public class Interpreter {
 				public void execute(Node node) throws ExitException {
 					w3cNodeConfSuite.add("Just for exit");
 					hangup = true;
+					System.err.println("raccrocher par un exit");
 					throw new ExitException();
 				}
 			});
@@ -173,6 +207,14 @@ public class Interpreter {
 							"event").getNodeValue());
 				}
 			});
+
+			put("property", new NodeExecutor() {
+				public void execute(Node node) throws EventException,
+						DOMException {
+					collectProperty(node.getAttributes());
+				}
+			});
+
 		}
 	};
 	public String transfertDestination;
@@ -199,10 +241,12 @@ public class Interpreter {
 	}
 
 	private void mainLoop(Node dialog) throws ScriptException, IOException,
-			InterpreterException, TransferException {
+			InterpreterException {
 		while (true) {
 			// PHASE SELECTION
 			if ((selectedItem = phaseSelect(dialog)) == null) {
+				hangup = true;
+				System.err.println("raccrocher par un par une sorti");
 				break;
 			}
 
@@ -225,9 +269,10 @@ public class Interpreter {
 						+ (isBlindTransfer(selectedItem) ? "blind" : "bridge"));
 				Node namedItem = selectedItem.getAttributes().getNamedItem(
 						"dest");
-				transfertDestination = namedItem == null ? selectedItem
-						.getAttributes().getNamedItem("destexpr")
-						.getNodeValue() : namedItem.getNodeValue();
+				transfertDestination = namedItem == null ? declaration
+						.evaluateScript(selectedItem.getAttributes()
+								.getNamedItem("destexpr").getNodeValue(), 50)
+						+ "" : namedItem.getNodeValue();
 				throw new TransferException();
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
@@ -238,6 +283,7 @@ public class Interpreter {
 						.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
 			}
 		}
+
 	}
 
 	public void blindTransferSuccess() throws ScriptException, IOException,
@@ -534,6 +580,7 @@ public class Interpreter {
 	}
 
 	private void collectDialogProperty(NodeList nodeList) {
+		getCurrentDialogProperties().clear();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals("property")) {
@@ -543,9 +590,9 @@ public class Interpreter {
 	}
 
 	private void collectProperty(NamedNodeMap attributes) {
-		getCurrentDialogProperties().put(
-				attributes.getNamedItem("name").getNodeValue(),
-				attributes.getNamedItem("value").getNodeValue());
+		currentDialogProperties.put(attributes.getNamedItem("name")
+				.getNodeValue(), attributes.getNamedItem("value")
+				.getNodeValue());
 	}
 
 	private Node phaseSelect(Node dialog) throws ScriptException, IOException {
@@ -581,17 +628,20 @@ public class Interpreter {
 
 	}
 
-	public void utterance(String string, String string2) throws ScriptException {
+	public void utterance(String string, String string2)
+			throws ScriptException, InterpreterException, IOException {
 		declaration.evaluateScript("lastresult$[0].utterance =" + string,
 				InterpreterScriptContext.APPLICATION_SCOPE);
 		declaration.evaluateScript("lastresult$[0].inputmode =" + string2,
 				InterpreterScriptContext.APPLICATION_SCOPE);
+		execute(Utils.serachItem(selectedItem, "filled"));
 	}
 
 	public void setCurrentDialogProperties(Properties currentDialogProperties) {
 		this.currentDialogProperties = currentDialogProperties;
 	}
 
+	// FIXME: add well management
 	public Properties getCurrentDialogProperties() {
 		return currentDialogProperties;
 	}
@@ -612,6 +662,6 @@ public class Interpreter {
 	}
 
 	public boolean raccrochage() {
-		return transfertDestination == null && hangup;
+		return hangup;
 	}
 }

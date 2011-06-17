@@ -47,6 +47,7 @@ public class InterpreterTest {
 
 		assertEquals(traceStat, interpreterContext.interpreter.getTracetWithLabel("stats"));
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
+		assertTrue(interpreterContext.interpreter.raccrochage());
 	}
 
 	@Test
@@ -63,6 +64,7 @@ public class InterpreterTest {
 
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceStat, interpreterContext.interpreter.getTracetWithLabel("stats"));
+		assertTrue(interpreterContext.interpreter.raccrochage());
 	}
 
 	@Test
@@ -91,6 +93,7 @@ public class InterpreterTest {
 		// sertEquals(varExcepted, interpreterContext.interpreter.getVar());
 
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
+		assertTrue(interpreterContext.interpreter.raccrochage());
 	}
 
 	// @Test
@@ -143,6 +146,7 @@ public class InterpreterTest {
 		System.err.println(traceLog);
 		System.err.println(interpreterContext.interpreter.getTraceLog());
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
+		assertTrue(interpreterContext.interpreter.raccrochage());
 	}
 
 	@Test

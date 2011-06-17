@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+	<catch>
+		<conf:fail expr="'catch-all caught ' + _event"/>
+	</catch>
+	<form>
+		<field name="one">
+			<conf:speech value="alpha"/>
+			<conf:grammar utterance="alpha"/>
+		</field>
+		<field name="two">
+			<conf:speech value="charlie"/>
+			<conf:grammar utterance="charlie"/>
+		</field>
+		<field name="three">
+			<conf:speech value="echo"/>
+			<conf:grammar utterance="echo"/>
+		</field>
+		<filled>
+			<clear/>
+			<if cond="one == undefined &amp;&amp; two == undefined &amp;&amp; three == undefined">
+				<conf:pass/>
+			<else/>
+				<conf:fail/>
+			</if>
+		</filled>
+	</form>
+</vxml>

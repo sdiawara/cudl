@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+
+ <catch event="connection.disconnect.hangup">
+   <conf:comment>
+     Caught <value expr="_event"/>
+   </conf:comment>
+  <conf:pass/>
+ </catch>
+
+
+ <catch event="error">
+  <conf:fail expr="'document caught event ' + _event"/>
+ </catch>
+
+
+ <form id="ciao">
+
+  <block>
+    <conf:comment>
+      About to drop the call.
+    </conf:comment>
+
+    <disconnect/>
+
+    <conf:comment>
+      Disconnect was called, we should have dropped the call.  If we're
+      here, then we didn't catch the event - oops.
+    </conf:comment>
+
+    <conf:fail reason="Executed code following &lt;disconnect&gt; tag"/>
+  </block>
+
+ </form>
+
+</vxml>

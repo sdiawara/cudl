@@ -7,9 +7,6 @@
   <field name="a">
   <conf:grammar utterance="alpha"/>
   <conf:noinput/>
-  
-  <filled>
-   </filled>
   <noinput>
       <if cond="a == undefined">
         <conf:pass/>

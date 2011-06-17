@@ -24,7 +24,6 @@ import cudl.utils.InterpreterRequierement;
 import cudl.utils.Utils;
 import cudl.utils.VxmlDefaultPageCreator;
 
-
 public class InterpreterContext extends WebClient {
 	private Document currentdDocument;
 	private Node currentDialog;
@@ -152,8 +151,6 @@ public class InterpreterContext extends WebClient {
 	public void talk(String sentence) throws ScriptException, IOException {
 		try {
 			interpreter.utterance(sentence, "'voice'");
-			interpreter.execute(Utils.serachItem(interpreter.selectedItem,
-					"filled"));
 		} catch (InterpreterException e) {
 			executionHandler(e);
 		}
@@ -161,11 +158,7 @@ public class InterpreterContext extends WebClient {
 
 	public void push(String dtmf) throws ScriptException, IOException {
 		try {
-			System.err.println(currentFileName + " \t" + "saisi dtmf  " + dtmf
-					+ "---->");
 			interpreter.utterance(dtmf, "'dtmf'");
-			interpreter.execute(Utils.serachItem(interpreter.selectedItem,
-					"filled"));
 		} catch (InterpreterException e) {
 			executionHandler(e);
 		}

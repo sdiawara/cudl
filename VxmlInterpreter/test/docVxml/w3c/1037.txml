@@ -5,8 +5,8 @@
 
 <form id="form0">
   <field name="a">
-  <conf:speech value="alpha"/>
-    <conf:grammar utterance="alpha"/>
+   <conf:grammar utterance="alpha"/>
+   <conf:speech value="alpha"/>
 
     <filled>
     <conf:pass/>
