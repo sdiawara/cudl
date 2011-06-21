@@ -1,4 +1,4 @@
-package cudl.interpreter;
+package cudl;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,10 +15,10 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
 import cudl.event.InterpreterEvent;
 import cudl.event.InterpreterEventHandler;
 import cudl.event.InterpreterListener;
-import cudl.interpreter.execption.EventException;
-import cudl.interpreter.execption.GotoException;
-import cudl.interpreter.execption.InterpreterException;
-import cudl.interpreter.execption.SubmitException;
+import cudl.exception.EventException;
+import cudl.exception.GotoException;
+import cudl.exception.InterpreterException;
+import cudl.exception.SubmitException;
 import cudl.script.DefaultInterpreterScriptContext;
 import cudl.utils.InterpreterRequierement;
 import cudl.utils.Utils;

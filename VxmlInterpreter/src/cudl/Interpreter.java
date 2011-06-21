@@ -1,4 +1,4 @@
-package cudl.interpreter;
+package cudl;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,13 +14,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import cudl.interpreter.execption.DisconnectException;
-import cudl.interpreter.execption.EventException;
-import cudl.interpreter.execption.ExitException;
-import cudl.interpreter.execption.FilledException;
-import cudl.interpreter.execption.GotoException;
-import cudl.interpreter.execption.InterpreterException;
-import cudl.interpreter.execption.SubmitException;
+import cudl.exception.DisconnectException;
+import cudl.exception.EventException;
+import cudl.exception.ExitException;
+import cudl.exception.FilledException;
+import cudl.exception.GotoException;
+import cudl.exception.InterpreterException;
+import cudl.exception.SubmitException;
 import cudl.script.DefaultInterpreterScriptContext;
 import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;

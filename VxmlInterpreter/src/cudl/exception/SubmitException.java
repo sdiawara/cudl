@@ -1,4 +1,4 @@
-package cudl.interpreter.execption;
+package cudl.exception;
 
 import javax.script.ScriptException;
 

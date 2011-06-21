@@ -1,4 +1,4 @@
-package cudl.interpreter.w3c;
+package cudl.w3c;
 
 import static org.junit.Assert.assertTrue;
 
@@ -13,7 +13,7 @@ import javax.script.ScriptException;
 import org.junit.Before;
 import org.junit.Test;
 
-import cudl.interpreter.InterpreterContext;
+import cudl.InterpreterContext;
 import cudl.utils.InterpreterRequierement;
 
 

@@ -1,4 +1,4 @@
-package cudl.interpreter;
+package cudl;
 
 import java.io.IOException;
 
@@ -6,7 +6,7 @@ import javax.script.ScriptException;
 
 import org.w3c.dom.Node;
 
-import cudl.interpreter.execption.InterpreterException;
+import cudl.exception.InterpreterException;
 
 
 public interface NodeExecutor {

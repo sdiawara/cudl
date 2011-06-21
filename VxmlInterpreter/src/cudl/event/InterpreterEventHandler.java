@@ -10,8 +10,8 @@ import javax.script.ScriptException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import cudl.interpreter.InterpreterContext;
-import cudl.interpreter.execption.InterpreterException;
+import cudl.InterpreterContext;
+import cudl.exception.InterpreterException;
 import cudl.utils.Utils;
 
 
