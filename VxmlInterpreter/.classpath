@@ -4,19 +4,20 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/commons-codec-1.4.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/commons-collections-3.2.1.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/commons-httpclient-3.1.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/commons-io-1.4.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/cssparser-0.9.5.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/htmlunit-2.7-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/htmlunit-core-js-2.7-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/nekohtml-1.9.14-20100122.114035-12.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/sac-1.3.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/serializer-2.7.1.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/xalan-2.7.1.jar"/>
-	<classpathentry kind="lib" path="/home/sdiawara/workspace/cudl/VxmlInterpreter/lib/htmlunit-2.7-SNAPSHOT/xercesImpl-2.9.1.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/commons-codec-1.4.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/commons-io-1.4.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/commons-lang-2.4.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/cssparser-0.9.5.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/htmlunit-2.7-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/htmlunit-core-js-2.7-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/nekohtml-1.9.14-20100122.114035-12.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/sac-1.3.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/serializer-2.7.1.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/xalan-2.7.1.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/xercesImpl-2.9.1.jar"/>
+	<classpathentry kind="var" path="HTML_UNIT/xml-apis-1.3.04.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
