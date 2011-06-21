@@ -2,8 +2,9 @@ package cudl.event;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.script.ScriptException;
 
@@ -12,34 +13,30 @@ import org.w3c.dom.NodeList;
 
 import cudl.interpreter.InterpreterContext;
 import cudl.interpreter.execption.InterpreterException;
-import cudl.utils.Utils;
-
 
 public class InterpreterEventHandler implements InterpreterListener {
+	private Map<String, Integer> eventCounter = new Hashtable<String, Integer>();
 
 	@Override
 	public void doEvent(InterpreterEvent interpreterEvent)
 			throws ScriptException, IOException {
 		InterpreterContext context = (InterpreterContext) interpreterEvent
 				.getSource();
+		String type = interpreterEvent.type;
+		eventCounter.put(type, (eventCounter.get(type) == null)?1:eventCounter.get(type) + 1);
+		
+		List<Node> catchList = searchEvent(type, context.field);
+		if (catchList.size() == 0) {
+			catchList = searchEvent(type, context.rootDocument
+					.getElementsByTagName("vxml").item(0));
+		}
 
-		List<Node> catchList = searchEvent(interpreterEvent.type, context.field);
-		removeUnlessCond(catchList);
 		try {
 			// FIXME: take the first with a correct event counter
 			// a counter who is ≤ at currentCounter
 			context.interpreter.execute(catchList.get(0));
 		} catch (InterpreterException e) {
 			context.executionHandler(e);
-		}
-	}
-
-	private void removeUnlessCond(List<Node> catchList) {
-		for (Iterator<Node> iterator = catchList.iterator(); iterator.hasNext();) {
-			Node node = iterator.next();
-			if (!Utils.checkCond(node)) {
-				catchList.remove(node);
-			}
 		}
 	}
 

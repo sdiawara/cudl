@@ -14,7 +14,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import cudl.interpreter.execption.DisconnectException;
+import cudl.event.InterpreterEvent;
+import cudl.event.InterpreterEventHandler;
 import cudl.interpreter.execption.EventException;
 import cudl.interpreter.execption.ExitException;
 import cudl.interpreter.execption.FilledException;
@@ -41,7 +42,7 @@ public class Interpreter {
 
 	private boolean nextItemSelectGuard = false;
 	private boolean hangup;
-	private List<Node> grammarW3c = new ArrayList<Node>();
+	public List<Node> grammarActive = new ArrayList<Node>();
 
 	private Hashtable<String, NodeExecutor> nodeExecution = new Hashtable<String, NodeExecutor>() {
 		{
@@ -56,13 +57,7 @@ public class Interpreter {
 				}
 			});
 
-			put("conf:grammar", new NodeExecutor() {
-				public void execute(Node node) throws ExitException {
-					grammarW3c.add(node);
-				}
-			});
-
-			put("noinput", new NodeExecutor() {
+			put("conf:noinput", new NodeExecutor() {
 				public void execute(Node node) throws ExitException,
 						InterpreterException {
 					throw new EventException("noinput");
@@ -75,28 +70,25 @@ public class Interpreter {
 
 					String nodeValue = node.getAttributes().getNamedItem(
 							"value").getNodeValue();
-					for (Iterator<Node> grammarIterator = grammarW3c.iterator(); grammarIterator
-							.hasNext();) {
-						Node grammar = (Node) grammarIterator.next();
-						String grammarUtterance = grammar.getAttributes()
-								.getNamedItem("utterance").getNodeValue();
-						if (grammarUtterance.contains(nodeValue)) {
-							utterance("'" + nodeValue + "'", "'voice'");
-
-						}
-					}
+					utterance("'" + nodeValue + "'", "'voice'");
 				}
 			});
 			// Just for W3C test
 			put("conf:fail", new NodeExecutor() {
-				public void execute(Node node) {
+				public void execute(Node node) throws DOMException,
+						ScriptException {
 					w3cNodeConfSuite.add(node.toString());
 					NamedNodeMap attributes = node.getAttributes();
 					if (attributes == null)
 						return;
 					if (node.getAttributes().getNamedItem("reason") != null)
 						System.err.println(node.getAttributes().getNamedItem(
-								"reason").getTextContent());
+								"reason ->").getTextContent());
+					else if (node.getAttributes().getNamedItem("expr") != null)
+						System.err.println("reason ->"
+								+ declaration.evaluateScript(node
+										.getAttributes().getNamedItem("expr")
+										.getTextContent(), 50));
 				}
 			});
 			put("filled", new NodeExecutor() {
@@ -152,7 +144,6 @@ public class Interpreter {
 			});
 			put("clear", new NodeExecutor() {
 				public void execute(Node node) {
-					
 					clearVariable(node);
 				}
 			});
@@ -218,9 +209,11 @@ public class Interpreter {
 		}
 	};
 	public String transfertDestination;
+	private InterpreterEventHandler interpreterEventHandler;
 
 	public Interpreter() throws IOException, ScriptException {
 		declaration = new InterpreterVariableDeclaration();
+		interpreterEventHandler = new InterpreterEventHandler();
 	}
 
 	public void interpretDialog(Node dialog) throws InterpreterException,
@@ -246,11 +239,27 @@ public class Interpreter {
 			// PHASE SELECTION
 			if ((selectedItem = phaseSelect(dialog)) == null) {
 				hangup = true;
-				System.err.println("raccrocher par un par une sorti");
 				break;
 			}
 
-			// Exécuter l'élément de formulaire.
+			// Grammar activation
+			grammarActive.clear();
+			if (VxmlElementType.isInputItem(selectedItem))
+				if (VxmlElementType.isAModalItem(selectedItem)) {
+					grammarActive
+							.add(Utils.serachItem(selectedItem, "grammar"));
+					System.err.println("modal" + grammarActive.size());
+				} else {
+					Node parent = selectedItem;
+					while (null != parent) {
+						Node serachItem = Utils.serachItem(parent, "grammar");
+						if (null != serachItem) {
+							grammarActive.add(serachItem);
+						}
+						parent = parent.getParentNode();
+					}
+				}
+
 			String nodeName = selectedItem.getNodeName();
 			if (nodeName.equals("field")) {
 				System.err.println("WAIT FOR USER INPUT");
@@ -377,7 +386,7 @@ public class Interpreter {
 				Node bargeinType = attributes.getNamedItem("bargeintype");
 				if (bargeinType != null) {
 					p.bargeinType = bargeinType.getNodeValue();
-				} else if (getCurrentDialogProperties().get("bargeintype") != null) {
+				} else if (currentDialogProperties.get("bargeintype") != null) {
 					p.bargeinType = getCurrentDialogProperties().getProperty(
 							"bargeintype");
 				}
@@ -494,13 +503,17 @@ public class Interpreter {
 	private void collectTrace(Node node) throws ScriptException {
 		Log log = new Log();
 		NamedNodeMap attributes = node.getAttributes();
+		System.err.print("LOG:");
 		if (attributes != null) {
 			Node label = attributes.getNamedItem("label");
-			if (label != null)
+			if (label != null) {
 				log.label = label.getNodeValue();
+				System.err.print(" "+log.label);
+			}
+
 		}
 		log.value = getNodeValue(node);
-		System.err.println("LOG :" + log.value);
+		System.err.println(" "+log.value);
 		logs.add(log);
 	}
 
@@ -557,7 +570,6 @@ public class Interpreter {
 	public void resetDialogScope() {
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
-
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
 
@@ -580,7 +592,7 @@ public class Interpreter {
 	}
 
 	private void collectDialogProperty(NodeList nodeList) {
-		getCurrentDialogProperties().clear();
+		currentDialogProperties.clear();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals("property")) {
@@ -643,6 +655,8 @@ public class Interpreter {
 
 	// FIXME: add well management
 	public Properties getCurrentDialogProperties() {
+		collectDialogProperty(selectedItem.getParentNode().getChildNodes());
+		System.err.println(currentDialogProperties);
 		return currentDialogProperties;
 	}
 
@@ -663,5 +677,10 @@ public class Interpreter {
 
 	public boolean raccrochage() {
 		return hangup;
+	}
+
+	public void doEvent(InterpreterEvent interpreterEvent)
+			throws ScriptException, IOException {
+		interpreterEventHandler.doEvent(interpreterEvent);
 	}
 }

@@ -201,11 +201,6 @@ public class W3cInterpreterTest {
 			// document not in that application.
 			add("w3c/a26a.txml");
 
-			// The platform can throw a semantic error upon encountering an
-			// error in VoiceXML semantics.
-			// FIXME: add semantic error in vxml.
-			// add("w3c/a32.txml");
-
 			// A document may have var elements.
 			add("w3c/42.txml");
 
@@ -235,8 +230,7 @@ public class W3cInterpreterTest {
 
 			// Application root catch handlers are default handlers for leaf
 			// documents.
-			// FIXME
-			// add("w3c/a62-leaf.txml");
+			add("w3c/a62-leaf.txml");
 
 			// When transitioning between two leaf documents that both specify
 			// the same application fully resolved URI then the transition must
@@ -299,6 +293,16 @@ public class W3cInterpreterTest {
 
 			// A form may contain <var> elements.
 			add("w3c/assert96.txml");
+
+			// The interpreter throws the named event.
+			add("w3c/431.txml");
+
+			// The interpreter observes event counting when an
+			// application-defined event is thrown.
+			// add("w3c/432.txml");
+
+			// An implementation platform must support text-to-speech
+			add("w3c/a626.txml");
 		}
 
 	};

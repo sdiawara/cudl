@@ -44,6 +44,7 @@ public class SessionFileCreator {
 			String caller = InterpreterRequierement.connectionRemoteUri;
 			String called = InterpreterRequierement.connectionLocalUri;
 			String origin = InterpreterRequierement.connectionOrigin;
+			String channel = InterpreterRequierement.channel;
 
 			if (caller != null && script.startsWith("connection.remote.uri")) {
 				script = "connection.remote.uri ='tel:" + caller + "';";
@@ -60,6 +61,9 @@ public class SessionFileCreator {
 						+ origin + "8800';";
 			}
 
+			if (channel != null && script.startsWith("connection.channel")) {
+				script = "connection.channel='" + channel + "';";
+			}
 			fileWriter.write(script);
 		}
 		fileWriter.close();

@@ -70,8 +70,7 @@ public class InterpreterTest extends TestCase {
 		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
 		assertEquals(expectedStats, interpreterContext.interpreter
 				.getTracetWithLabel("stats"));
-		System.err.println(expectedPrompts);
-		System.err.println(interpreterContext.interpreter.getPrompts());
+		
 		assertEquals(expectedPrompts, interpreterContext.interpreter
 				.getPrompts());
 		assertFalse(interpreterContext.interpreter.raccrochage());
