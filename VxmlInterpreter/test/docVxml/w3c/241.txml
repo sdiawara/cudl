@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+
+<vxml xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance" version="2.0">
+
+<form id="form0">
+  <field name="a">
+  <conf:grammar utterance="alpha">
+    <conf:key name="a" value="valA"/>
+  </conf:grammar>
+  <conf:speech value="alpha"/>
+  <filled>
+    <if cond="a != 'valA'">
+        <conf:fail expr="'unexpected value ' + a"/>
+    </if>
+    <conf:pass/>
+  </filled>
+  </field>
+</form>
+
+<catch>
+    <conf:fail expr="'caught unexpected event: ' + _event"/>
+</catch>
+
+</vxml>

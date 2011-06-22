@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+<!--
+ Assertion 626 Section 1.2.5
+ An implementation platform must support text-to-speech.
+
+ Web requirements:
+ none
+
+ a626.vxml
+   test1 - simply plays TTS output.
+
+ @author Dan Evans dde@nortelnetworks.com
+ @version 1.0, 10/14/2002
+-->
+<form id="a626">
+  <block name="test1">
+    Assertion 626. If you are hearing synthesized speech, this test passed.
+    <conf:pass/>
+  </block>
+  <catch event="error">
+    <prompt>
+      Error event is <value expr="_event"/>.
+    </prompt>
+    <conf:fail reason="a626.fail.test1: error exception thrown"/>
+  </catch>
+</form>
+</vxml>
