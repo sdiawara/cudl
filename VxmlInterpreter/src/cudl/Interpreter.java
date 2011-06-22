@@ -22,6 +22,7 @@ import cudl.exception.FilledException;
 import cudl.exception.GotoException;
 import cudl.exception.InterpreterException;
 import cudl.exception.SubmitException;
+import cudl.exception.TransferException;
 import cudl.script.DefaultInterpreterScriptContext;
 import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
@@ -323,12 +324,18 @@ public class Interpreter {
 		}
 	}
 
-	public void callerHangup() throws EventException {
+	public void callerHangup(int i) throws EventException, ScriptException {
+		declaration.evaluateScript(
+				"connection.protocol.isdnvn6.transferresult= '" + i + "'",
+				DefaultInterpreterScriptContext.SESSION_SCOPE);
 		throw new EventException("connection.disconnect.hangup");
 	}
 
 	public void noAnswer() throws ScriptException, InterpreterException,
 			IOException {
+		declaration.evaluateScript(
+				"connection.protocol.isdnvn6.transferresult= '2'",
+				DefaultInterpreterScriptContext.SESSION_SCOPE);
 		setTransferResultAndExecute("'noanswer'");
 	}
 
@@ -508,12 +515,12 @@ public class Interpreter {
 			Node label = attributes.getNamedItem("label");
 			if (label != null) {
 				log.label = label.getNodeValue();
-				System.err.print(" "+log.label);
+				System.err.print(" " + log.label);
 			}
 
 		}
 		log.value = getNodeValue(node);
-		System.err.println(" "+log.value);
+		System.err.println(" " + log.value);
 		logs.add(log);
 	}
 

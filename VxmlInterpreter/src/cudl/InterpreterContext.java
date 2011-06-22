@@ -188,9 +188,9 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void callerHangup() throws IOException, ScriptException {
+	public void callerHangup(int i) throws IOException, ScriptException {
 		try {
-			interpreter.callerHangup();
+			interpreter.callerHangup(i);
 		} catch (InterpreterException e) {
 			executionHandler(e);
 		}
@@ -198,6 +198,7 @@ public class InterpreterContext extends WebClient {
 
 	public void noAnswer() throws ScriptException, IOException {
 		try {
+			
 			interpreter.noAnswer();
 		} catch (InterpreterException e) {
 			executionHandler(e);

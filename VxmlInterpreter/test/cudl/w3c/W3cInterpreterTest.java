@@ -337,7 +337,7 @@ public class W3cInterpreterTest {
 				} else if (fileName.endsWith("290.txml")) {
 					interpreterContext.callerHangDestination();
 				} else if (fileName.endsWith("300.txml")) {
-					interpreterContext.callerHangup();
+					interpreterContext.callerHangup(0);
 				} else if (fileName.endsWith("295.txml")) {
 					interpreterContext.noAnswer();
 				} else if (fileName.endsWith("296.txml")) {

@@ -139,7 +139,7 @@ public class InterpreterTest extends TestCase {
 
 		interpreterContext = new InterpreterContext("VxmlGlobalServletService");
 		interpreterContext.launchInterpreter();
-		interpreterContext.callerHangup();
+		interpreterContext.callerHangup(0);
 
 		assertEquals("sup:4700810C810106830783105506911808",
 				interpreterContext.interpreter.transfertDestination);
