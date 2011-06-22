@@ -1,4 +1,4 @@
-package cudl.interpreter.old;
+package cudl.old;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 
-import cudl.interpreter.InterpreterContext;
+import cudl.InterpreterContext;
 import cudl.utils.InterpreterRequierement;
 import cudl.utils.Prompt;
 

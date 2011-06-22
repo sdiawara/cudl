@@ -1,4 +1,4 @@
-package cudl.interpreter;
+package cudl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -16,7 +16,7 @@ import javax.script.ScriptException;
 import org.junit.Before;
 import org.junit.Test;
 
-import cudl.interpreter.InterpreterContext;
+import cudl.InterpreterContext;
 import cudl.utils.InterpreterRequierement;
 import cudl.utils.Prompt;
 

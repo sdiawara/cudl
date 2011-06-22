@@ -1,4 +1,4 @@
-package cudl.interpreter.execption;
+package cudl.exception;
 
 public class EventException extends InterpreterException {
 	public String type;

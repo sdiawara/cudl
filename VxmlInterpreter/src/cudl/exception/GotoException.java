@@ -1,4 +1,4 @@
-package cudl.interpreter.execption;
+package cudl.exception;
 
 public class GotoException extends InterpreterException {
 	public String next;

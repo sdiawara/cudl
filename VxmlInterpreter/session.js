@@ -1,6 +1,6 @@
-// This file content the specifics session variable for OMS platforme
+// This file contains specific session variables for OMS platform
 
-session= new Object();
+session = new Object();
 session.connection = connection = new Object();
 connection.local = new Object();
 connection.remote = new Object();
