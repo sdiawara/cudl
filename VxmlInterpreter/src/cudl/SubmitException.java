@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 import cudl.script.InterpreterVariableDeclaration;
 
 
-public class SubmitException extends InterpreterException {
+class SubmitException extends InterpreterException {
 	public String next;
 
 	public SubmitException(Node node, InterpreterVariableDeclaration declaration)

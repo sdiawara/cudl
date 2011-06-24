@@ -1,4 +1,4 @@
 package cudl;
 
-public class FilledException extends InterpreterException {
+class FilledException extends InterpreterException {
 }

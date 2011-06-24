@@ -1,5 +1,5 @@
 package cudl;
 
 
-public class TransferException extends InterpreterException {
+class TransferException extends InterpreterException {
 }

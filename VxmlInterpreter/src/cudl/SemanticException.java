@@ -1,4 +1,4 @@
 package cudl;
 
-public class SemanticException extends Exception {
+class SemanticException extends Exception {
 }

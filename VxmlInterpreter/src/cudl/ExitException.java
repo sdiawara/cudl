@@ -1,4 +1,4 @@
 package cudl;
 
-public class ExitException extends InterpreterException {
+class ExitException extends InterpreterException {
 }
