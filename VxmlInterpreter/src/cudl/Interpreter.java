@@ -166,10 +166,26 @@ public class Interpreter {
 			put("submit", new NodeExecutor() {
 				public void execute(Node node) throws GotoException,
 						SubmitException, ScriptException {
-					throw new SubmitException(node, declaration);
-				}
+					String next;
+					NamedNodeMap attributes = node.getAttributes();
+					next = attributes.getNamedItem("next").getNodeValue();
 
+					Node namedItem = attributes.getNamedItem("namelist");
+					String[] namelist = namedItem != null ? namedItem
+							.getNodeValue().split(" ") : new String[0];
+					String urlSuite = "?";
+					for (int i = 0; i < namelist.length; i++) {
+						String declareVariable = namelist[i];
+
+						urlSuite += declareVariable + "="
+								+ declaration.getValue(declareVariable) + "&";
+
+					}
+					next += urlSuite;
+					throw new SubmitException(next);
+				}
 			});
+			
 			put("log", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException {
 					collectTrace(node);
@@ -278,8 +294,7 @@ public class Interpreter {
 	private void activateGrammar() {
 		if (VxmlElementType.isInputItem(selectedItem))
 			if (VxmlElementType.isAModalItem(selectedItem)) {
-				grammarActive
-						.add(Utils.serachItem(selectedItem, "grammar"));
+				grammarActive.add(Utils.serachItem(selectedItem, "grammar"));
 				System.err.println("modal" + grammarActive.size());
 			} else {
 				Node parent = selectedItem;
