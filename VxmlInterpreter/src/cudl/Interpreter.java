@@ -245,21 +245,7 @@ public class Interpreter {
 
 			// Grammar activation
 			grammarActive.clear();
-			if (VxmlElementType.isInputItem(selectedItem))
-				if (VxmlElementType.isAModalItem(selectedItem)) {
-					grammarActive
-							.add(Utils.serachItem(selectedItem, "grammar"));
-					System.err.println("modal" + grammarActive.size());
-				} else {
-					Node parent = selectedItem;
-					while (null != parent) {
-						Node serachItem = Utils.serachItem(parent, "grammar");
-						if (null != serachItem) {
-							grammarActive.add(serachItem);
-						}
-						parent = parent.getParentNode();
-					}
-				}
+			activateGrammar();
 
 			String nodeName = selectedItem.getNodeName();
 			if (nodeName.equals("field")) {
@@ -294,6 +280,24 @@ public class Interpreter {
 			}
 		}
 
+	}
+
+	private void activateGrammar() {
+		if (VxmlElementType.isInputItem(selectedItem))
+			if (VxmlElementType.isAModalItem(selectedItem)) {
+				grammarActive
+						.add(Utils.serachItem(selectedItem, "grammar"));
+				System.err.println("modal" + grammarActive.size());
+			} else {
+				Node parent = selectedItem;
+				while (null != parent) {
+					Node serachItem = Utils.serachItem(parent, "grammar");
+					if (null != serachItem) {
+						grammarActive.add(serachItem);
+					}
+					parent = parent.getParentNode();
+				}
+			}
 	}
 
 	public void blindTransferSuccess() throws ScriptException, IOException,

@@ -1,6 +1,5 @@
 package cudl;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.script.ScriptException;
@@ -27,25 +26,20 @@ import cudl.utils.VxmlDefaultPageCreator;
 public class InterpreterContext extends WebClient {
 	private Document currentdDocument;
 	private Node currentDialog;
-	public Document rootDocument;
 	private NodeList dialogs;
-	public Interpreter interpreter = new Interpreter();
 	private InterpreterListener interpreterListener;
-
-	public Node field;
 	private String currentFileName;
 	private String currentRootFileName;
 
-	public InterpreterContext(String fileName, File session)
-			throws IOException, ScriptException {
-		setPageCreator(new VxmlDefaultPageCreator());
-		buildDocument(fileName);
-		interpreterListener = new InterpreterEventHandler();
-	}
+	public Interpreter interpreter = new Interpreter();
+	public Node field;
+	public Document rootDocument;
 
 	public InterpreterContext(String fileName) throws IOException,
 			ScriptException {
-		this(fileName, null);
+		setPageCreator(new VxmlDefaultPageCreator());
+		buildDocument(fileName);
+		interpreterListener = new InterpreterEventHandler();
 	}
 
 	public void launchInterpreter() throws IOException, ScriptException {
@@ -93,6 +87,7 @@ public class InterpreterContext extends WebClient {
 		System.err.println(url);
 		XmlPage page = getPage(url);
 		currentdDocument = page.getXmlDocument();
+
 		dialogs = currentdDocument.getElementsByTagName("form");
 		currentDialog = dialogs.item(0);
 		Node appplicationRoot = currentdDocument.getElementsByTagName("vxml")
@@ -198,7 +193,7 @@ public class InterpreterContext extends WebClient {
 
 	public void noAnswer() throws ScriptException, IOException {
 		try {
-			
+
 			interpreter.noAnswer();
 		} catch (InterpreterException e) {
 			executionHandler(e);
