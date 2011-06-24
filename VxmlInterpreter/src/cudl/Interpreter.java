@@ -16,13 +16,6 @@ import org.w3c.dom.NodeList;
 
 import cudl.event.InterpreterEvent;
 import cudl.event.InterpreterEventHandler;
-import cudl.exception.EventException;
-import cudl.exception.ExitException;
-import cudl.exception.FilledException;
-import cudl.exception.GotoException;
-import cudl.exception.InterpreterException;
-import cudl.exception.SubmitException;
-import cudl.exception.TransferException;
 import cudl.script.DefaultInterpreterScriptContext;
 import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
