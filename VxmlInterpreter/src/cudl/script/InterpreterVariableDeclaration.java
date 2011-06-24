@@ -18,12 +18,11 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import cudl.utils.InterpreterRequierement;
 import cudl.utils.RemoteFileAccess;
 import cudl.utils.SessionFileCreator;
 
 
-public final class InterpreterVariableDeclaration {
+public class InterpreterVariableDeclaration {
 	private Map<Node, String> dialogItemName;
 	private int anonymeNameCount = 0;
 	private ScriptEngineManager manager;
@@ -39,13 +38,15 @@ public final class InterpreterVariableDeclaration {
 			add("lastresult$[0].interpretation = undefined");
 		}
 	};
+	private String location;
 
-	public InterpreterVariableDeclaration() throws IOException, ScriptException {
+	public InterpreterVariableDeclaration(String scriptLocation) throws IOException, ScriptException {
 		manager = new ScriptEngineManager();
 		engine = manager.getEngineByName("ecmascript");
 		context = new DefaultInterpreterScriptContext();
 		dialogItemName = new Hashtable<Node, String>();
 		addVariableNormalized();
+		location = scriptLocation;
 	}
 
 	private void addVariableNormalized() throws IOException, ScriptException {
@@ -120,7 +121,7 @@ public final class InterpreterVariableDeclaration {
 		if (script.getNodeName().equals("script")) {
 			if (null != attributes && attributes.getNamedItem("src") != null) {
 				File remoteFile = RemoteFileAccess.getRemoteFile(
-						InterpreterRequierement.url + "/", attributes
+						location , attributes
 								.getNamedItem("src").getTextContent());
 				val = engine.eval(new FileReader(remoteFile), context);
 			} else {

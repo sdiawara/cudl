@@ -9,12 +9,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.script.ScriptException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
 import cudl.InterpreterContext;
-import cudl.utils.InterpreterRequierement;
 
 public class W3cInterpreterTest {
 	private InterpreterContext interpreterContext;
@@ -306,24 +307,26 @@ public class W3cInterpreterTest {
 		}
 
 	};
+	private String url;
+	
 
 	@Before
 	public void setUp() throws IOException {
-		InterpreterRequierement.url = "file://"
+		url = "file://"
 				+ new File(".").getCanonicalPath() + "/test/docVxml/";
 	}
 
 	@Test()
-	public void w3cIRTest() throws IOException, ScriptException {
+	public void w3cIRTest() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 
-		InterpreterRequierement.sessionFileName = "file://"
-				+ new File(".").getCanonicalPath() + "/session.js";
+//		InterpreterRequierement.sessionFileName = "file://"
+//				+ new File(".").getCanonicalPath() + "/session.js";
 		int count = 0;
 		for (Iterator<String> iterator = fileNames.iterator(); iterator
 				.hasNext();) {
 			String fileName = iterator.next();
 
-			interpreterContext = new InterpreterContext(fileName);
+			interpreterContext = new InterpreterContext(url+fileName);
 
 			interpreterContext.launchInterpreter();
 
@@ -364,13 +367,13 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3cManual1() throws IOException, ScriptException {
+	public void w3cManual1() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 		// If the last main FIA loop did not result in a goto nextitem
 		// and there is no form item which is eligible to be visited
 		// then an implicit exit is generated.
 
 		// Read file
-		interpreterContext = new InterpreterContext("w3c/assert165.txml");
+		interpreterContext = new InterpreterContext(url+"w3c/assert165.txml");
 		interpreterContext.launchInterpreter();
 
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());

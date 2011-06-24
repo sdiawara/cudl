@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
-<vxml version="2.0" application="w3c/399root.txml" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+<vxml version="2.0" application="399root.txml" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
   <catch>
     <conf:fail expr="'catch-all caught ' + _event"/>
   </catch>
@@ -17,7 +17,7 @@
       <if cond="application.applVar1 != 6">
         <conf:fail reason="Application scope variable applVar1 hasn't been correctly initialized"/>
       <else/>
-        <goto next="w3c/399bis.txml"/>
+        <goto next="399bis.txml"/>
       </if>
     </block>
   </form>

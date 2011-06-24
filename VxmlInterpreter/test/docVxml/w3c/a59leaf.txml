@@ -1,5 +1,5 @@
 <!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
-<vxml version="2.0" application="w3c/a59root.txml"
+<vxml version="2.0" application="a59root.txml"
    xmlns="http://www.w3.org/2001/txml"
    xmlns:conf="http://www.w3.org/2002/vxml-conformance"
 >

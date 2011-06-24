@@ -16,7 +16,7 @@
 
   <form>
     <block>
-      <goto next="w3c/a76-var-root1.txml" />
+      <goto next="a76-var-root1.txml" />
     </block>
   </form>
 </vxml>

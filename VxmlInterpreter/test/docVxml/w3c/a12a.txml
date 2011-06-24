@@ -7,7 +7,7 @@
   <catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
   <form id="firstForm">
     <block>
-      <goto next="w3c/a12b.txml"/>
+      <goto next="a12b.txml"/>
     </block>
   </form>  
 </vxml>

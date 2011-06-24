@@ -13,6 +13,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import cudl.event.InterpreterEvent;
 import cudl.event.InterpreterEventHandler;
@@ -221,8 +222,8 @@ public class Interpreter {
 	public String transfertDestination;
 	private InterpreterEventHandler interpreterEventHandler;
 
-	public Interpreter() throws IOException, ScriptException {
-		declaration = new InterpreterVariableDeclaration();
+	public Interpreter(String location) throws IOException, ScriptException {
+		declaration = new InterpreterVariableDeclaration(location);
 		interpreterEventHandler = new InterpreterEventHandler();
 	}
 
@@ -699,7 +700,7 @@ public class Interpreter {
 	}
 
 	public void doEvent(InterpreterEvent interpreterEvent)
-			throws ScriptException, IOException {
+			throws ScriptException, IOException, SAXException {
 		interpreterEventHandler.doEvent(interpreterEvent);
 	}
 }

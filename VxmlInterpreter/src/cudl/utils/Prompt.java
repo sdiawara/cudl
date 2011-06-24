@@ -1,17 +1,9 @@
 package cudl.utils;
 
 public class Prompt {
-
 	public String audio = "";
 	public String timeout = "";
 	public String bargein = "";
-
-	// TODO the two following fields should not be here since they
-	// are not drectly prompt related but interaction field
-	// related.
-	// May be we should create a new Field class and reference
-	// an instance of it here... may be not :)
-	// Pascal 2009/007/29
 	public String bargeinType ="";
 	public String tts="";
 	

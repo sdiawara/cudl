@@ -1,44 +1,80 @@
 package cudl;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.script.ScriptException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.xml.XmlPage;
+import org.xml.sax.SAXException;
 
 import cudl.event.InterpreterEvent;
 import cudl.event.InterpreterEventHandler;
 import cudl.event.InterpreterListener;
 import cudl.script.DefaultInterpreterScriptContext;
-import cudl.utils.InterpreterRequierement;
 import cudl.utils.Utils;
-import cudl.utils.VxmlDefaultPageCreator;
 
-public class InterpreterContext extends WebClient {
+public class InterpreterContext {
 	private Document currentdDocument;
 	private Node currentDialog;
 	private NodeList dialogs;
 	private InterpreterListener interpreterListener;
 	private String currentFileName;
 	private String currentRootFileName;
-
-	public Interpreter interpreter = new Interpreter();
+	private String location;
+	public Interpreter interpreter;
 	public Node field;
 	public Document rootDocument;
 
+	private DocumentBuilder documentBuilder;
+	private URLConnection connection;
+
+	Map<String, Map<String, String>> cookieMap = new HashMap<String, Map<String, String>>();
+	private String cookies;
+
 	public InterpreterContext(String fileName) throws IOException,
-			ScriptException {
-		setPageCreator(new VxmlDefaultPageCreator());
+			ScriptException, ParserConfigurationException, SAXException {
+		location = fileName;
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
+				.newInstance();
+		documentBuilder = builderFactory.newDocumentBuilder();
+		interpreter = new Interpreter(fileName);
+		getCookie(fileName);
 		buildDocument(fileName);
 		interpreterListener = new InterpreterEventHandler();
 	}
 
-	public void launchInterpreter() throws IOException, ScriptException {
+	private void getCookie(String fileName) throws IOException,
+			MalformedURLException {
+		connection = new URL(fileName).openConnection();
+		cookies = connection.getHeaderField("Set-Cookie");
+
+		if (cookies != null) {
+			StringTokenizer st = new StringTokenizer(cookies, ";");
+			Map<String, String> cookie = new HashMap<String, String>();
+			if (st.hasMoreTokens()) {
+				String token = st.nextToken();
+				String name = token.substring(0, token.indexOf("=")).trim();
+				String value = token.substring(token.indexOf("=") + 1,
+						token.length()).trim();
+				cookie.put(name, value);
+				cookieMap.put(name, cookie);
+			}
+		}
+	}
+
+	public void launchInterpreter() throws IOException, ScriptException,
+			SAXException {
 		try {
 			interpreter.interpretDialog(currentDialog);
 			field = interpreter.selectedItem;
@@ -48,7 +84,7 @@ public class InterpreterContext extends WebClient {
 	}
 
 	public void executionHandler(InterpreterException e) throws IOException,
-			ScriptException {
+			ScriptException, SAXException {
 		if (e instanceof GotoException) {
 			GotoException gotoException = (GotoException) e;
 			String next = gotoException.next;
@@ -72,32 +108,37 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void event(String eventType) throws ScriptException, IOException {
+	public void event(String eventType) throws ScriptException, IOException,
+			SAXException {
 		field = interpreter.selectedItem;
 		interpreterListener.doEvent(new InterpreterEvent(this, eventType));
 	}
 
 	private void buildDocument(String fileName) throws ScriptException,
-			IOException {
-		String url = tackWeelFormedUrl(fileName).replaceAll("#", "%23");
+			IOException, SAXException {
+		String url = Utils.tackWeelFormedUrl(location, fileName).replaceAll(
+				"#", "%23");
 		System.err.println(url);
-		XmlPage page = getPage(url);
-		currentdDocument = page.getXmlDocument();
 
+		connection = new URL(url).openConnection();
+		connection.setDoOutput(true);
+		connection.setRequestProperty("Cookie", cookies);
+
+		currentdDocument = documentBuilder.parse(connection.getInputStream());
 		dialogs = currentdDocument.getElementsByTagName("form");
 		currentDialog = dialogs.item(0);
 		Node appplicationRoot = currentdDocument.getElementsByTagName("vxml")
 				.item(0).getAttributes().getNamedItem("application");
 		if (null != appplicationRoot) {
-			String rootUrl = tackWeelFormedUrl(appplicationRoot
+			String rootUrl = Utils.tackWeelFormedUrl(location, appplicationRoot
 					.getTextContent());
-			XmlPage rootPage = getPage(rootUrl);
-			rootDocument = rootPage.getXmlDocument();
+			rootDocument = documentBuilder.parse(rootUrl);
 			declareRootScopeVariableIfNeed(rootUrl);
 		} else if (!url.equals(currentRootFileName)) {
 			interpreter.resetApplicationScope();
 		}
 		declareDocumentScopeVariableIfNeed(fileName);
+
 	}
 
 	private void declareRootScopeVariableIfNeed(String textContent)
@@ -107,7 +148,8 @@ public class InterpreterContext extends WebClient {
 			interpreter.declareVariable(rootDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes(),
 					DefaultInterpreterScriptContext.APPLICATION_SCOPE);
-			currentRootFileName = tackWeelFormedUrl(textContent);
+			currentRootFileName = Utils
+					.tackWeelFormedUrl(location, textContent);
 		}
 	}
 
@@ -117,29 +159,14 @@ public class InterpreterContext extends WebClient {
 			interpreter.declareVariable(currentdDocument.getElementsByTagName(
 					"vxml").item(0).getChildNodes(),
 					DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
-			currentFileName = tackWeelFormedUrl(fileName);
+			currentFileName = Utils.tackWeelFormedUrl(location, fileName);
 		}
-	}
-
-	private String tackWeelFormedUrl(String relativePath) throws IOException {
-
-		// URL target = new URL(new URL(currentFileName),relativePath);
-
-		if (relativePath.startsWith("http://")
-				|| relativePath.startsWith("file://")) {
-			return relativePath;
-		}
-
-		if (null != InterpreterRequierement.url) {
-			return InterpreterRequierement.url + "/" + relativePath;
-		}
-
-		return relativePath;
 	}
 
 	// we assume that the user is in a context where the word he utters is
 	// recognized if it is not the case we use the function nomatch
-	public void talk(String sentence) throws ScriptException, IOException {
+	public void talk(String sentence) throws ScriptException, IOException,
+			SAXException {
 		try {
 			interpreter.utterance(sentence, "'voice'");
 		} catch (InterpreterException e) {
@@ -147,7 +174,8 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void push(String dtmf) throws ScriptException, IOException {
+	public void push(String dtmf) throws ScriptException, IOException,
+			SAXException {
 		try {
 			interpreter.utterance(dtmf, "'dtmf'");
 		} catch (InterpreterException e) {
@@ -155,7 +183,8 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void destinationHangup() throws ScriptException, IOException {
+	public void destinationHangup() throws ScriptException, IOException,
+			SAXException {
 		try {
 			interpreter.destinationHangup();
 		} catch (InterpreterException e) {
@@ -163,7 +192,8 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void callerHangDestination() throws ScriptException, IOException {
+	public void callerHangDestination() throws ScriptException, IOException,
+			SAXException {
 		try {
 			interpreter.callerHangDestination();
 		} catch (InterpreterException e) {
@@ -171,7 +201,8 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void blindTransferSuccess() throws ScriptException, IOException {
+	public void blindTransferSuccess() throws ScriptException, IOException,
+			SAXException {
 		try {
 			interpreter.blindTransferSuccess();
 		} catch (InterpreterException e) {
@@ -179,7 +210,8 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void callerHangup(int i) throws IOException, ScriptException {
+	public void callerHangup(int i) throws IOException, ScriptException,
+			SAXException {
 		try {
 			interpreter.callerHangup(i);
 		} catch (InterpreterException e) {
@@ -187,7 +219,7 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void noAnswer() throws ScriptException, IOException {
+	public void noAnswer() throws ScriptException, IOException, SAXException {
 		try {
 
 			interpreter.noAnswer();
@@ -196,7 +228,8 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void maxTimeDisconnect() throws ScriptException, IOException {
+	public void maxTimeDisconnect() throws ScriptException, IOException,
+			SAXException {
 		try {
 			interpreter.maxTimeDisconnect();
 		} catch (InterpreterException e) {
@@ -204,7 +237,8 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void destinationBusy() throws ScriptException, IOException {
+	public void destinationBusy() throws ScriptException, IOException,
+			SAXException {
 		try {
 			interpreter.destinationBusy();
 		} catch (InterpreterException e) {
@@ -212,7 +246,7 @@ public class InterpreterContext extends WebClient {
 		}
 	}
 
-	public void networkBusy() throws ScriptException, IOException {
+	public void networkBusy() throws ScriptException, IOException, SAXException {
 		try {
 			interpreter.networkBusy();
 		} catch (InterpreterException e) {

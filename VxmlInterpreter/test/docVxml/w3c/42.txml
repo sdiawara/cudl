@@ -9,7 +9,7 @@
 
   <form>
     <block>
-      <goto next="w3c/42b.txml"/>
+      <goto next="42b.txml"/>
     </block>
   </form>
 </vxml>

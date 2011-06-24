@@ -16,7 +16,7 @@
 
   <form>
     <block>
-      <goto next="w3c/a72-var-leaf1.txml" />
+      <goto next="a72-var-leaf1.txml" />
     </block>
   </form>
 </vxml>

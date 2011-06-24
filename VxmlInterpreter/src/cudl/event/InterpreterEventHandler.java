@@ -10,6 +10,7 @@ import javax.script.ScriptException;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import cudl.InterpreterContext;
 
@@ -19,7 +20,7 @@ public class InterpreterEventHandler implements InterpreterListener {
 
 	@Override
 	public void doEvent(InterpreterEvent interpreterEvent)
-			throws ScriptException, IOException {
+			throws ScriptException, IOException, SAXException {
 		InterpreterContext context = (InterpreterContext) interpreterEvent
 				.getSource();
 		String type = interpreterEvent.type;

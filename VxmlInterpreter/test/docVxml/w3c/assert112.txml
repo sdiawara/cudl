@@ -17,7 +17,7 @@
 
   <form>
     <block>
-        <submit next="w3c/assert112-b.txml"/>
+        <submit next="assert112-b.txml"/>
         <conf:fail reason="FIA did not end!"/>
     </block>
     <block>

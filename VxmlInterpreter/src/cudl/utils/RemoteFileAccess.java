@@ -11,9 +11,9 @@ public class RemoteFileAccess {
 	public static File getRemoteFile(String url, String fileName)
 			throws IOException {
 		System.err.println("remotefilename " + url + fileName);
-		if (null == url)
-			return null;
-		URL url2 = new URL(url + fileName);
+
+		URL url2 = new URL(Utils.tackWeelFormedUrl(url, fileName));
+
 		BufferedReader in = new BufferedReader(new InputStreamReader(url2
 				.openStream()));
 		File file = new File("tempremotefile");

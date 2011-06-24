@@ -4,6 +4,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import java.lang.String;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Utils {
 	public static Node lastNodeVisited;
@@ -40,5 +42,11 @@ public class Utils {
 		Node cond = (attribute.getLength() == 0) ? null : attribute
 				.getNamedItem("cond");
 		return cond == null || cond.getNodeValue().equals("true");
+	}
+
+	public static String tackWeelFormedUrl(String location, String relativePath)
+			throws MalformedURLException {
+		URL target = new URL(new URL(location), relativePath);
+		return target.toString();
 	}
 }

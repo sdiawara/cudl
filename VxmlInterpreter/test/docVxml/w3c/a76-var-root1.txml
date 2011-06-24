@@ -20,7 +20,7 @@
     <block>
       <conf:comment>Verify rootvar value before moving on to next root.</conf:comment>
       <if cond="rootvar == 7">
-        <goto next="w3c/a76-var-root2.txml" />
+        <goto next="a76-var-root2.txml" />
       <else/>
         <conf:fail expr="'a76-var-root1 has unexpected value for rootvar: ' + rootvar" />
       </if>

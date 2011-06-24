@@ -3,7 +3,7 @@
 <vxml version="2.0" 
   xmlns="http://www.w3.org/2001/vxml" 
   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
-  application="w3c/a26root.txml">
+  application="a26root.txml">
 
   <catch event="error.semantic"> 
   <conf:fail reason="root var not defined"/>
@@ -14,7 +14,7 @@
     <block>
   <if cond="application.x &lt; application.y">
       <assign name="application.x" expr="2"/>
-      <goto next="w3c/a26b.txml"/>
+      <goto next="a26b.txml"/>
   <else/>
       <conf:fail reason="root var values not correct"/>
   </if>

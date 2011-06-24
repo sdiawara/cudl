@@ -3,7 +3,7 @@
 <vxml version="2.0" 
   xmlns="http://www.w3.org/2001/vxml" 
   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
-  application="w3c/a25root.txml">
+  application="a25root.txml">
 
   <catch event="error.semantic"> 
   <conf:fail reason="root var not defined"/>

@@ -1,11 +1,5 @@
 package cudl;
 
-import javax.script.ScriptException;
-
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import cudl.script.InterpreterVariableDeclaration;
 
 public class InterpreterException extends Exception {
 	// Should'nt this class also have package visibility ?

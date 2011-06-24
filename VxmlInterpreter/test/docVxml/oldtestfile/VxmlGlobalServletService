@@ -15,7 +15,7 @@
       <var name="currentState"  expr="'InitDial'"></var>
       <var name="toState"  expr="''"></var>
       <var name="callReason"  expr="'normal'"></var>
-      <submit next="oldtestfile/PhaseRelai" namelist="currentState toState callReason" method="post" />
+      <submit next="PhaseRelai" namelist="currentState toState callReason" method="post" />
     </block>
   </form>
 </vxml>
