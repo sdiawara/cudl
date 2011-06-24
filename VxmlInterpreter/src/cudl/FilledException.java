@@ -1,4 +1,4 @@
-package cudl.exception;
+package cudl;
 
 public class FilledException extends InterpreterException {
 }

@@ -12,7 +12,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import cudl.InterpreterContext;
-import cudl.exception.InterpreterException;
 
 
 public class InterpreterEventHandler implements InterpreterListener {
@@ -36,7 +35,7 @@ public class InterpreterEventHandler implements InterpreterListener {
 			// FIXME: take the first with a correct event counter
 			// a counter who is ≤ at currentCounter
 			context.interpreter.execute(catchList.get(0));
-		} catch (InterpreterException e) {
+		} catch (cudl.InterpreterException e) {
 			context.executionHandler(e);
 		}
 	}
