@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.script.ScriptException;
 import javax.xml.parsers.DocumentBuilder;
@@ -39,7 +36,6 @@ public class InterpreterContext {
 	private DocumentBuilder documentBuilder;
 	private URLConnection connection;
 
-	Map<String, Map<String, String>> cookieMap = new HashMap<String, Map<String, String>>();
 	private String cookies;
 
 	public InterpreterContext(String fileName) throws IOException,
@@ -49,30 +45,12 @@ public class InterpreterContext {
 				.newInstance();
 		documentBuilder = builderFactory.newDocumentBuilder();
 		interpreter = new Interpreter(fileName);
-		getCookie(fileName);
+		connection = new URL(fileName).openConnection();
+		cookies = connection.getHeaderField("Set-Cookie");
 		buildDocument(fileName);
 		interpreterListener = new InterpreterEventHandler();
 	}
-
-	private void getCookie(String fileName) throws IOException,
-			MalformedURLException {
-		connection = new URL(fileName).openConnection();
-		cookies = connection.getHeaderField("Set-Cookie");
-
-		if (cookies != null) {
-			StringTokenizer st = new StringTokenizer(cookies, ";");
-			Map<String, String> cookie = new HashMap<String, String>();
-			if (st.hasMoreTokens()) {
-				String token = st.nextToken();
-				String name = token.substring(0, token.indexOf("=")).trim();
-				String value = token.substring(token.indexOf("=") + 1,
-						token.length()).trim();
-				cookie.put(name, value);
-				cookieMap.put(name, cookie);
-			}
-		}
-	}
-
+	
 	public void launchInterpreter() throws IOException, ScriptException,
 			SAXException {
 		try {
@@ -121,7 +99,6 @@ public class InterpreterContext {
 		System.err.println(url);
 
 		connection = new URL(url).openConnection();
-		connection.setDoOutput(true);
 		connection.setRequestProperty("Cookie", cookies);
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
