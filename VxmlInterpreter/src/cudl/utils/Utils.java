@@ -49,4 +49,13 @@ public class Utils {
 		URL target = new URL(new URL(location), relativePath);
 		return target.toString();
 	}
+	
+	public static String getNodeAttributeValue(Node node, String attributeName) {
+		NamedNodeMap attributes = node.getAttributes();
+		if (attributes == null)
+			return null;
+
+		Node attributeValue = attributes.getNamedItem(attributeName);
+		return attributeValue == null ? null : attributeValue.getNodeValue();
+	}
 }

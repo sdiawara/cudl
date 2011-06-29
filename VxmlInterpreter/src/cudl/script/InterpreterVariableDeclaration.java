@@ -21,13 +21,13 @@ import org.w3c.dom.Node;
 import cudl.utils.RemoteFileAccess;
 import cudl.utils.SessionFileCreator;
 
-
 public class InterpreterVariableDeclaration {
 	private Map<Node, String> dialogItemName;
 	private int anonymeNameCount = 0;
 	private ScriptEngineManager manager;
 	private ScriptEngine engine;
 	private InterpreterScriptContext context;
+	private String location;
 	private List<String> normalizedApplicationVariable = new ArrayList<String>() {
 		{
 			add("lastresult$ = new Array()");
@@ -38,9 +38,9 @@ public class InterpreterVariableDeclaration {
 			add("lastresult$[0].interpretation = undefined");
 		}
 	};
-	private String location;
 
-	public InterpreterVariableDeclaration(String scriptLocation) throws IOException, ScriptException {
+	public InterpreterVariableDeclaration(String scriptLocation)
+			throws IOException, ScriptException {
 		manager = new ScriptEngineManager();
 		engine = manager.getEngineByName("ecmascript");
 		context = new DefaultInterpreterScriptContext();
@@ -120,9 +120,8 @@ public class InterpreterVariableDeclaration {
 		NamedNodeMap attributes = script.getAttributes();
 		if (script.getNodeName().equals("script")) {
 			if (null != attributes && attributes.getNamedItem("src") != null) {
-				File remoteFile = RemoteFileAccess.getRemoteFile(
-						location , attributes
-								.getNamedItem("src").getTextContent());
+				File remoteFile = RemoteFileAccess.getRemoteFile(location,
+						attributes.getNamedItem("src").getTextContent());
 				val = engine.eval(new FileReader(remoteFile), context);
 			} else {
 				// FIXME: evaluate in scope
@@ -133,18 +132,14 @@ public class InterpreterVariableDeclaration {
 		} else if (script.getNodeName().equals("value")) {
 			val = engine.eval(getReplaceBindingName(attributes.getNamedItem(
 					"expr").getTextContent()), context);
-		} else {
-			val = engine.eval(getReplaceBindingName(attributes.getNamedItem(
-					"cond").getTextContent()), context)
-					+ "";
-		}
+		} 
 
 		return val;
 	}
 
 	public Object evaluateScript(String script, int scope)
 			throws ScriptException {
-		return engine.eval(script, context);
+		return engine.eval(getReplaceBindingName(script), context)+"";
 	}
 
 	public void setValue(Node node, String value, int scope)
@@ -228,5 +223,21 @@ public class InterpreterVariableDeclaration {
 
 	private Bindings getBindings(int scope) {
 		return context.getBindings(scope);
+	}
+
+	public void declareVariable(String name, String value, int scope)
+			throws ScriptException {
+		getBindings(scope).put(name,
+				engine.eval(getReplaceBindingName(value), context));
+	}
+
+	public Object evaluateFileScript(String fileName, int scope)
+			throws ScriptException, IOException {
+		File remoteFile = RemoteFileAccess.getRemoteFile(fileName);
+		return engine.eval(new FileReader(remoteFile), context);
+	}
+
+	public void setValue(String name, String value, int scope) {
+		getBindings(scope).put(name, value);
 	}
 }

@@ -1,16 +1,20 @@
 package cudl;
 
+import static cudl.utils.Utils.getNodeAttributeValue;
+import static cudl.utils.Utils.searchDialogByName;
+import static cudl.utils.Utils.serachItem;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import javax.script.ScriptException;
 
 import org.w3c.dom.DOMException;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -22,7 +26,6 @@ import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
 import cudl.utils.Log;
 import cudl.utils.Prompt;
-import cudl.utils.Utils;
 import cudl.utils.VxmlElementType;
 
 public class Interpreter {
@@ -33,7 +36,7 @@ public class Interpreter {
 	private List<Log> logs = new ArrayList<Log>();
 
 	private List<Prompt> prompts = new ArrayList<Prompt>();
-	private Properties currentDialogProperties = new Properties();
+	private Properties dialogProperties = new Properties();
 
 	private boolean nextItemSelectGuard = false;
 	private boolean hangup;
@@ -62,9 +65,7 @@ public class Interpreter {
 			put("conf:speech", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException,
 						InterpreterException, IOException {
-
-					String nodeValue = node.getAttributes().getNamedItem(
-							"value").getNodeValue();
+					String nodeValue = getNodeAttributeValue(node, "value");
 					utterance("'" + nodeValue + "'", "'voice'");
 				}
 			});
@@ -73,22 +74,25 @@ public class Interpreter {
 				public void execute(Node node) throws DOMException,
 						ScriptException {
 					w3cNodeConfSuite.add(node.toString());
-					NamedNodeMap attributes = node.getAttributes();
-					if (attributes == null)
-						return;
-					if (node.getAttributes().getNamedItem("reason") != null)
-						System.err.println(node.getAttributes().getNamedItem(
-								"reason ->").getTextContent());
-					else if (node.getAttributes().getNamedItem("expr") != null)
-						System.err.println("reason ->"
-								+ declaration.evaluateScript(node
-										.getAttributes().getNamedItem("expr")
-										.getTextContent(), 50));
+
+					String reason = getNodeAttributeValue(node, "reason");
+					if (reason != null)
+						System.err.println("reason ->" + reason);
+					else {
+						String expr = getNodeAttributeValue(node, "expr");
+						if (expr != null)
+							System.err.println("reason ->"
+									+ declaration.evaluateScript(expr, 50));
+					}
 				}
 			});
 			put("filled", new NodeExecutor() {
-				public void execute(Node node) throws FilledException {
-					throw new FilledException();
+				public void execute(Node node) throws InterpreterException,
+						ScriptException, IOException {
+					if (!selectedItem.getNodeName().equals("subdialog"))
+						throw new FilledException();
+					else
+						Interpreter.this.execute(node);
 				}
 			});
 			put("prompt", new NodeExecutor() {
@@ -155,9 +159,10 @@ public class Interpreter {
 					// )
 					// add assert163.txml file from to test
 
-					if (node.getAttributes().getNamedItem("nextitem") == null) {
-						throw new GotoException(node.getAttributes()
-								.getNamedItem("next").getNodeValue());
+					String nextItemAtt = getNodeAttributeValue(node, "nextitem");
+					if (nextItemAtt == null) {
+						throw new GotoException(getNodeAttributeValue(node,
+								"next"));
 					}
 					selectedItem = selectDialogNextItemTovisit(node);
 					nextItemSelectGuard = true;
@@ -167,26 +172,24 @@ public class Interpreter {
 			put("submit", new NodeExecutor() {
 				public void execute(Node node) throws GotoException,
 						SubmitException, ScriptException {
-					String next;
-					NamedNodeMap attributes = node.getAttributes();
-					next = attributes.getNamedItem("next").getNodeValue();
+					String next = getNodeAttributeValue(node, "next");
 
-					Node namedItem = attributes.getNamedItem("namelist");
-					String[] namelist = namedItem != null ? namedItem
-							.getNodeValue().split(" ") : new String[0];
-					String urlSuite = "?";
-					for (int i = 0; i < namelist.length; i++) {
-						String declareVariable = namelist[i];
-
-						urlSuite += declareVariable + "="
-								+ declaration.getValue(declareVariable) + "&";
-
+					String nameList = getNodeAttributeValue(node, "namelist");
+					if (nameList != null) {
+						StringTokenizer tokenizer = new StringTokenizer(
+								nameList);
+						String urlSuite = "?";
+						while (tokenizer.hasMoreElements()) {
+							String data = tokenizer.nextToken();
+							urlSuite += data + "=" + declaration.getValue(data)
+									+ "&";
+						}
+						next += urlSuite;
 					}
-					next += urlSuite;
 					throw new SubmitException(next);
 				}
 			});
-			
+
 			put("log", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException {
 					collectTrace(node);
@@ -205,15 +208,15 @@ public class Interpreter {
 			put("throw", new NodeExecutor() {
 				public void execute(Node node) throws EventException,
 						DOMException {
-					throw new EventException(node.getAttributes().getNamedItem(
-							"event").getNodeValue());
+					throw new EventException(getNodeAttributeValue(node,
+							"event"));
 				}
 			});
 
 			put("property", new NodeExecutor() {
 				public void execute(Node node) throws EventException,
 						DOMException {
-					collectProperty(node.getAttributes());
+					collectProperty(node);
 				}
 			});
 
@@ -264,21 +267,21 @@ public class Interpreter {
 			} else if (nodeName.equals("record")) {
 			} else if (nodeName.equals("object")) {
 			} else if (nodeName.equals("subdialog")) {
-				execute(Utils.searchDialogByName(selectedItem.getParentNode()
-						.getParentNode().getChildNodes(), selectedItem
-						.getAttributes().getNamedItem("src").getNodeValue()
-						.replace("#", "")));
+				String src = getNodeAttributeValue(selectedItem, "src");
+				execute(searchDialogByName(selectedItem.getParentNode()
+						.getParentNode().getChildNodes(), src.replace("#", "")));
+				execute(selectedItem);
 				declaration.setValue(selectedItem, "new Object()",
 						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 			} else if (nodeName.equals("transfer")) {
 				w3cNodeConfSuite.add("transfer "
 						+ (isBlindTransfer(selectedItem) ? "blind" : "bridge"));
-				Node namedItem = selectedItem.getAttributes().getNamedItem(
-						"dest");
-				transfertDestination = namedItem == null ? declaration
-						.evaluateScript(selectedItem.getAttributes()
-								.getNamedItem("destexpr").getNodeValue(), 50)
-						+ "" : namedItem.getNodeValue();
+				String dest = getNodeAttributeValue(selectedItem, "dest");
+				String destExpr = getNodeAttributeValue(selectedItem,
+						"destexpr");
+				transfertDestination = (dest != null) ? dest : declaration
+						.evaluateScript(destExpr, 50)
+						+ "";
 				throw new TransferException();
 			} else if (nodeName.equals("initial")) {
 			} else if (nodeName.equals("block")) {
@@ -295,12 +298,12 @@ public class Interpreter {
 	private void activateGrammar() {
 		if (VxmlElementType.isInputItem(selectedItem))
 			if (VxmlElementType.isAModalItem(selectedItem)) {
-				grammarActive.add(Utils.serachItem(selectedItem, "grammar"));
+				grammarActive.add(serachItem(selectedItem, "grammar"));
 				System.err.println("modal" + grammarActive.size());
 			} else {
 				Node parent = selectedItem;
 				while (null != parent) {
-					Node serachItem = Utils.serachItem(parent, "grammar");
+					Node serachItem = serachItem(parent, "grammar");
 					if (null != serachItem) {
 						grammarActive.add(serachItem);
 					}
@@ -333,7 +336,7 @@ public class Interpreter {
 		try {
 			execute(selectedItem);
 		} catch (FilledException e) {
-			execute(Utils.serachItem(selectedItem, "filled"));
+			execute(serachItem(selectedItem, "filled"));
 		}
 	}
 
@@ -352,9 +355,8 @@ public class Interpreter {
 		setTransferResultAndExecute("'noanswer'");
 	}
 
-	private boolean isBlindTransfer(Node selectedItem2) {
-		Node namedItem = selectedItem2.getAttributes().getNamedItem("bridge");
-		return namedItem == null || namedItem.getNodeValue().equals("false");
+	private boolean isBlindTransfer(Node node) {
+		return !Boolean.parseBoolean(getNodeAttributeValue(node, "bridge"));
 	}
 
 	public void declareVariable(NodeList nodeList, int scope)
@@ -392,37 +394,26 @@ public class Interpreter {
 	private void collectPrompt(Node node) throws ScriptException, IOException {
 		Prompt p = new Prompt();
 		if (node.getNodeName().equals("prompt")) {
-			NamedNodeMap attributes = node.getAttributes();
-			if (attributes.getLength() > 0) {
-				Node timeout = attributes.getNamedItem("timeout");
-				if (timeout != null) {
-					p.timeout = timeout.getNodeValue();
-				}
-				Node bargein = attributes.getNamedItem("bargein");
-				if (bargein != null) {
-					p.bargein = bargein.getNodeValue();
-				}
+			String timeout = getNodeAttributeValue(node, "timeout");
+			p.timeout = timeout != null ? timeout : "";
 
-				Node bargeinType = attributes.getNamedItem("bargeintype");
-				if (bargeinType != null) {
-					p.bargeinType = bargeinType.getNodeValue();
-				} else if (currentDialogProperties.get("bargeintype") != null) {
-					p.bargeinType = getCurrentDialogProperties().getProperty(
-							"bargeintype");
-				}
-			}
+			String bargein = getNodeAttributeValue(node, "bargein");
+			p.bargein = bargein != null ? bargein : "";
+
+			String bargeinType = getNodeAttributeValue(node, "bargeintype");
+			bargeinType = (String) (bargeinType == null ? dialogProperties
+					.get("bargeintype") : bargeinType);
+			p.bargeinType = bargeinType != null ? bargeinType : "";
 
 			NodeList childs = node.getChildNodes();
 			for (int i = 0; i < childs.getLength(); i++) {
 				Node child = childs.item(i);
 
 				if (child.getNodeName().equals("audio")) {
+					String audioSrc = getNodeAttributeValue(child, "src");
+					if (audioSrc != null)
+						p.audio += audioSrc + " ";
 
-					NamedNodeMap attributesAudio = child.getAttributes();
-					Node src = attributesAudio.getNamedItem("src");
-					if (src != null) {
-						p.audio += src.getNodeValue() + " ";
-					}
 					if (child.getChildNodes().getLength() > 0)
 						p.tts += child.getChildNodes().item(0).getNodeValue()
 								+ " ";
@@ -460,39 +451,45 @@ public class Interpreter {
 				DefaultInterpreterScriptContext.ANONYME_SCOPE);
 	}
 
-	private void clearVariable(Node node1) {
+	private void clearVariable(Node node) {
 
-		String[] nameList = node1.getAttributes().getNamedItem("namelist")
-				.getNodeValue().split(" ");
+		String namelist = getNodeAttributeValue(node, "namelist");
 
-		for (int i = 0; i < nameList.length; i++) {
+		if (namelist != null) {
+			StringTokenizer tokenizer = new StringTokenizer(namelist);
+			while (tokenizer.hasMoreElements()) {
+				String name = (String) tokenizer.nextElement();
+				declaration.setValue(name, "undefined", 50);
+			}
 		}
+
 	}
 
 	private void assignVariableValue(Node node1) throws ScriptException {
+		// String expr = getNodeAttributeValue(node1, "expr");
+		// String name = getNodeAttributeValue(node1, "name");
+		// declaration.setValue(name, expr,
+		// DefaultInterpreterScriptContext.ANONYME_SCOPE);
+
+		// FIXME: remove node to setValue parameter, add string name generate
 		Node expr = node1.getAttributes().getNamedItem("expr");
 		declaration.setValue(node1, expr.getNodeValue(),
 				DefaultInterpreterScriptContext.ANONYME_SCOPE);
 	}
 
 	private Node selectDialogNextItemTovisit(Node node) {
-		Node nextItem = node.getAttributes().getNamedItem(
-				node.getNodeName().equals("goto") ? "nextitem" : "next");
-		return (nextItem != null) ? searchItemByName(node.getParentNode()
-				.getParentNode(), nextItem.getNodeValue()) : null;
+		String nextItem = getNodeAttributeValue(node, node.getNodeName()
+				.equals("goto") ? "nextitem" : "next");
+		return searchItemByName(node.getParentNode().getParentNode(), nextItem);
 	}
 
 	private Node searchItemByName(Node dialog, String id) {
 		NodeList childs = dialog.getChildNodes();
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
-			NamedNodeMap attributes = child.getAttributes();
-
-			if (attributes != null && attributes.getLength() > 0) {
-				Node namedItem = attributes.getNamedItem("name");
-				if (namedItem != null && namedItem.getNodeValue().equals(id)) {
-					return child;
-				}
+			String name = getNodeAttributeValue(child, "name");
+			if (name != null && name.equals(id)) {
+				return child;
 			}
 		}
 		return null;
@@ -522,15 +519,13 @@ public class Interpreter {
 
 	private void collectTrace(Node node) throws ScriptException {
 		Log log = new Log();
-		NamedNodeMap attributes = node.getAttributes();
-		System.err.print("LOG:");
-		if (attributes != null) {
-			Node label = attributes.getNamedItem("label");
-			if (label != null) {
-				log.label = label.getNodeValue();
-				System.err.print(" " + log.label);
-			}
 
+		String label = getNodeAttributeValue(node, "label");
+
+		System.err.print("LOG:");
+		if (label != null) {
+			log.label = label;
+			System.err.print(" " + label);
 		}
 		log.value = getNodeValue(node);
 		System.err.println(" " + log.value);
@@ -543,8 +538,8 @@ public class Interpreter {
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
 			if ("value".equals(child.getNodeName())) {
-				value += declaration.getValue(child.getAttributes()
-						.getNamedItem("expr").getTextContent());
+				value += declaration.getValue(getNodeAttributeValue(child,
+						"expr"));
 			} else
 				value += child.getNodeValue();
 		}
@@ -600,31 +595,27 @@ public class Interpreter {
 	}
 
 	private boolean checkCond(Node node) throws ScriptException, IOException {
-		NamedNodeMap attribute = node.getAttributes();
-		Node cond = (attribute.getLength() == 0) ? null : attribute
-				.getNamedItem("cond");
+		String cond = getNodeAttributeValue(node, "cond");
 
 		return cond == null
-				|| declaration.evaluateScript(node,
+				|| declaration.evaluateScript(cond,
 						DefaultInterpreterScriptContext.ANONYME_SCOPE).equals(
 						"true");
-
 	}
 
 	private void collectDialogProperty(NodeList nodeList) {
-		currentDialogProperties.clear();
+		dialogProperties.clear();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
 			if (node.getNodeName().equals("property")) {
-				collectProperty(node.getAttributes());
+				collectProperty(node);
 			}
 		}
 	}
 
-	private void collectProperty(NamedNodeMap attributes) {
-		currentDialogProperties.put(attributes.getNamedItem("name")
-				.getNodeValue(), attributes.getNamedItem("value")
-				.getNodeValue());
+	private void collectProperty(Node node) {
+		dialogProperties.put(getNodeAttributeValue(node, "name"),
+				getNodeAttributeValue(node, "value"));
 	}
 
 	private Node phaseSelect(Node dialog) throws ScriptException, IOException {
@@ -666,18 +657,18 @@ public class Interpreter {
 				InterpreterScriptContext.APPLICATION_SCOPE);
 		declaration.evaluateScript("lastresult$[0].inputmode =" + string2,
 				InterpreterScriptContext.APPLICATION_SCOPE);
-		execute(Utils.serachItem(selectedItem, "filled"));
+		execute(serachItem(selectedItem, "filled"));
 	}
 
 	public void setCurrentDialogProperties(Properties currentDialogProperties) {
-		this.currentDialogProperties = currentDialogProperties;
+		this.dialogProperties = currentDialogProperties;
 	}
 
 	// FIXME: add well management
 	public Properties getCurrentDialogProperties() {
 		collectDialogProperty(selectedItem.getParentNode().getChildNodes());
-		System.err.println(currentDialogProperties);
-		return currentDialogProperties;
+		System.err.println(dialogProperties);
+		return dialogProperties;
 	}
 
 	public void maxTimeDisconnect() throws ScriptException,

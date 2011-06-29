@@ -1,7 +1,6 @@
 package cudl;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -50,7 +49,7 @@ public class InterpreterContext {
 		buildDocument(fileName);
 		interpreterListener = new InterpreterEventHandler();
 	}
-	
+
 	public void launchInterpreter() throws IOException, ScriptException,
 			SAXException {
 		try {
@@ -99,7 +98,8 @@ public class InterpreterContext {
 		System.err.println(url);
 
 		connection = new URL(url).openConnection();
-		connection.setRequestProperty("Cookie", cookies);
+		if (cookies != null)
+			connection.setRequestProperty("Cookie", cookies);
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
 		dialogs = currentdDocument.getElementsByTagName("form");

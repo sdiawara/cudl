@@ -4,9 +4,9 @@ public class Prompt {
 	public String audio = "";
 	public String timeout = "";
 	public String bargein = "";
-	public String bargeinType ="";
-	public String tts="";
-	
+	public String bargeinType = "";
+	public String tts = "";
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof Prompt) {
@@ -16,6 +16,7 @@ public class Prompt {
 					&& equalOrBothNull(bargein, other.bargein)
 					&& equalOrBothNull(bargeinType, other.bargeinType)
 					&& equalOrBothNull(tts, other.tts);
+
 		} else {
 			return false;
 		}
@@ -24,8 +25,8 @@ public class Prompt {
 	@Override
 	public String toString() {
 		return "prompt[" + "audio:" + audio + "," + "timeout:" + timeout + ","
-				+ "bargein:" + bargein + "," + "bargeinType:"
-				+ bargeinType + "," + "tts:" + tts + "]";
+				+ "bargein:" + bargein + "," + "bargeinType:" + bargeinType
+				+ "," + "tts:" + tts + "]";
 	}
 
 	private boolean equalOrBothNull(Object o1, Object o2) {

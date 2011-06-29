@@ -27,4 +27,22 @@ public class RemoteFileAccess {
 
 		return file;
 	}
+
+	public static File getRemoteFile(String fileName) throws IOException {
+		System.err.println("remotefilename " + fileName);
+
+		URL url2 = new URL(fileName);
+		BufferedReader in = new BufferedReader(new InputStreamReader(url2
+				.openStream()));
+		File file = new File("tempremotefile");
+		FileWriter fileWriter = new FileWriter(file);
+		String inputLine;
+		while ((inputLine = in.readLine()) != null) {
+			fileWriter.append(inputLine + "\n");
+		}
+		in.close();
+		fileWriter.close();
+
+		return file;
+	}
 }

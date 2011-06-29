@@ -304,29 +304,33 @@ public class W3cInterpreterTest {
 
 			// An implementation platform must support text-to-speech
 			add("w3c/a626.txml");
+
+			// A subdialog invokes a new dialog that once done, returns to the
+			// original context.
+			add("w3c/a19.txml");
+
 		}
 
 	};
 	private String url;
-	
 
 	@Before
 	public void setUp() throws IOException {
-		url = "file://"
-				+ new File(".").getCanonicalPath() + "/test/docVxml/";
+		url = "file://" + new File(".").getCanonicalPath() + "/test/docVxml/";
 	}
 
 	@Test()
-	public void w3cIRTest() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void w3cIRTest() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 
-//		InterpreterRequierement.sessionFileName = "file://"
-//				+ new File(".").getCanonicalPath() + "/session.js";
+		// InterpreterRequierement.sessionFileName = "file://"
+		// + new File(".").getCanonicalPath() + "/session.js";
 		int count = 0;
 		for (Iterator<String> iterator = fileNames.iterator(); iterator
 				.hasNext();) {
 			String fileName = iterator.next();
 
-			interpreterContext = new InterpreterContext(url+fileName);
+			interpreterContext = new InterpreterContext(url + fileName);
 
 			interpreterContext.launchInterpreter();
 
@@ -367,13 +371,14 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3cManual1() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void w3cManual1() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		// If the last main FIA loop did not result in a goto nextitem
 		// and there is no form item which is eligible to be visited
 		// then an implicit exit is generated.
 
 		// Read file
-		interpreterContext = new InterpreterContext(url+"w3c/assert165.txml");
+		interpreterContext = new InterpreterContext(url + "w3c/assert165.txml");
 		interpreterContext.launchInterpreter();
 
 		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());

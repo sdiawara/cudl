@@ -21,7 +21,6 @@ import org.xml.sax.SAXException;
 import cudl.utils.Prompt;
 
 public class InterpreterTest {
-	private Map<String, String> varExcepted = new TreeMap<String, String>();
 	private InterpreterContext interpreterContext;
 	private String url;
 
@@ -31,7 +30,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTrace() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void testLogTrace() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -51,7 +51,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTraceWithExit() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void testLogTraceWithExit() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -69,7 +70,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTraceWhithVariable() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void testLogTraceWhithVariable() throws IOException,
+			ScriptException, ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 2");
@@ -79,20 +81,11 @@ public class InterpreterTest {
 		List<String> traceStat = new ArrayList<String>();
 		traceStat.add("LOG Hello");
 
-		varExcepted = new TreeMap<String, String>();
-		varExcepted.put("block_0", "defined");
-		varExcepted.put("block_1", "defined");
-		varExcepted.put("block_2", "defined");
-		varExcepted.put("block_3", "defined");
-		varExcepted.put("telephone", "+689 123456");
-		varExcepted.put("telephone1", "+356 689999");
-
 		interpreterContext = new InterpreterContext(url + "shelloVar.vxml");
 		interpreterContext.launchInterpreter();
 
 		assertEquals(traceStat, interpreterContext.interpreter
 				.getTracetWithLabel("stats"));
-		// sertEquals(varExcepted, interpreterContext.interpreter.getVar());
 
 		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 		assertTrue(interpreterContext.interpreter.raccrochage());
@@ -153,7 +146,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogManyBlock() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void testLogManyBlock() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -168,7 +162,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogGotoInASameDialog() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void testLogGotoInASameDialog() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -185,7 +180,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testCollectPrompt() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void testCollectPrompt() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -236,12 +232,8 @@ public class InterpreterTest {
 	}
 
 	@Test()
-	public void testNodeValue() throws IOException, ScriptException, ParserConfigurationException, SAXException {
-		varExcepted = new TreeMap<String, String>();
-		varExcepted.put("block_0", "defined");
-		varExcepted.put("appli_scope_var",
-				"cette variable est defini partout dans le formulaire");
-
+	public void testNodeValue() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -260,7 +252,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void sideEffectInScript() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void sideEffectInScript() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("bla bla");
 		traceLog.add("un exemple de variable de global avec effet de bord");
@@ -273,7 +266,8 @@ public class InterpreterTest {
 	}
 
 	@Test(expected = ScriptException.class)
-	public void anonymeScopeVariable() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void anonymeScopeVariable() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 
 		interpreterContext = new InterpreterContext(url
 				+ "anonymeScopeVariable.vxml");
@@ -281,7 +275,8 @@ public class InterpreterTest {
 	}
 
 	@Test(expected = ScriptException.class)
-	public void dialogScopeVariable() throws IOException, ScriptException, ParserConfigurationException, SAXException {
+	public void dialogScopeVariable() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		interpreterContext = new InterpreterContext(url
 				+ "dialogScopeVariable.vxml");
 		interpreterContext.launchInterpreter();
@@ -289,7 +284,8 @@ public class InterpreterTest {
 
 	@Test
 	public void documentScopeVariableIsVisibleInAllDocument()
-			throws IOException, ScriptException, URISyntaxException, ParserConfigurationException, SAXException {
+			throws IOException, ScriptException, URISyntaxException,
+			ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -331,7 +327,8 @@ public class InterpreterTest {
 
 	@Test(expected = ScriptException.class)
 	public void WhenRootChangeLastRootVariableIsNotLongerAccessible()
-			throws IOException, ScriptException, ParserConfigurationException, SAXException {
+			throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		interpreterContext = new InterpreterContext(url
 				+ "rootChangeVariable.vxml");
 		interpreterContext.launchInterpreter();
