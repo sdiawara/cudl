@@ -22,6 +22,7 @@ public class Interpreter {
 	}
 
 	public void start() throws IOException, ScriptException, SAXException {
+		System.err.println("Start interpretation");
 		context.launchInterpreter();
 	}
 
@@ -66,8 +67,7 @@ public class Interpreter {
 
 	public void push(String dtmf) throws ScriptException, IOException,
 			SAXException {
-		context.push("'" + dtmf + "'");
-		;
+		context.push("'" + dtmf.replaceAll(" ", "") + "'");
 	}
 
 	public void disconnect() throws ScriptException, IOException, SAXException {
