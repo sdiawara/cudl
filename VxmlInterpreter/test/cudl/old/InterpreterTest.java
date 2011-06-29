@@ -14,13 +14,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import cudl.Interpreter;
 import cudl.InterpreterContext;
 import cudl.utils.Prompt;
 
 public class InterpreterTest extends TestCase {
 
-	private InterpreterContext interpreterContext;
 	private String url;
+	private Interpreter interpreter;
 
 	@Before
 	public void setUp() throws IOException {
@@ -65,18 +66,18 @@ public class InterpreterTest extends TestCase {
 		// expectedPrompt.interruptionGrammar = "/data/modeles/TARIF.srg";
 		expectedPrompts.add(expectedPrompt);
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "VxmlGlobalServletService");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 
-		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
-		assertEquals(expectedStats, interpreterContext.interpreter
+		assertEquals(expectedLogs, interpreter.getTraceLog());
+		assertEquals(expectedStats, interpreter
 				.getTracetWithLabel("stats"));
 		System.err.println(expectedPrompts);
-		System.err.println(interpreterContext.interpreter.getPrompts());
-		assertEquals(expectedPrompts, interpreterContext.interpreter
+		System.err.println(interpreter.getPrompts());
+		assertEquals(expectedPrompts, interpreter
 				.getPrompts());
-		assertFalse(interpreterContext.interpreter.raccrochage());
+		assertFalse(interpreter.raccrochage());
 	}
 
 	@Test
@@ -93,14 +94,16 @@ public class InterpreterTest extends TestCase {
 		expectedLogs.add("LOG PHASE incompris");
 		expectedLogs.add("LOG PHASE interaction");
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "VxmlGlobalServletService");
-		interpreterContext.launchInterpreter();
-		interpreterContext.event("noinput");
-		interpreterContext.event("nomatch");
+		interpreter.start();
+		interpreter.noInput();
+		interpreter.noMatch();
+		//interpreterContext.event("noinput");
+		//interpreterContext.event("nomatch");
 
-		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
-		assertFalse(interpreterContext.interpreter.raccrochage());
+		assertEquals(expectedLogs, interpreter.getTraceLog());
+		assertFalse(interpreter.raccrochage());
 	}
 
 	@Test
@@ -111,21 +114,21 @@ public class InterpreterTest extends TestCase {
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("LOG PHASE transfert");
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "transfer/VxmlGlobalServletService");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 
 		assertEquals("sup:4700810C810106830783105506911808",
-				interpreterContext.interpreter.transfertDestination);
-		assertFalse(interpreterContext.interpreter.raccrochage());
+				interpreter.getTranferDestination());
+		assertFalse(interpreter.raccrochage());
 		// si
 		// transfert
 		// alors il
 		// n'y
 		// a pas raccrochage
-		assertFalse(interpreterContext.interpreter.getTraceLog().isEmpty());
-		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
-		assertFalse(interpreterContext.interpreter.raccrochage());
+		assertFalse(interpreter.getTraceLog().isEmpty());
+		assertEquals(expectedLogs, interpreter.getTraceLog());
+		assertFalse(interpreter.raccrochage());
 	}
 
 	@Test
@@ -137,23 +140,23 @@ public class InterpreterTest extends TestCase {
 		expectedLogs.add("LOG PHASE transfert");
 		expectedLogs.add("LOG PHASE fin transfert");
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "transfer/VxmlGlobalServletService");
-		interpreterContext.launchInterpreter();
-		interpreterContext.callerHangup(0);
+		interpreter.start();
+		interpreter.callerHangup(0);
 
 		assertEquals("sup:4700810C810106830783105506911808",
-				interpreterContext.interpreter.transfertDestination);
+				interpreter.getTranferDestination());
 		// si
 		// transfert
 		// alors il
 		// n'y
 		// a pas raccrochage
-		assertFalse(interpreterContext.interpreter.getTraceLog().isEmpty());
-		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
-		System.err.println(interpreterContext.interpreter.raccrochage()
+		assertFalse(interpreter.getTraceLog().isEmpty());
+		assertEquals(expectedLogs, interpreter.getTraceLog());
+		System.err.println(interpreter.raccrochage()
 				+ "   ---->");
-		assertTrue(interpreterContext.interpreter.raccrochage());
+		assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
@@ -164,15 +167,15 @@ public class InterpreterTest extends TestCase {
 		expectedLogs.add("LOG PHASE transfert");
 		expectedLogs.add("LOG PHASE fin transfert KO");
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "transfer/VxmlGlobalServletService");
-		interpreterContext.launchInterpreter();
-		interpreterContext.noAnswer();
+		interpreter.start();
+		interpreter.noAnswer();
 
 		assertEquals("sup:4700810C810106830783105506911808",
-				interpreterContext.interpreter.transfertDestination);
-		assertTrue(interpreterContext.interpreter.raccrochage());
-		assertFalse(interpreterContext.interpreter.getTraceLog().isEmpty());
-		assertEquals(expectedLogs, interpreterContext.interpreter.getTraceLog());
+				interpreter.getTranferDestination());
+		assertTrue(interpreter.raccrochage());
+		assertFalse(interpreter.getTraceLog().isEmpty());
+		assertEquals(expectedLogs, interpreter.getTraceLog());
 	}
 }

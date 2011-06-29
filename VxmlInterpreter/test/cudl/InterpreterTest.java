@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,8 +19,8 @@ import org.xml.sax.SAXException;
 import cudl.utils.Prompt;
 
 public class InterpreterTest {
-	private InterpreterContext interpreterContext;
 	private String url;
+	private Interpreter interpreter;
 
 	@Before
 	public void setUp() throws IOException {
@@ -41,13 +39,12 @@ public class InterpreterTest {
 		List<String> traceStat = new ArrayList<String>();
 		traceStat.add("LOG Hello");
 
-		interpreterContext = new InterpreterContext(url + "shello2.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter = new Interpreter(url + "shello2.vxml");
+		interpreter.start();
 
-		assertEquals(traceStat, interpreterContext.interpreter
-				.getTracetWithLabel("stats"));
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
-		assertTrue(interpreterContext.interpreter.raccrochage());
+		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
+		assertEquals(traceLog, interpreter.getTraceLog());
+		assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
@@ -59,14 +56,13 @@ public class InterpreterTest {
 
 		List<String> traceStat = new ArrayList<String>();
 		traceStat.add("LOG Hello");
-
-		interpreterContext = new InterpreterContext(url + "shelloExit.vxml");
-		interpreterContext.launchInterpreter();
-
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
-		assertEquals(traceStat, interpreterContext.interpreter
+		interpreter = new Interpreter(url + "shelloExit.vxml");
+		interpreter.start();
+		
+		assertEquals(traceLog, interpreter.getTraceLog());
+		assertEquals(traceStat, interpreter
 				.getTracetWithLabel("stats"));
-		assertTrue(interpreterContext.interpreter.raccrochage());
+		assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
@@ -80,15 +76,15 @@ public class InterpreterTest {
 
 		List<String> traceStat = new ArrayList<String>();
 		traceStat.add("LOG Hello");
+		interpreter = new Interpreter(url + "shelloVar.vxml");
+		interpreter.start();
+		
 
-		interpreterContext = new InterpreterContext(url + "shelloVar.vxml");
-		interpreterContext.launchInterpreter();
-
-		assertEquals(traceStat, interpreterContext.interpreter
+		assertEquals(traceStat, interpreter
 				.getTracetWithLabel("stats"));
 
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
-		assertTrue(interpreterContext.interpreter.raccrochage());
+		assertEquals(traceLog, interpreter.getTraceLog());
+		assertTrue(interpreter.raccrochage());
 	}
 
 	// @Test
@@ -111,8 +107,8 @@ public class InterpreterTest {
 	// varExcepted.put("telephone", "undefined");
 	// varExcepted.put("telephone1", "undefined");
 	//
-	// interpreterContext = new InterpreterContext(url+"shelloVarClear.vxml");
-	// interpreterContext.launchInterpreter();
+	// interpreter = new Interpreter(url+"shelloVarClear.vxml");
+	// interpreterContext.interpreter.start();
 	//
 	// assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
 	// assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
@@ -132,17 +128,17 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello 4");
 		traceLog.add("LOG Hello 5");
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "shelloWith_if_elseif_and_else.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 
-		assertTrue(interpreterContext.interpreter.getTracetWithLabel("stats")
+		assertTrue(interpreter.getTracetWithLabel("stats")
 				.isEmpty());
 
 		System.err.println(traceLog);
-		System.err.println(interpreterContext.interpreter.getTraceLog());
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
-		assertTrue(interpreterContext.interpreter.raccrochage());
+		System.err.println(interpreter.getTraceLog());
+		assertEquals(traceLog, interpreter.getTraceLog());
+		assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
@@ -153,12 +149,12 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello 1");
 		traceLog.add("LOG Hello 2");
 
-		interpreterContext = new InterpreterContext(url + "manyBlocks.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter = new Interpreter(url + "manyBlocks.vxml");
+		interpreter.start();
 
-		assertTrue(interpreterContext.interpreter.getTracetWithLabel("stats")
+		assertTrue(interpreter.getTracetWithLabel("stats")
 				.isEmpty());
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
+		assertEquals(traceLog, interpreter.getTraceLog());
 	}
 
 	@Test
@@ -171,12 +167,12 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello 3");
 		traceLog.add("LOG Hello 4");
 
-		interpreterContext = new InterpreterContext(url + "goto.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter = new Interpreter(url + "goto.vxml");
+		interpreter.start();
 
-		assertTrue(interpreterContext.interpreter.getTracetWithLabel("stats")
+		assertTrue(interpreter.getTracetWithLabel("stats")
 				.isEmpty());
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
+		assertEquals(traceLog, interpreter.getTraceLog());
 	}
 
 	@Test
@@ -207,10 +203,10 @@ public class InterpreterTest {
 		promptExecepeted.tts = "dites tarif.";
 		prompts.add(promptExecepeted);
 
-		interpreterContext = new InterpreterContext(url + "prompt.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter = new Interpreter(url + "prompt.vxml");
+		interpreter.start();
 
-		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
+		assertEquals(prompts, interpreter.getPrompts());
 	}
 
 	@Test
@@ -224,11 +220,11 @@ public class InterpreterTest {
 		promptExecepeted.tts = "Bienvenue chez Graines a gogo. Ce mois-ci nous proposons le barril de 250 kg de graines de chardon a 299.95€ frais d'expédition et de transport compris.";
 		prompts.add(promptExecepeted);
 
-		interpreterContext = new InterpreterContext(url + "prompt1.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter = new Interpreter(url + "prompt1.vxml");
+		interpreter.start();
 
-		assertTrue(interpreterContext.interpreter.getPrompts().size() == 1);
-		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
+		assertTrue(interpreter.getPrompts().size() == 1);
+		assertEquals(prompts, interpreter.getPrompts());
 	}
 
 	@Test()
@@ -245,10 +241,10 @@ public class InterpreterTest {
 		promptExecepeted.tts = "ha ok: cette variable est defini partout dans le formulaire. c'est compris";
 		prompts.add(promptExecepeted);
 
-		interpreterContext = new InterpreterContext(url + "root.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter = new Interpreter(url + "root.vxml");
+		interpreter.start();
 
-		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
+		assertEquals(prompts, interpreter.getPrompts());
 	}
 
 	@Test
@@ -258,28 +254,28 @@ public class InterpreterTest {
 		traceLog.add("bla bla");
 		traceLog.add("un exemple de variable de global avec effet de bord");
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "sideEffectInScope.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 
-		assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
+		assertEquals(traceLog, interpreter.getTraceLog());
 	}
 
 	@Test(expected = ScriptException.class)
 	public void anonymeScopeVariable() throws IOException, ScriptException,
 			ParserConfigurationException, SAXException {
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "anonymeScopeVariable.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 	}
 
 	@Test(expected = ScriptException.class)
 	public void dialogScopeVariable() throws IOException, ScriptException,
 			ParserConfigurationException, SAXException {
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "dialogScopeVariable.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 	}
 
 	@Test
@@ -299,11 +295,11 @@ public class InterpreterTest {
 		promptExecepeted.tts = "variable du document3";
 		prompts.add(promptExecepeted);
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "documentScopeVariable.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 
-		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
+		assertEquals(prompts, interpreter.getPrompts());
 	}
 
 	@Test
@@ -319,27 +315,27 @@ public class InterpreterTest {
 		promptExecepeted.tts = "variable du document";
 		prompts.add(promptExecepeted);
 
-		interpreterContext = new InterpreterContext(url + "rootVariable.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter = new Interpreter(url + "rootVariable.vxml");
+		interpreter.start();
 
-		assertEquals(prompts, interpreterContext.interpreter.getPrompts());
+		assertEquals(prompts, interpreter.getPrompts());
 	}
 
 	@Test(expected = ScriptException.class)
 	public void WhenRootChangeLastRootVariableIsNotLongerAccessible()
 			throws IOException, ScriptException, ParserConfigurationException,
 			SAXException {
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "rootChangeVariable.vxml");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 	}
 
 	@Test
 	public void comparerTwoVariableInDifferentScope() throws IOException,
 			ScriptException, ParserConfigurationException, SAXException {
 
-		interpreterContext = new InterpreterContext(url
+		interpreter = new Interpreter(url
 				+ "compareTwoVariableDeclaredIndifferentScope");
-		interpreterContext.launchInterpreter();
+		interpreter.start();
 	}
 }

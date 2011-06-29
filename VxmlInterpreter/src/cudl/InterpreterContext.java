@@ -28,14 +28,13 @@ public class InterpreterContext {
 	private String currentFileName;
 	private String currentRootFileName;
 	private String location;
-	public Interpreter interpreter;
-	public Node field;
-	public Document rootDocument;
-
 	private DocumentBuilder documentBuilder;
 	private URLConnection connection;
-
 	private String cookies;
+
+	public InternalInterpreter interpreter;
+	public Node field;
+	public Document rootDocument;
 
 	public InterpreterContext(String fileName) throws IOException,
 			ScriptException, ParserConfigurationException, SAXException {
@@ -43,7 +42,7 @@ public class InterpreterContext {
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
 				.newInstance();
 		documentBuilder = builderFactory.newDocumentBuilder();
-		interpreter = new Interpreter(fileName);
+		interpreter = new InternalInterpreter(fileName);
 		connection = new URL(fileName).openConnection();
 		cookies = connection.getHeaderField("Set-Cookie");
 		buildDocument(fileName);
