@@ -36,8 +36,8 @@ public class InterpreterContext {
 	public Node field;
 	public Document rootDocument;
 
-	public InterpreterContext(String fileName) throws IOException,
-			ScriptException, ParserConfigurationException, SAXException {
+	InterpreterContext(String fileName) throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		location = fileName;
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
 				.newInstance();
@@ -49,8 +49,7 @@ public class InterpreterContext {
 		interpreterListener = new InterpreterEventHandler();
 	}
 
-	public void launchInterpreter() throws IOException, ScriptException,
-			SAXException {
+	void launchInterpreter() throws IOException, ScriptException, SAXException {
 		try {
 			interpreter.interpretDialog(currentDialog);
 			field = interpreter.selectedItem;
@@ -84,7 +83,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void event(String eventType) throws ScriptException, IOException,
+	void event(String eventType) throws ScriptException, IOException,
 			SAXException {
 		field = interpreter.selectedItem;
 		interpreterListener.doEvent(new InterpreterEvent(this, eventType));
@@ -141,7 +140,7 @@ public class InterpreterContext {
 
 	// we assume that the user is in a context where the word he utters is
 	// recognized if it is not the case we use the function nomatch
-	public void talk(String sentence) throws ScriptException, IOException,
+	void talk(String sentence) throws ScriptException, IOException,
 			SAXException {
 		try {
 			interpreter.utterance(sentence, "'voice'");
@@ -150,7 +149,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void push(String dtmf) throws ScriptException, IOException,
+	void push(String dtmf) throws ScriptException, IOException,
 			SAXException {
 		try {
 			interpreter.utterance(dtmf, "'dtmf'");
@@ -159,7 +158,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void destinationHangup() throws ScriptException, IOException,
+	void destinationHangup() throws ScriptException, IOException,
 			SAXException {
 		try {
 			interpreter.destinationHangup();
@@ -168,7 +167,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void callerHangDestination() throws ScriptException, IOException,
+	void callerHangDestination() throws ScriptException, IOException,
 			SAXException {
 		try {
 			interpreter.callerHangDestination();
@@ -177,7 +176,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void blindTransferSuccess() throws ScriptException, IOException,
+	void blindTransferSuccess() throws ScriptException, IOException,
 			SAXException {
 		try {
 			interpreter.blindTransferSuccess();
@@ -186,7 +185,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void callerHangup(int i) throws IOException, ScriptException,
+	void callerHangup(int i) throws IOException, ScriptException,
 			SAXException {
 		try {
 			interpreter.callerHangup(i);
@@ -195,7 +194,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void noAnswer() throws ScriptException, IOException, SAXException {
+	void noAnswer() throws ScriptException, IOException, SAXException {
 		try {
 
 			interpreter.noAnswer();
@@ -204,7 +203,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void maxTimeDisconnect() throws ScriptException, IOException,
+	void maxTimeDisconnect() throws ScriptException, IOException,
 			SAXException {
 		try {
 			interpreter.maxTimeDisconnect();
@@ -213,7 +212,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void destinationBusy() throws ScriptException, IOException,
+	void destinationBusy() throws ScriptException, IOException,
 			SAXException {
 		try {
 			interpreter.destinationBusy();
@@ -222,7 +221,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void networkBusy() throws ScriptException, IOException, SAXException {
+	void networkBusy() throws ScriptException, IOException, SAXException {
 		try {
 			interpreter.networkBusy();
 		} catch (InterpreterException e) {

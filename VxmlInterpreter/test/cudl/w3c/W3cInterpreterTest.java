@@ -1,5 +1,6 @@
 package cudl.w3c;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -15,10 +16,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import cudl.Interpreter;
 import cudl.InterpreterContext;
+import cudl.utils.Prompt;
 
 public class W3cInterpreterTest {
-	private InterpreterContext interpreterContext;
+	private Interpreter interpreter;
 	private List<String> fileNames = new ArrayList<String>() {
 		{
 			/*
@@ -313,57 +316,58 @@ public class W3cInterpreterTest {
 
 	};
 	private String url;
+	private Prompt prompt;
 
 	@Before
 	public void setUp() throws IOException {
 		url = "file://" + new File(".").getCanonicalPath() + "/test/docVxml/";
+		prompt = new Prompt();
+		prompt.tts = "pass";
 	}
 
 	@Test()
 	public void w3cIRTest() throws IOException, ScriptException,
 			ParserConfigurationException, SAXException {
-
-		// InterpreterRequierement.sessionFileName = "file://"
-		// + new File(".").getCanonicalPath() + "/session.js";
+	
 		int count = 0;
 		for (Iterator<String> iterator = fileNames.iterator(); iterator
 				.hasNext();) {
 			String fileName = iterator.next();
 
-			interpreterContext = new InterpreterContext(url + fileName);
+			interpreter = new Interpreter(url + fileName);
+			interpreter.start();
 
-			interpreterContext.launchInterpreter();
-
-			String tmp = interpreterContext.interpreter.w3cNodeConfSuite.get(0);
-			System.out.println("tmp =" + tmp);
-			if (tmp.contains("transfer")) {
-				if (tmp.contains("blind"))
-					interpreterContext.blindTransferSuccess();
-				else if (fileName.endsWith("288.txml")) {
-					interpreterContext.destinationHangup();
-				} else if (fileName.endsWith("290.txml")) {
-					interpreterContext.callerHangDestination();
-				} else if (fileName.endsWith("300.txml")) {
-					interpreterContext.callerHangup(0);
-				} else if (fileName.endsWith("295.txml")) {
-					interpreterContext.noAnswer();
-				} else if (fileName.endsWith("296.txml")) {
-					interpreterContext.maxTimeDisconnect();
-				} else if (fileName.endsWith("301.txml")) {
-					interpreterContext.destinationBusy();
-				} else if (fileName.endsWith("302.txml")) {
-					interpreterContext.networkBusy();
-				}
-
-				tmp = interpreterContext.interpreter.w3cNodeConfSuite.get(1);
+			// System.out.println("tmp =" + tmp);
+			if (fileName.endsWith("289.txml") || fileName.endsWith("294.txml")
+					|| fileName.endsWith("298.txml")) {
+				interpreter.blindTransferSuccess();
+			} else if (fileName.endsWith("288.txml")) {
+				interpreter.destinationHangup();
+			} else if (fileName.endsWith("290.txml")) {
+				interpreter.callerHangDestination();
+			} else if (fileName.endsWith("300.txml")) {
+				interpreter.callerHangup(0);
+			} else if (fileName.endsWith("295.txml")) {
+				interpreter.noAnswer();
+			} else if (fileName.endsWith("296.txml")) {
+				interpreter.maxTimeDisconnect();
+			} else if (fileName.endsWith("301.txml")) {
+				interpreter.destinationBusy();
+			} else if (fileName.endsWith("302.txml")) {
+				interpreter.networkBusy();
 			}
 
-			if (!(tmp.equals("[conf:pass: null]"))) {
-				System.out.println(tmp);
+			// tmp = interpreterContext.interpreter.w3cNodeConfSuite.get(1);
+			// }
+
+			List<Prompt> prompts = interpreter.getPrompts();
+			int i = prompts.size() - 1;
+			if (!(prompt.equals(prompts.get(i)))) {
+				// System.out.println(tmp);
 				System.out.println(count + " tests of " + fileNames.size());
 			}
 
-			assertTrue(tmp.equals("[conf:pass: null]"));
+			assertEquals(prompt, prompts.get(i));
 			count++;
 			// System.out.println(fileName + " test pass");
 		}
@@ -378,9 +382,9 @@ public class W3cInterpreterTest {
 		// then an implicit exit is generated.
 
 		// Read file
-		interpreterContext = new InterpreterContext(url + "w3c/assert165.txml");
-		interpreterContext.launchInterpreter();
+		interpreter = new Interpreter(url + "w3c/assert165.txml");
+		interpreter.start();
 
-		assertTrue(interpreterContext.interpreter.w3cNodeConfSuite.isEmpty());
+		assertTrue(interpreter.raccrochage());
 	}
 }

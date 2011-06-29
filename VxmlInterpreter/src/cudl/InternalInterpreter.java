@@ -31,10 +31,7 @@ import cudl.utils.VxmlElementType;
 public class InternalInterpreter {
 	private InterpreterVariableDeclaration declaration;
 	Node selectedItem;
-	public List<String> w3cNodeConfSuite = new ArrayList<String>();
-
 	private List<Log> logs = new ArrayList<Log>();
-
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 	private Properties dialogProperties = new Properties();
 
@@ -50,7 +47,9 @@ public class InternalInterpreter {
 			// Just for W3C test
 			put("conf:pass", new NodeExecutor() {
 				public void execute(Node node) throws ExitException {
-					w3cNodeConfSuite.add(node.toString());
+					Prompt prompt = new Prompt();
+					prompt.tts = "pass";
+					prompts.add(prompt);
 					throw new ExitException();
 				}
 			});
@@ -73,7 +72,7 @@ public class InternalInterpreter {
 			put("conf:fail", new NodeExecutor() {
 				public void execute(Node node) throws DOMException,
 						ScriptException {
-					w3cNodeConfSuite.add(node.toString());
+					// w3cNodeConfSuite.add(node.toString());
 
 					String reason = getNodeAttributeValue(node, "reason");
 					if (reason != null)
@@ -198,7 +197,10 @@ public class InternalInterpreter {
 			put("exit", new NodeExecutor() {
 
 				public void execute(Node node) throws ExitException {
-					w3cNodeConfSuite.add("Just for exit");
+					// w3cNodeConfSuite.add("Just for exit");
+					Prompt prompt = new Prompt();
+					prompt.tts="pass";
+					prompts.add(prompt);
 					hangup = true;
 					System.err.println("raccrocher par un exit");
 					throw new ExitException();
@@ -225,8 +227,7 @@ public class InternalInterpreter {
 	public String transfertDestination;
 	private InterpreterEventHandler interpreterEventHandler;
 
-	public InternalInterpreter(String location) throws IOException,
-			ScriptException {
+	InternalInterpreter(String location) throws IOException, ScriptException {
 		declaration = new InterpreterVariableDeclaration(location);
 		interpreterEventHandler = new InterpreterEventHandler();
 	}
@@ -275,8 +276,6 @@ public class InternalInterpreter {
 				declaration.setValue(selectedItem, "new Object()",
 						DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 			} else if (nodeName.equals("transfer")) {
-				w3cNodeConfSuite.add("transfer "
-						+ (isBlindTransfer(selectedItem) ? "blind" : "bridge"));
 				String dest = getNodeAttributeValue(selectedItem, "dest");
 				String destExpr = getNodeAttributeValue(selectedItem,
 						"destexpr");
@@ -355,9 +354,9 @@ public class InternalInterpreter {
 		setTransferResultAndExecute("'noanswer'");
 	}
 
-	private boolean isBlindTransfer(Node node) {
-		return !Boolean.parseBoolean(getNodeAttributeValue(node, "bridge"));
-	}
+//	private boolean isBlindTransfer(Node node) {
+//		return !Boolean.parseBoolean(getNodeAttributeValue(node, "bridge"));
+//	}
 
 	void declareVariable(NodeList nodeList, int scope) throws ScriptException,
 			IOException {

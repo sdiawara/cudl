@@ -9,6 +9,7 @@ import java.util.Properties;
 import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.omg.CORBA.Context;
 import org.xml.sax.SAXException;
 
 import cudl.utils.Prompt;
@@ -86,6 +87,36 @@ public class Interpreter {
 
 	public Properties getCurrentDialogProperties() {
 		return context.interpreter.getCurrentDialogProperties();
+	}
+
+	public void blindTransferSuccess() throws ScriptException, IOException,
+			SAXException {
+		context.blindTransferSuccess();
+	}
+
+	public void destinationHangup() throws ScriptException, IOException,
+			SAXException {
+		context.destinationHangup();
+
+	}
+
+	public void callerHangDestination() throws ScriptException, IOException,
+			SAXException {
+		context.callerHangDestination();
+	}
+
+	public void maxTimeDisconnect() throws ScriptException, IOException,
+			SAXException {
+		context.maxTimeDisconnect();
+	}
+
+	public void destinationBusy() throws ScriptException, IOException,
+			SAXException {
+		context.destinationBusy();
+	}
+
+	public void networkBusy() throws ScriptException, IOException, SAXException {
+		context.networkBusy();
 	}
 
 }
