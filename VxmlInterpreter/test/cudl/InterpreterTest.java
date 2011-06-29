@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import cudl.utils.Prompt;
 
 public class InterpreterTest {
 	private String url;

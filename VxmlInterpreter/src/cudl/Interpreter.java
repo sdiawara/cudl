@@ -9,10 +9,8 @@ import java.util.Properties;
 import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.omg.CORBA.Context;
 import org.xml.sax.SAXException;
 
-import cudl.utils.Prompt;
 
 public class Interpreter {
 	private InterpreterContext context;

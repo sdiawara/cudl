@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import cudl.Interpreter;
-import cudl.utils.Prompt;
+import cudl.Prompt;
 
 public class InterpreterTest extends TestCase {
 

@@ -13,32 +13,30 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import cudl.InterpreterContext;
-
+import cudl.InterpreterException;
 
 public class InterpreterEventHandler implements InterpreterListener {
 	private Map<String, Integer> eventCounter = new Hashtable<String, Integer>();
 
 	@Override
 	public void doEvent(InterpreterEvent interpreterEvent)
-			throws ScriptException, IOException, SAXException {
+			throws ScriptException, IOException, SAXException,
+			InterpreterException {
 		InterpreterContext context = (InterpreterContext) interpreterEvent
 				.getSource();
 		String type = interpreterEvent.type;
-		eventCounter.put(type, (eventCounter.get(type) == null)?1:eventCounter.get(type) + 1);
-		
+		eventCounter.put(type, (eventCounter.get(type) == null) ? 1
+				: eventCounter.get(type) + 1);
+
 		List<Node> catchList = searchEvent(type, context.field);
 		if (catchList.size() == 0) {
 			catchList = searchEvent(type, context.rootDocument
 					.getElementsByTagName("vxml").item(0));
 		}
 
-		try {
-			// FIXME: take the first with a correct event counter
-			// a counter who is ≤ at currentCounter
-			context.interpreter.execute(catchList.get(0));
-		} catch (cudl.InterpreterException e) {
-			context.executionHandler(e);
-		}
+		// FIXME: take the first with a correct event counter
+		// a counter who is ≤ at currentCounter
+		context.interpreter.execute(catchList.get(0));
 	}
 
 	private List<Node> searchEvent(String eventName, Node parent) {

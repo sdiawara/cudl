@@ -1,6 +1,6 @@
 package cudl.w3c;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -17,8 +17,7 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import cudl.Interpreter;
-import cudl.InterpreterContext;
-import cudl.utils.Prompt;
+import cudl.Prompt;
 
 public class W3cInterpreterTest {
 	private Interpreter interpreter;

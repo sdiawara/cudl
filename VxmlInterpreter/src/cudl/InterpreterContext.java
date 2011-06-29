@@ -58,7 +58,7 @@ public class InterpreterContext {
 		}
 	}
 
-	public void executionHandler(InterpreterException e) throws IOException,
+	private void executionHandler(InterpreterException e) throws IOException,
 			ScriptException, SAXException {
 		if (e instanceof GotoException) {
 			GotoException gotoException = (GotoException) e;
@@ -86,7 +86,11 @@ public class InterpreterContext {
 	void event(String eventType) throws ScriptException, IOException,
 			SAXException {
 		field = interpreter.selectedItem;
-		interpreterListener.doEvent(new InterpreterEvent(this, eventType));
+		try {
+			interpreterListener.doEvent(new InterpreterEvent(this, eventType));
+		} catch (InterpreterException e) {
+			executionHandler(e);
+		}
 	}
 
 	private void buildDocument(String fileName) throws ScriptException,
@@ -149,8 +153,7 @@ public class InterpreterContext {
 		}
 	}
 
-	void push(String dtmf) throws ScriptException, IOException,
-			SAXException {
+	void push(String dtmf) throws ScriptException, IOException, SAXException {
 		try {
 			interpreter.utterance(dtmf, "'dtmf'");
 		} catch (InterpreterException e) {
@@ -158,8 +161,7 @@ public class InterpreterContext {
 		}
 	}
 
-	void destinationHangup() throws ScriptException, IOException,
-			SAXException {
+	void destinationHangup() throws ScriptException, IOException, SAXException {
 		try {
 			interpreter.destinationHangup();
 		} catch (InterpreterException e) {
@@ -185,8 +187,7 @@ public class InterpreterContext {
 		}
 	}
 
-	void callerHangup(int i) throws IOException, ScriptException,
-			SAXException {
+	void callerHangup(int i) throws IOException, ScriptException, SAXException {
 		try {
 			interpreter.callerHangup(i);
 		} catch (InterpreterException e) {
@@ -203,8 +204,7 @@ public class InterpreterContext {
 		}
 	}
 
-	void maxTimeDisconnect() throws ScriptException, IOException,
-			SAXException {
+	void maxTimeDisconnect() throws ScriptException, IOException, SAXException {
 		try {
 			interpreter.maxTimeDisconnect();
 		} catch (InterpreterException e) {
@@ -212,8 +212,7 @@ public class InterpreterContext {
 		}
 	}
 
-	void destinationBusy() throws ScriptException, IOException,
-			SAXException {
+	void destinationBusy() throws ScriptException, IOException, SAXException {
 		try {
 			interpreter.destinationBusy();
 		} catch (InterpreterException e) {

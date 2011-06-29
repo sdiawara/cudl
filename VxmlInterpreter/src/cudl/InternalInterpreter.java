@@ -17,21 +17,17 @@ import javax.script.ScriptException;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import cudl.event.InterpreterEvent;
-import cudl.event.InterpreterEventHandler;
 import cudl.script.DefaultInterpreterScriptContext;
 import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
-import cudl.utils.Log;
-import cudl.utils.Prompt;
 import cudl.utils.VxmlElementType;
 
 public class InternalInterpreter {
 	private InterpreterVariableDeclaration declaration;
 	Node selectedItem;
 	private List<Log> logs = new ArrayList<Log>();
+
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 	private Properties dialogProperties = new Properties();
 
@@ -225,11 +221,9 @@ public class InternalInterpreter {
 		}
 	};
 	public String transfertDestination;
-	private InterpreterEventHandler interpreterEventHandler;
 
 	InternalInterpreter(String location) throws IOException, ScriptException {
 		declaration = new InterpreterVariableDeclaration(location);
-		interpreterEventHandler = new InterpreterEventHandler();
 	}
 
 	void interpretDialog(Node dialog) throws InterpreterException,
@@ -687,10 +681,5 @@ public class InternalInterpreter {
 
 	boolean raccrochage() {
 		return hangup;
-	}
-
-	void doEvent(InterpreterEvent interpreterEvent) throws ScriptException,
-			IOException, SAXException {
-		interpreterEventHandler.doEvent(interpreterEvent);
 	}
 }

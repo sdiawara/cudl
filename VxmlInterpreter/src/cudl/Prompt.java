@@ -1,4 +1,4 @@
-package cudl.utils;
+package cudl;
 
 public class Prompt {
 	public String audio = "";
