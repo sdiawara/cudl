@@ -225,7 +225,8 @@ public class InternalInterpreter {
 	public String transfertDestination;
 	private InterpreterEventHandler interpreterEventHandler;
 
-	public InternalInterpreter(String location) throws IOException, ScriptException {
+	public InternalInterpreter(String location) throws IOException,
+			ScriptException {
 		declaration = new InterpreterVariableDeclaration(location);
 		interpreterEventHandler = new InterpreterEventHandler();
 	}
@@ -650,8 +651,8 @@ public class InternalInterpreter {
 
 	}
 
-	void utterance(String string, String string2)
-			throws ScriptException, InterpreterException, IOException {
+	void utterance(String string, String string2) throws ScriptException,
+			InterpreterException, IOException {
 		declaration.evaluateScript("lastresult$[0].utterance =" + string,
 				InterpreterScriptContext.APPLICATION_SCOPE);
 		declaration.evaluateScript("lastresult$[0].inputmode =" + string2,
@@ -670,8 +671,8 @@ public class InternalInterpreter {
 		return dialogProperties;
 	}
 
-	void maxTimeDisconnect() throws ScriptException,
-			InterpreterException, IOException {
+	void maxTimeDisconnect() throws ScriptException, InterpreterException,
+			IOException {
 		setTransferResultAndExecute("'maxtime_disconnect'");
 	}
 
@@ -689,8 +690,8 @@ public class InternalInterpreter {
 		return hangup;
 	}
 
-	void doEvent(InterpreterEvent interpreterEvent)
-			throws ScriptException, IOException, SAXException {
+	void doEvent(InterpreterEvent interpreterEvent) throws ScriptException,
+			IOException, SAXException {
 		interpreterEventHandler.doEvent(interpreterEvent);
 	}
 }

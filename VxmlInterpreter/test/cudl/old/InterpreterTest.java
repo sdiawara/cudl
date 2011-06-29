@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import cudl.Interpreter;
-import cudl.InterpreterContext;
 import cudl.utils.Prompt;
 
 public class InterpreterTest extends TestCase {
@@ -31,7 +30,8 @@ public class InterpreterTest extends TestCase {
 
 	@Test
 	public void testCallServiceNavigateUntilNextInteractionAndCollectsNavigationTraces()
-			throws IOException, ScriptException, ParserConfigurationException, SAXException {
+			throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("new call");
@@ -66,23 +66,21 @@ public class InterpreterTest extends TestCase {
 		// expectedPrompt.interruptionGrammar = "/data/modeles/TARIF.srg";
 		expectedPrompts.add(expectedPrompt);
 
-		interpreter = new Interpreter(url
-				+ "VxmlGlobalServletService");
+		interpreter = new Interpreter(url + "VxmlGlobalServletService");
 		interpreter.start();
 
 		assertEquals(expectedLogs, interpreter.getTraceLog());
-		assertEquals(expectedStats, interpreter
-				.getTracetWithLabel("stats"));
+		assertEquals(expectedStats, interpreter.getTracetWithLabel("stats"));
 		System.err.println(expectedPrompts);
 		System.err.println(interpreter.getPrompts());
-		assertEquals(expectedPrompts, interpreter
-				.getPrompts());
+		assertEquals(expectedPrompts, interpreter.getPrompts());
 		assertFalse(interpreter.raccrochage());
 	}
 
 	@Test
 	public void testNoInputAndNoMatchNavigatesUntilNextInteraction()
-			throws IOException, ScriptException, ParserConfigurationException, SAXException {
+			throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("new call");
@@ -94,13 +92,12 @@ public class InterpreterTest extends TestCase {
 		expectedLogs.add("LOG PHASE incompris");
 		expectedLogs.add("LOG PHASE interaction");
 
-		interpreter = new Interpreter(url
-				+ "VxmlGlobalServletService");
+		interpreter = new Interpreter(url + "VxmlGlobalServletService");
 		interpreter.start();
 		interpreter.noInput();
 		interpreter.noMatch();
-		//interpreterContext.event("noinput");
-		//interpreterContext.event("nomatch");
+		// interpreterContext.event("noinput");
+		// interpreterContext.event("nomatch");
 
 		assertEquals(expectedLogs, interpreter.getTraceLog());
 		assertFalse(interpreter.raccrochage());
@@ -108,18 +105,18 @@ public class InterpreterTest extends TestCase {
 
 	@Test
 	public void testNavigationCollectsTransfertInformationButDoNotTransfer()
-			throws IOException, ScriptException, ParserConfigurationException, SAXException {
+			throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("LOG PHASE transfert");
 
-		interpreter = new Interpreter(url
-				+ "transfer/VxmlGlobalServletService");
+		interpreter = new Interpreter(url + "transfer/VxmlGlobalServletService");
 		interpreter.start();
 
-		assertEquals("sup:4700810C810106830783105506911808",
-				interpreter.getTranferDestination());
+		assertEquals("sup:4700810C810106830783105506911808", interpreter
+				.getTranferDestination());
 		assertFalse(interpreter.raccrochage());
 		// si
 		// transfert
@@ -133,20 +130,20 @@ public class InterpreterTest extends TestCase {
 
 	@Test
 	public void testTransferOKSimulatesTransferOnTransferPage()
-			throws IOException, ScriptException, ParserConfigurationException, SAXException {
+			throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("LOG PHASE transfert");
 		expectedLogs.add("LOG PHASE fin transfert");
 
-		interpreter = new Interpreter(url
-				+ "transfer/VxmlGlobalServletService");
+		interpreter = new Interpreter(url + "transfer/VxmlGlobalServletService");
 		interpreter.start();
 		interpreter.callerHangup(0);
 
-		assertEquals("sup:4700810C810106830783105506911808",
-				interpreter.getTranferDestination());
+		assertEquals("sup:4700810C810106830783105506911808", interpreter
+				.getTranferDestination());
 		// si
 		// transfert
 		// alors il
@@ -154,26 +151,25 @@ public class InterpreterTest extends TestCase {
 		// a pas raccrochage
 		assertFalse(interpreter.getTraceLog().isEmpty());
 		assertEquals(expectedLogs, interpreter.getTraceLog());
-		System.err.println(interpreter.raccrochage()
-				+ "   ---->");
+		System.err.println(interpreter.raccrochage() + "   ---->");
 		assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
 	public void testTransferKOSimulatesBadTransferOnTransferPage()
-			throws IOException, ScriptException, ParserConfigurationException, SAXException {
+			throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("LOG PHASE transfert");
 		expectedLogs.add("LOG PHASE fin transfert KO");
 
-		interpreter = new Interpreter(url
-				+ "transfer/VxmlGlobalServletService");
+		interpreter = new Interpreter(url + "transfer/VxmlGlobalServletService");
 		interpreter.start();
 		interpreter.noAnswer();
 
-		assertEquals("sup:4700810C810106830783105506911808",
-				interpreter.getTranferDestination());
+		assertEquals("sup:4700810C810106830783105506911808", interpreter
+				.getTranferDestination());
 		assertTrue(interpreter.raccrochage());
 		assertFalse(interpreter.getTraceLog().isEmpty());
 		assertEquals(expectedLogs, interpreter.getTraceLog());
