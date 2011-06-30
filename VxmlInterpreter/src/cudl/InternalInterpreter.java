@@ -24,7 +24,11 @@ import cudl.script.InterpreterVariableDeclaration;
 import cudl.utils.VxmlElementType;
 
 public class InternalInterpreter {
-	private InterpreterVariableDeclaration declaration;
+	private InterpreterVariableDeclaration declaration; // FIXME: make it
+														// observable or not :p
+	// private FormInterpreationAlgorithm fia; // dialog, declaration,
+	// private InterpreterContext context;
+
 	Node selectedItem;
 	private List<Log> logs = new ArrayList<Log>();
 
@@ -195,7 +199,7 @@ public class InternalInterpreter {
 				public void execute(Node node) throws ExitException {
 					// w3cNodeConfSuite.add("Just for exit");
 					Prompt prompt = new Prompt();
-					prompt.tts="pass";
+					prompt.tts = "pass";
 					prompts.add(prompt);
 					hangup = true;
 					System.err.println("raccrocher par un exit");
@@ -224,6 +228,7 @@ public class InternalInterpreter {
 
 	InternalInterpreter(String location) throws IOException, ScriptException {
 		declaration = new InterpreterVariableDeclaration(location);
+
 	}
 
 	void interpretDialog(Node dialog) throws InterpreterException,
@@ -348,9 +353,9 @@ public class InternalInterpreter {
 		setTransferResultAndExecute("'noanswer'");
 	}
 
-//	private boolean isBlindTransfer(Node node) {
-//		return !Boolean.parseBoolean(getNodeAttributeValue(node, "bridge"));
-//	}
+	// private boolean isBlindTransfer(Node node) {
+	// return !Boolean.parseBoolean(getNodeAttributeValue(node, "bridge"));
+	// }
 
 	void declareVariable(NodeList nodeList, int scope) throws ScriptException,
 			IOException {
