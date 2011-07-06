@@ -3,8 +3,8 @@
 	<classpathentry excluding="fr/mbs/vxml/script/InterpreterScriptEngine.java" kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry excluding="src/|test/|lib/" kind="src" path=""/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry exported="true" kind="var" path="ECLIPSE_HOME"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -50,6 +50,24 @@ public class VxmlElementType {
 		}
 	};
 
+	private static final Set<String> EXECUTABLE_ITEM = new HashSet<String>() {
+		{
+			add("var");
+			add("assign");
+			add("clear");
+			add("if");
+			add("prompt");
+			add("reprompt");
+			add("goto");
+			add("submit");
+			add("exit");
+			add("return");
+			add("disconnect");
+			add("script");
+			add("log");
+		}
+	};
+
 	public static boolean isFormItem(Node node) {
 		return isInputItem(node)
 				|| FORM_ITEM_TYPES.contains(node.getNodeName());
@@ -86,6 +104,17 @@ public class VxmlElementType {
 		return DIALOG.contains(item.getNodeName());
 	}
 
+	public static boolean isAModalItem(Node item) {
+		NamedNodeMap attributes = item.getAttributes();
+		Node namedItem = attributes.getNamedItem("modal");
+		return attributes != null && namedItem != null
+				&& namedItem.getNodeValue().equals("true");
+	}
+
+	public static boolean isAnExecutableItem(Node item) {
+		return EXECUTABLE_ITEM.contains(item.getNodeName());
+	}
+
 	private static int getIfItemConditionChildsNumber(Node node) {
 		NodeList childs = node.getChildNodes();
 
@@ -96,12 +125,5 @@ public class VxmlElementType {
 			}
 		}
 		return count;
-	}
-
-	public static boolean isAModalItem(Node item) {
-		NamedNodeMap attributes = item.getAttributes();
-		Node namedItem = attributes.getNamedItem("modal");
-		return attributes != null && namedItem != null
-				&& namedItem.getNodeValue().equals("true");
 	}
 }

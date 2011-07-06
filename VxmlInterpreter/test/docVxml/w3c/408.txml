@@ -19,7 +19,7 @@
     <conf:comment>
      Failed inside first form block, value is <value expr="leVar"/>
     </conf:comment>
-    <conf:fail reason="'Inside first form block, value is ' + leVar"/>
+    <conf:fail expr="'Inside first form block, value is ' + leVar"/>
    <else/>
     <conf:comment>
      Passed first, value is <value expr="leVar"/>
@@ -37,7 +37,7 @@
     <conf:comment>
      Failed inside second form block, value is <value expr="leVar"/>
     </conf:comment>
-    <conf:fail reason="'Inside second form block, value is ' + leVar"/>
+    <conf:fail expr="'Inside second form block, value is ' + leVar"/>
    <else/>
     <conf:comment>
      Passed second, value is <value expr="leVar"/>

@@ -11,110 +11,109 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-
 public class Interpreter {
-	private InterpreterContext context;
+	private InternalInterpreter internalInterpreter;
 
 	public Interpreter(String fileName) throws IOException, ScriptException,
 			ParserConfigurationException, SAXException {
-		context = new InterpreterContext(fileName);
+		internalInterpreter = new InternalInterpreter(fileName);
 	}
 
 	public void start() throws IOException, ScriptException, SAXException {
-		System.err.println("Start interpretation");
-		context.launchInterpreter();
+		internalInterpreter.interpretDialog();
 	}
 
 	public List<String> getTracetWithLabel(String... label) {
-		return context.interpreter.getTracetWithLabel(label);
+		return internalInterpreter.getTracetWithLabel(label);
 	}
 
 	public List<String> getTraceLog() {
-		return context.interpreter.getTraceLog();
+		return internalInterpreter.getTraceLog();
 	}
 
 	public boolean raccrochage() {
-		return context.interpreter.raccrochage();
+		return internalInterpreter.getContext().isHangup();
 	}
 
 	public List<Prompt> getPrompts() {
-		return context.interpreter.getPrompts();
+		return internalInterpreter.getPrompts();
 	}
 
 	public void noInput() throws ScriptException, IOException, SAXException {
-		context.event("noinput");
+		internalInterpreter.event("noinput");
 	}
 
 	public void noMatch() throws ScriptException, IOException, SAXException {
-		context.event("nomatch");
+		internalInterpreter.event("nomatch");
 	}
 
 	public String getTranferDestination() {
-		return context.interpreter.transfertDestination;
+		return internalInterpreter.getContext().getTransferDestination();
 	}
 
 	public void noAnswer() throws ScriptException, IOException, SAXException {
-		context.noAnswer();
+		internalInterpreter.noAnswer();
 	}
 
 	public void talk(String sentence) throws UnsupportedEncodingException,
 			ScriptException, IOException, SAXException {
-		context.talk("'"
+		internalInterpreter.utterance("'"
 				+ URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "")
-				+ "'");
+				+ "'", "'voice'");
 	}
 
 	public void push(String dtmf) throws ScriptException, IOException,
 			SAXException {
-		context.push("'" + dtmf.replaceAll(" ", "") + "'");
+		internalInterpreter.utterance("'" + dtmf.replaceAll(" ", "") + "'",
+				"'dtmf'");
 	}
 
 	public void disconnect() throws ScriptException, IOException, SAXException {
-		context.event("connection.disconnect.hangup");
+		internalInterpreter.event("connection.disconnect.hangup");
 	}
 
 	public void callerHangup(int i) throws IOException, ScriptException,
 			SAXException {
-		context.callerHangup(i);
+		internalInterpreter.callerHangup(i);
 	}
 
 	public String getGrammarActive() {
-		return context.interpreter.grammarActive.get(0).getAttributes()
-				.getNamedItem("src").getNodeValue().trim();
+		return internalInterpreter.getContext().getGrammarActive().get(0)
+				.getAttributes().getNamedItem("src").getNodeValue().trim();
 	}
 
 	public Properties getCurrentDialogProperties() {
-		return context.interpreter.getCurrentDialogProperties();
+		return internalInterpreter.getCurrentDialogProperties();
 	}
 
 	public void blindTransferSuccess() throws ScriptException, IOException,
 			SAXException {
-		context.blindTransferSuccess();
+		internalInterpreter.blindTransferSuccess();
 	}
 
 	public void destinationHangup() throws ScriptException, IOException,
 			SAXException {
-		context.destinationHangup();
+		internalInterpreter.destinationHangup();
 
 	}
 
 	public void callerHangDestination() throws ScriptException, IOException,
 			SAXException {
-		context.callerHangDestination();
+		internalInterpreter.callerHangDestination();
 	}
 
 	public void maxTimeDisconnect() throws ScriptException, IOException,
 			SAXException {
-		context.maxTimeDisconnect();
+		internalInterpreter.maxTimeDisconnect();
 	}
 
 	public void destinationBusy() throws ScriptException, IOException,
 			SAXException {
-		context.destinationBusy();
+		internalInterpreter.destinationBusy();
 	}
 
 	public void networkBusy() throws ScriptException, IOException, SAXException {
-		context.networkBusy();
+		internalInterpreter.networkBusy();
 	}
 
 }

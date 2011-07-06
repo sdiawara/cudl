@@ -22,7 +22,7 @@ import cudl.utils.RemoteFileAccess;
 import cudl.utils.SessionFileCreator;
 
 public class InterpreterVariableDeclaration {
-	private Map<Node, String> dialogItemName;
+	// private Map<Node, String> dialogItemName;
 	private int anonymeNameCount = 0;
 	private ScriptEngineManager manager;
 	private ScriptEngine engine;
@@ -43,8 +43,10 @@ public class InterpreterVariableDeclaration {
 			throws IOException, ScriptException {
 		manager = new ScriptEngineManager();
 		engine = manager.getEngineByName("ecmascript");
+		System.err.println("ENGINE VERSION "
+				+ engine.getFactory().getEngineVersion());
 		context = new DefaultInterpreterScriptContext();
-		dialogItemName = new Hashtable<Node, String>();
+		// dialogItemName = new Hashtable<Node, String>();
 		addVariableNormalized();
 		location = scriptLocation;
 	}
@@ -75,43 +77,15 @@ public class InterpreterVariableDeclaration {
 		for (Iterator<String> appliVar = normalizedApplicationVariable
 				.iterator(); appliVar.hasNext();) {
 			String script = (String) appliVar.next();
-			engine.eval(script,
-					getBindings(InterpreterScriptContext.APPLICATION_SCOPE));
+			engine.eval(script, context);
 		}
 	}
 
-	public void declareDialogItem(Node formItem) throws ScriptException {
-		NamedNodeMap attributes = formItem.getAttributes();
-		Node name = null;
-		Node value = null;
-		if (attributes.getLength() > 0) {
-			name = attributes.getNamedItem("name");
-			value = attributes.getNamedItem("expr");
-		}
-		String nodeName = (null == name) ? formItem.getNodeName() + "_"
-				+ anonymeNameCount++ : name.getNodeValue();
-		String nodeValue = (null == value) ? "undefined" : value
-				.getTextContent();
-
-		Bindings bindings = getBindings(InterpreterScriptContext.DOCUMENT_SCOPE);
-		bindings.put(nodeName, engine.eval(nodeValue, bindings));
-
-		dialogItemName.put(formItem, nodeName);
-	}
-
-	public void declareVariable(Node node, int scope) throws ScriptException {
-		if (!node.getNodeName().equals("var"))
-			throw new IllegalArgumentException(
-					"This node should be an vxml var node");
-		NamedNodeMap attributes = node.getAttributes();
-		String nodeName = attributes.getNamedItem("name").getTextContent();
-		Node value = attributes.getNamedItem("expr");
-		String nodeValue = (null == value) ? "undefined" : value
-				.getTextContent();
-
-		System.err.println(nodeName + "   =" + nodeValue + scope);
-		getBindings(scope).put(nodeName,
-				engine.eval(getReplaceBindingName(nodeValue), context));
+	public void declareVariable(String name, String value, int scope)
+			throws ScriptException {
+		System.err.println(name + "   =" + value + scope);
+		getBindings(scope).put(name,
+				engine.eval(getReplaceBindingName(value), context));
 	}
 
 	public Object evaluateScript(Node script, int scope) throws DOMException,
@@ -132,46 +106,31 @@ public class InterpreterVariableDeclaration {
 		} else if (script.getNodeName().equals("value")) {
 			val = engine.eval(getReplaceBindingName(attributes.getNamedItem(
 					"expr").getTextContent()), context);
-		} 
+		}
 
 		return val;
 	}
 
 	public Object evaluateScript(String script, int scope)
 			throws ScriptException {
-		return engine.eval(getReplaceBindingName(script), context)+"";
+		System.err.println(script + "=== "
+				+ engine.eval(getReplaceBindingName(script), context) + "");
+		return engine.eval(getReplaceBindingName(script), context) + "";
 	}
 
-	public void setValue(Node node, String value, int scope)
+	public void setValue(String name, String value, int scope)
 			throws ScriptException {
-
-		NamedNodeMap attributes = node.getAttributes();
-		Node namedItem;
-		namedItem = (null == attributes) ? null : attributes
-				.getNamedItem("name");
-
-		if (namedItem == null) {
-			getBindings(scope).put(dialogItemName.get(node),
-					engine.eval(value, context));
-		} else {
-			engine.eval(getReplaceBindingName(namedItem.getNodeValue() + " = "
-					+ value), context);
-		}
-	}
-
-	public Object getValue(Node selectedItem) throws DOMException,
-			ScriptException {
-		NamedNodeMap attributes = selectedItem.getAttributes();
-		Node namedItem = (null == attributes) ? null : attributes
-				.getNamedItem("name");
-		String name = (null == namedItem) ? dialogItemName.get(selectedItem)
-				: namedItem.getNodeValue();
-
-		return getValue(name);
+		System.err.println("set " + name + "= " + value + " scope =" + scope);
+		String realvalue = engine.eval(getReplaceBindingName(value), context)
+				+ "";
+		System.err.println("realvalue =" + realvalue);
+		getBindings(scope).put(name,
+				realvalue == null ? "undefined" : realvalue);
 	}
 
 	public Object getValue(String name) throws ScriptException {
-		Object eval = engine.eval(getReplaceBindingName(name), context);
+		Object eval = null;
+		eval = engine.eval(getReplaceBindingName(name), context);
 		return (null == eval) ? "undefined" : eval;
 	}
 
@@ -225,19 +184,10 @@ public class InterpreterVariableDeclaration {
 		return context.getBindings(scope);
 	}
 
-	public void declareVariable(String name, String value, int scope)
-			throws ScriptException {
-		getBindings(scope).put(name,
-				engine.eval(getReplaceBindingName(value), context));
-	}
-
 	public Object evaluateFileScript(String fileName, int scope)
 			throws ScriptException, IOException {
 		File remoteFile = RemoteFileAccess.getRemoteFile(fileName);
+		System.err.println(remoteFile.getCanonicalPath());
 		return engine.eval(new FileReader(remoteFile), context);
-	}
-
-	public void setValue(String name, String value, int scope) {
-		getBindings(scope).put(name, value);
 	}
 }

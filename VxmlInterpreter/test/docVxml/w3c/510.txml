@@ -8,8 +8,11 @@
 	<form id="myForm">	
 		<block>
 			<if cond="var1 == 'hi folks'">
+				<log>test</log>
 				<conf:pass/>
-			<else/>
+				pass
+				<log>test</log>
+				<else/>
 				<conf:fail reason="document scope var is not visible from an anonymous scope "/>
 			</if>
 		</block>

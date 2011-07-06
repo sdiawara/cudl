@@ -10,9 +10,6 @@ import javax.script.ScriptException;
 import org.junit.Before;
 import org.junit.Test;
 
-import cudl.script.DefaultInterpreterScriptContext;
-import cudl.script.InterpreterScriptContext;
-
 public class ScriptTest {
 	ScriptEngineManager engineManager = new ScriptEngineManager();
 	ScriptEngine engine = engineManager.getEngineByName("ecmascript");
@@ -23,7 +20,7 @@ public class ScriptTest {
 	private Bindings appli;
 	private DefaultInterpreterScriptContext context;
 
-	@Before
+	@Before 
 	public void setup() throws ScriptException {
 		context = new DefaultInterpreterScriptContext();
 		anonyme = context.getBindings(InterpreterScriptContext.ANONYME_SCOPE);
