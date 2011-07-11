@@ -18,10 +18,10 @@
     </catch>
   
     <block>
-    
-      <if cond="docvar!=undefined">
+   
+      <if cond="typeof docvar!='undefined'">
         <conf:fail expr="'Variables from calling document are accessible, but should not be.'"/>
-      <elseif cond="dialogvar!=undefined"/>
+      <elseif cond="typeof dialogvar != 'undefined'"/>
         <conf:fail expr="'Variables from calling dialog are accessible, but should not be.'"/>
       <else/>
         <conf:pass/>

@@ -109,14 +109,14 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 			// }
 
 			// Activer les grammaires de l'élément de formulaire.
-
 			activateGrammar();
 
 			// Exécuter l'élément de formulaire.
 			if ("subdialog".equals(getName(formItem))) {
 				String src = getNodeAttributeValue(formItem, "src");
+				InternalInterpreter internalInterpreter;
 				if (src != null) {
-					InternalInterpreter internalInterpreter = new InternalInterpreter(
+					internalInterpreter = new InternalInterpreter(
 							context.getCurrentFileName());
 					System.err.println("locatio sub " + context.getLocation()
 							+ "\t" + context.getCurrentFileName());
@@ -124,13 +124,17 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 
 					internalInterpreter.interpretDialog();
 					internalInterpreter.mainLoop();
+					//FIXME: add log
+					executor.prompts.addAll(internalInterpreter.getPrompts());
 				}
+				//FIXME: implement return 
 				declaration.evaluateScript(formItemNames.get(formItem)
 						+ "=new Object();" + formItemNames.get(formItem)
 						+ ".result ='passed'",
 						InterpreterScriptContext.DIALOG_SCOPE);
+				
+				
 				Node filled = Utils.serachItem(formItem, "filled");
-
 				if (filled != null)
 					executor.execute(filled);
 
@@ -176,17 +180,14 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 	private void setSubdialogRequierement(String src,
 			InternalInterpreter internalInterpreter) throws ScriptException,
 			IOException, SAXException {
-		if (src.contains("#"))
+		String[] split = src.split("#");
+
+		if (split.length == 2)
 			internalInterpreter.getContext().setCurrentDialog(
 					Utils.searchDialogByName(context.getCurrentDialog()
-							.getParentNode().getChildNodes(), src.replaceAll(
-							"#", "")));
-		else
-			internalInterpreter.getContext().buildDocument(src);
-	}
-
-	void Process() {
-
+							.getParentNode().getChildNodes(), split[1]));
+		if (!split[0].equals(""))
+			internalInterpreter.getContext().buildDocument(split[0]);
 	}
 
 	// private void playPrompts(NodeList childNodes) throws
