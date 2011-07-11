@@ -13,7 +13,7 @@ public class Utils {
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
 			String name = getNodeAttributeValue(child, "name");
-			if (name != null && name.equals(id)) {
+			if (id.equals(name)) {
 				return child;
 			}
 		}
@@ -23,14 +23,9 @@ public class Utils {
 	public static Node searchDialogByName(NodeList nodeList, String id) {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Node node = nodeList.item(i);
-			NamedNodeMap attributes = node.getAttributes();
-			Node namedItem = null;
-			if (null != attributes) {
-				namedItem = attributes.getNamedItem("id");
-			}
-			if (namedItem != null && namedItem.getNodeValue().equals(id)) {
+			String idd = getNodeAttributeValue(node, "id");
+			if (id.equals(idd))
 				return node;
-			}
 		}
 		return null;
 	}

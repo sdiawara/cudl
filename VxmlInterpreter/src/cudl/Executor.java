@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.script.ScriptException;
@@ -25,7 +24,6 @@ import cudl.utils.VxmlElementType;
 class Executor {
 	private final WIPContext context;
 	private final InterpreterVariableDeclaration declaration;
-	private Properties dialogProperties;
 
 	// This contains what would hear by users
 	List<Prompt> prompts = new ArrayList<Prompt>();
@@ -56,7 +54,7 @@ class Executor {
 						InterpreterException, IOException {
 					String nodeValue = getNodeAttributeValue(node, "value");
 					declaration.evaluateScript("lastresult$[0].utterance ='"
-							+ nodeValue+"'",
+							+ nodeValue + "'",
 							InterpreterScriptContext.APPLICATION_SCOPE);
 					declaration.evaluateScript("lastresult$[0].inputmode ="
 							+ "'voice'",
@@ -184,7 +182,8 @@ class Executor {
 				@Override
 				public void execute(Node node) throws InterpreterException,
 						ScriptException, IOException {
-					// TODO: implement
+					System.err.println("return");
+				//	throw new ReturnException();
 				}
 			});
 			put("disconnect", new NodeExecutor() {
@@ -231,7 +230,6 @@ class Executor {
 					throw new FilledException(context.getSelectedFormItem());
 				}
 			});
-
 		}
 	};
 

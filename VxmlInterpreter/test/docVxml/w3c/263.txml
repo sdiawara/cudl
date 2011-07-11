@@ -21,6 +21,7 @@
   <form id="subtarget">
     <var name="result" expr="'passed'"/>
     <block>
+    <log>In subdialog</log>
       <return namelist="result"/>
     </block>
   </form>

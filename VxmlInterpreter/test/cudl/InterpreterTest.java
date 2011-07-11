@@ -57,6 +57,8 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "shelloExit.vxml");
 		interpreter.start();
 
+		System.err.println(traceLog);
+		System.err.println(interpreter.getTraceLog());
 		assertEquals(traceLog, interpreter.getTraceLog());
 		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
 		// assertTrue(interpreter.raccrochage());

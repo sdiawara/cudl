@@ -2,7 +2,7 @@ package cudl;
 
 import org.w3c.dom.Node;
 
-public class InterpreterException extends Exception {
+class InterpreterException extends Exception {
 	// Should'nt this class also have package visibility ?
 }
 
@@ -43,5 +43,13 @@ class SubmitException extends InterpreterException {
 
 	public SubmitException(String next) {
 		this.next = next;
+	}
+}
+
+class ReturnException extends Exception{
+	private final String namelist;
+
+	public ReturnException(String namelist) {
+		this.namelist = namelist;
 	}
 }

@@ -27,7 +27,7 @@ class WIPContext {
 	private URLConnection connection;
 	private String cookies;
 	private Object currentRootFileName;
-	private Object currentFileName;
+	private String currentFileName;
 	private Document rootDocument;
 	private Document currentdDocument;
 	private Node currentDialog;
@@ -36,6 +36,9 @@ class WIPContext {
 	private boolean hangup;
 	private List<Node> grammarActive;
 	private String next;
+	private boolean inSubdialog;
+	private Node lastDialog;
+	private boolean canExecuteFilled;
 
 	// String method;
 
@@ -63,7 +66,7 @@ class WIPContext {
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
 		NodeList dialogs = currentdDocument.getElementsByTagName("form");
-		if (/* url.contains("#") && !url.endsWith("#") */getNext() != null) {
+		if (getNext() != null) {
 			currentDialog = Utils.searchDialogByName(dialogs, getNext());
 		} else
 			currentDialog = dialogs.item(0);
@@ -97,13 +100,13 @@ class WIPContext {
 
 	private void declareDocumentScopeVariableIfNeed(String fileName)
 			throws ScriptException, IOException {
-		if (!fileName.equals(currentFileName)) {
+		if (!fileName.equals(getCurrentFileName())) {
 			declaration
 					.resetScopeBinding(InterpreterScriptContext.DOCUMENT_SCOPE);
 			NodeList childNodes = currentdDocument.getElementsByTagName("vxml")
 					.item(0).getChildNodes();
 			declareVariable(childNodes, InterpreterScriptContext.DOCUMENT_SCOPE);
-			currentFileName = Utils.tackWeelFormedUrl(location, fileName);
+			setCurrentFileName(Utils.tackWeelFormedUrl(location, fileName));
 		}
 	}
 
@@ -135,7 +138,6 @@ class WIPContext {
 
 	void setCurrentDialog(Node dialog) {
 		currentDialog = dialog;
-		// notifyObserver();
 	}
 
 	public boolean getCurrentChange() {
@@ -195,5 +197,37 @@ class WIPContext {
 
 	public String getNext() {
 		return next;
+	}
+
+	public boolean isInSubdialog() {
+		return inSubdialog;
+	}
+
+	public void setInSubdialog(boolean inSubdialog) {
+		this.inSubdialog = inSubdialog;
+	}
+
+	public Node getLastDialog() {
+		return lastDialog;
+	}
+
+	public void setLastDialog(Node lastDialog) {
+		this.lastDialog = lastDialog;
+	}
+
+	public void setCanExecuteFilled(boolean canExecuteFilled) {
+		this.canExecuteFilled = canExecuteFilled;
+	}
+
+	public boolean canExecuteFilled() {
+		return this.canExecuteFilled;
+	}
+
+	public void setCurrentFileName(String currentFileName) {
+		this.currentFileName = currentFileName;
+	}
+
+	public String getCurrentFileName() {
+		return currentFileName;
 	}
 }

@@ -21,6 +21,11 @@ public class Interpreter {
 
 	public void start() throws IOException, ScriptException, SAXException {
 		internalInterpreter.interpretDialog();
+		try {
+			internalInterpreter.mainLoop();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public List<String> getTracetWithLabel(String... label) {
@@ -40,11 +45,21 @@ public class Interpreter {
 	}
 
 	public void noInput() throws ScriptException, IOException, SAXException {
-		internalInterpreter.event("noinput");
+		try {
+			internalInterpreter.event("noinput");
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void noMatch() throws ScriptException, IOException, SAXException {
-		internalInterpreter.event("nomatch");
+		try {
+			internalInterpreter.event("nomatch");
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public String getTranferDestination() {
@@ -52,29 +67,54 @@ public class Interpreter {
 	}
 
 	public void noAnswer() throws ScriptException, IOException, SAXException {
-		internalInterpreter.noAnswer();
+		try {
+			internalInterpreter.noAnswer();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void talk(String sentence) throws UnsupportedEncodingException,
 			ScriptException, IOException, SAXException {
-		internalInterpreter.utterance("'"
-				+ URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "")
-				+ "'", "'voice'");
+		try {
+			internalInterpreter.utterance("'"
+					+ URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "")
+					+ "'", "'voice'");
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void push(String dtmf) throws ScriptException, IOException,
 			SAXException {
-		internalInterpreter.utterance("'" + dtmf.replaceAll(" ", "") + "'",
-				"'dtmf'");
+		try {
+			internalInterpreter.utterance("'" + dtmf.replaceAll(" ", "") + "'",
+					"'dtmf'");
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void disconnect() throws ScriptException, IOException, SAXException {
-		internalInterpreter.event("connection.disconnect.hangup");
+		try {
+			internalInterpreter.event("connection.disconnect.hangup");
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void callerHangup(int i) throws IOException, ScriptException,
 			SAXException {
-		internalInterpreter.callerHangup(i);
+		try {
+			internalInterpreter.callerHangup(i);
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public String getGrammarActive() {
@@ -88,32 +128,61 @@ public class Interpreter {
 
 	public void blindTransferSuccess() throws ScriptException, IOException,
 			SAXException {
-		internalInterpreter.blindTransferSuccess();
+		try {
+			internalInterpreter.blindTransferSuccess();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void destinationHangup() throws ScriptException, IOException,
 			SAXException {
-		internalInterpreter.destinationHangup();
-
+		try {
+			internalInterpreter.destinationHangup();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void callerHangDestination() throws ScriptException, IOException,
 			SAXException {
-		internalInterpreter.callerHangDestination();
+		try {
+			internalInterpreter.callerHangDestination();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void maxTimeDisconnect() throws ScriptException, IOException,
 			SAXException {
-		internalInterpreter.maxTimeDisconnect();
+		try {
+			internalInterpreter.maxTimeDisconnect();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void destinationBusy() throws ScriptException, IOException,
 			SAXException {
-		internalInterpreter.destinationBusy();
+		try {
+			internalInterpreter.destinationBusy();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void networkBusy() throws ScriptException, IOException, SAXException {
-		internalInterpreter.networkBusy();
+		try {
+			internalInterpreter.networkBusy();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

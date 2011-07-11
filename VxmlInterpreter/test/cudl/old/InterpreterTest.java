@@ -173,13 +173,4 @@ public class InterpreterTest extends TestCase {
 		assertFalse(interpreter.getTraceLog().isEmpty());
 		assertEquals(expectedLogs, interpreter.getTraceLog());
 	}
-
-	@Test
-	public void testsayTarifOn3900() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
-		interpreter = new Interpreter("http://devdix-3900p.ipp93.cvf/index.jsp");
-		interpreter.start();
-		System.err.println(interpreter.getPrompts());
-		
-	}
 }

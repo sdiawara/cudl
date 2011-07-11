@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+ 
+ 
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event" />
+  </catch>
+
+  
+  <form id="subtarget">
+  
+
+    <catch event="error.semantic">
+      <conf:pass/>
+    </catch>
+  
+    <block>
+    
+      <if cond="docvar!=undefined">
+        <conf:fail expr="'Variables from calling document are accessible, but should not be.'"/>
+      <elseif cond="dialogvar!=undefined"/>
+        <conf:fail expr="'Variables from calling dialog are accessible, but should not be.'"/>
+      <else/>
+        <conf:pass/>
+      </if>
+      <return/>
+    </block>
+  </form>
+
+</vxml>

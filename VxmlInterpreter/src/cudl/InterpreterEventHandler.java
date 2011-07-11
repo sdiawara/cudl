@@ -14,21 +14,19 @@ import org.xml.sax.SAXException;
 
 import cudl.event.InterpreterEvent;
 
-public class InterpreterEventHandler implements InterpreterListener {
+class InterpreterEventHandler implements InterpreterListener {
 	private Map<String, Integer> eventCounter = new Hashtable<String, Integer>();
 	private final WIPContext context;
 
-	public InterpreterEventHandler(WIPContext context) {
+InterpreterEventHandler(WIPContext context) {
 		this.context = context;
 	}
-
+  
 	@Override
-	public void doEvent(InterpreterEvent interpreterEvent, Executor executor)
+public void doEvent(InterpreterEvent interpreterEvent, Executor executor)
 			throws ScriptException, IOException, SAXException,
 			InterpreterException {
 
-		InternalInterpreter source = (InternalInterpreter) interpreterEvent
-				.getSource();
 		String type = interpreterEvent.type;
 		eventCounter.put(type, (eventCounter.get(type) == null) ? 1
 				: eventCounter.get(type) + 1);

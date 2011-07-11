@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 85: 
+  A subdialog can be a new dialog within the existing document. -->
+
+  <catch>
+    <conf:fail expr="'unexpected error: '+ _event" />
+  </catch>
+
+  <form>
+    <subdialog name="sd" src="#sub" />
+    <block>
+      <conf:pass/>
+    </block>
+  </form>
+
+  <form id="sub">
+    <block>
+      <return />
+    </block>
+  </form>
+</vxml>
+

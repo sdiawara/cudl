@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 86: 
+  A subdialog can be a new dialog within a new document. -->
+
+  <catch>
+    <conf:fail expr="'a86-2 had unexpected error: '+ _event" />
+  </catch>
+
+  <form>
+    <block>
+      <return />
+    </block>
+  </form>
+</vxml>
+

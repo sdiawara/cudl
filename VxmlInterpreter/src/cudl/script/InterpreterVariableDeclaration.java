@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -22,8 +20,6 @@ import cudl.utils.RemoteFileAccess;
 import cudl.utils.SessionFileCreator;
 
 public class InterpreterVariableDeclaration {
-	// private Map<Node, String> dialogItemName;
-	private int anonymeNameCount = 0;
 	private ScriptEngineManager manager;
 	private ScriptEngine engine;
 	private InterpreterScriptContext context;

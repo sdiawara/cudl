@@ -14,9 +14,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.script.ScriptException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
@@ -31,7 +33,7 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 	private String gotoNextItem;
 	private boolean lastIteraionEndWithGotoNextItem;
 	private Map<Node, String> formItemNames = new LinkedHashMap<Node, String>();
-	private boolean reprompt;
+
 	Executor executor;
 
 	FormInterpreationAlgorithm(WIPContext context,
@@ -42,7 +44,6 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 	}
 
 	void initializeDialog(Node dialog) throws ScriptException, IOException {
-		context.setCurrentDialog(dialog);
 		form_item_generated = 0;
 		lastIteraionEndWithGotoNextItem = false;
 		formItemNames.clear();
@@ -83,7 +84,8 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 		}
 	}
 
-	void mainLoop() throws ScriptException, IOException, InterpreterException {
+	void mainLoop() throws ScriptException, IOException, InterpreterException,
+			ParserConfigurationException, SAXException {
 		while (true) {
 			// PHASE SELECT
 			Node formItem = selectNextFormItem();
@@ -92,32 +94,53 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 				break;
 			}
 			context.setSelectedFormItem(formItem);
+
 			// Mettre en file d'attente les invites de l'élément de formulaire.
-			List<Node> promptsQueue = new ArrayList<Node>();
-			NodeList childNodes = formItem.getChildNodes();
-			if (isInputItem(formItem) || "initial".equals(getName(formItem))) {
-				if (reprompt && !context.getCurrentChange()) {
-					// NodeList childNodes = childNodes;
-					promptsQueue = selectedPrompt(formItem, childNodes);
-					promptCounter.put(formItemNames.get(formItem),
-							(promptCounter.get(formItem) + 1));
-				}
-			}
+			// List<Node> promptsQueue = new ArrayList<Node>();
+			// NodeList childNodes = formItem.getChildNodes();
+			// if (isInputItem(formItem) || "initial".equals(getName(formItem)))
+			// {
+			// if (reprompt && !context.getCurrentChange()) {
+			// // NodeList childNodes = childNodes;
+			// promptsQueue = selectedPrompt(formItem, childNodes);
+			// promptCounter.put(formItemNames.get(formItem),
+			// (promptCounter.get(formItem) + 1));
+			// }
+			// }
 
 			// Activer les grammaires de l'élément de formulaire.
 
 			activateGrammar();
 
 			// Exécuter l'élément de formulaire.
-			if ("transfer".equals(getName(formItem))) {
+			if ("subdialog".equals(getName(formItem))) {
+				String src = getNodeAttributeValue(formItem, "src");
+				if (src != null) {
+					InternalInterpreter internalInterpreter = new InternalInterpreter(
+							context.getCurrentFileName());
+					System.err.println("locatio sub " + context.getLocation()
+							+ "\t" + context.getCurrentFileName());
+					setSubdialogRequierement(src, internalInterpreter);
+
+					internalInterpreter.interpretDialog();
+					internalInterpreter.mainLoop();
+				}
+				declaration.evaluateScript(formItemNames.get(formItem)
+						+ "=new Object();" + formItemNames.get(formItem)
+						+ ".result ='passed'",
+						InterpreterScriptContext.DIALOG_SCOPE);
+				Node filled = Utils.serachItem(formItem, "filled");
+
+				if (filled != null)
+					executor.execute(filled);
+
+			} else if ("transfer".equals(getName(formItem))) {
 				String dest = getNodeAttributeValue(formItem, "dest");
 				String destExpr = getNodeAttributeValue(formItem, "destexpr");
 				context.setTransfertDestination((dest != null) ? dest
 						: declaration.evaluateScript(destExpr, 50) + "");
 				throw new TransferException();
 			} else if ("field".equals(getName(formItem))) {
-				// playPrompts(childNodes);
-				// throw new FilledException(formItem);
 				executor.execute(formItem);
 			} else if ("block".equals(getName(formItem))) {
 				declaration.setValue(formItemNames.get(formItem), "true",
@@ -148,6 +171,18 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 						+ " non traité");
 			}
 		}
+	}
+
+	private void setSubdialogRequierement(String src,
+			InternalInterpreter internalInterpreter) throws ScriptException,
+			IOException, SAXException {
+		if (src.contains("#"))
+			internalInterpreter.getContext().setCurrentDialog(
+					Utils.searchDialogByName(context.getCurrentDialog()
+							.getParentNode().getChildNodes(), src.replaceAll(
+							"#", "")));
+		else
+			internalInterpreter.getContext().buildDocument(src);
 	}
 
 	void Process() {
@@ -199,23 +234,23 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 		return executor.prompts;
 	}
 
-	private List<Node> selectedPrompt(Node formItem, NodeList childNodes) {
-		List<Node> promptsQueue = new ArrayList<Node>();
-		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node item = childNodes.item(i);
-			if ("prompt".equals(getName(item))) {
-				String countAtt = getNodeAttributeValue(item, "count");
-				if (countAtt != null
-						&& Integer.parseInt(countAtt) <= promptCounter
-								.get(formItemNames.get(formItem))) {
-					promptsQueue.add(item);
-				} else if (countAtt == null) {
-					promptsQueue.add(item);
-				}
-			}
-		}
-		return promptsQueue;
-	}
+	// private List<Node> selectedPrompt(Node formItem, NodeList childNodes) {
+	// List<Node> promptsQueue = new ArrayList<Node>();
+	// for (int i = 0; i < childNodes.getLength(); i++) {
+	// Node item = childNodes.item(i);
+	// if ("prompt".equals(getName(item))) {
+	// String countAtt = getNodeAttributeValue(item, "count");
+	// if (countAtt != null
+	// && Integer.parseInt(countAtt) <= promptCounter
+	// .get(formItemNames.get(formItem))) {
+	// promptsQueue.add(item);
+	// } else if (countAtt == null) {
+	// promptsQueue.add(item);
+	// }
+	// }
+	// }
+	// return promptsQueue;
+	// }
 
 	private void activateGrammar() {
 		List<Node> grammarActive = new ArrayList<Node>();
@@ -241,7 +276,7 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 		return child.getNodeName();
 	}
 
-	public String getFormItemName(Node selectedFormItem) {
+	String getFormItemName(Node selectedFormItem) {
 		return formItemNames.get(selectedFormItem);
 	}
 }

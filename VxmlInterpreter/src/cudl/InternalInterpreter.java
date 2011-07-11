@@ -21,11 +21,10 @@ import cudl.script.DefaultInterpreterScriptContext;
 import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
 
-public class InternalInterpreter {
+class InternalInterpreter {
 	private InterpreterVariableDeclaration declaration;
 	private Properties dialogProperties = new Properties();
 	private boolean hangup;
-
 	private FormInterpreationAlgorithm fia;
 	private WIPContext context;
 	private InterpreterEventHandler interpreterListener;
@@ -40,10 +39,9 @@ public class InternalInterpreter {
 	void interpretDialog() throws ScriptException, IOException, SAXException {
 		fia = new FormInterpreationAlgorithm(context, declaration);
 		fia.initializeDialog(context.getCurrentDialog());
-		mainLoop();
 	}
 
-	private void mainLoop() throws ScriptException, IOException, SAXException {
+	void mainLoop() throws ScriptException, IOException, SAXException, ParserConfigurationException {
 		try {
 			fia.mainLoop();
 		} catch (GotoException e) {
@@ -51,7 +49,7 @@ public class InternalInterpreter {
 			fia.initializeDialog(context.getCurrentDialog());
 			mainLoop();
 		} catch (SubmitException e) {
-			System.err.println("submmit "+e.next);
+			System.err.println("submmit " + e.next);
 			context.buildDocument(e.next);
 			fia.initializeDialog(context.getCurrentDialog());
 			mainLoop();
@@ -63,12 +61,12 @@ public class InternalInterpreter {
 				executionHandler(e1);
 			}
 		} catch (InterpreterException e) {
-			System.err.println(e.getClass() + "++=======");
+			System.err.println(e.getClass() + "INGNORE");
 		}
 	}
 
 	void blindTransferSuccess() throws ScriptException, IOException,
-			SAXException {
+			SAXException, ParserConfigurationException {
 		try {
 			interpreterListener.doEvent(new InterpreterEvent(this,
 					"connection.disconnect.transfer"), fia.executor);
@@ -77,7 +75,7 @@ public class InternalInterpreter {
 		}
 	}
 
-	void destinationHangup() throws ScriptException, IOException, SAXException {
+	void destinationHangup() throws ScriptException, IOException, SAXException, ParserConfigurationException {
 		declaration.setValue(
 				fia.getFormItemName(context.getSelectedFormItem()),
 				"'far_end_disconnect'",
@@ -86,7 +84,7 @@ public class InternalInterpreter {
 	}
 
 	void callerHangDestination() throws ScriptException, IOException,
-			SAXException {
+			SAXException, ParserConfigurationException {
 		try {
 			setTransferResultAndExecute("'near_end_disconnect'");
 		} catch (InterpreterException e) {
@@ -104,7 +102,7 @@ public class InternalInterpreter {
 	}
 
 	void event(String eventType) throws ScriptException, IOException,
-			SAXException {
+			SAXException, ParserConfigurationException {
 		try {
 			interpreterListener.doEvent(new InterpreterEvent(this, eventType),
 					fia.executor);
@@ -114,7 +112,7 @@ public class InternalInterpreter {
 	}
 
 	private void executionHandler(InterpreterException e)
-			throws ScriptException, IOException, SAXException {
+			throws ScriptException, IOException, SAXException, ParserConfigurationException {
 
 		if (e instanceof GotoException) {
 			declaration
@@ -124,14 +122,12 @@ public class InternalInterpreter {
 			mainLoop();
 		} else if (e instanceof SubmitException) {
 			context.buildDocument(((SubmitException) e).next);
-			System.err.println("current submit dialog"
-					+ context.getCurrentDialog());
 			fia.initializeDialog(context.getCurrentDialog());
 			mainLoop();
 		}
 	}
 
-	void callerHangup(int i) throws ScriptException, IOException, SAXException {
+	void callerHangup(int i) throws ScriptException, IOException, SAXException, ParserConfigurationException {
 		declaration.evaluateScript(
 				"connection.protocol.isdnvn6.transferresult= '" + i + "'",
 				DefaultInterpreterScriptContext.SESSION_SCOPE);
@@ -143,7 +139,7 @@ public class InternalInterpreter {
 		}
 	}
 
-	void noAnswer() throws ScriptException, IOException, SAXException {
+	void noAnswer() throws ScriptException, IOException, SAXException, ParserConfigurationException {
 		declaration.evaluateScript(
 				"connection.protocol.isdnvn6.transferresult= '2'",
 				DefaultInterpreterScriptContext.SESSION_SCOPE);
@@ -153,10 +149,6 @@ public class InternalInterpreter {
 			executionHandler(e);
 		}
 	}
-
-	// private boolean isBlindTransfer(Node node) {
-	// return !Boolean.parseBoolean(getNodeAttributeValue(node, "bridge"));
-	// }
 
 	List<String> getTraceLog() {
 		List<String> labeledLog = new ArrayList<String>();
@@ -231,7 +223,7 @@ public class InternalInterpreter {
 	}
 
 	void utterance(String string, String string2) throws ScriptException,
-			IOException, SAXException {
+			IOException, SAXException, ParserConfigurationException {
 		declaration.evaluateScript("lastresult$[0].utterance =" + string,
 				InterpreterScriptContext.APPLICATION_SCOPE);
 		declaration.evaluateScript("lastresult$[0].inputmode =" + string2,
@@ -248,7 +240,6 @@ public class InternalInterpreter {
 		this.dialogProperties = currentDialogProperties;
 	}
 
-	// FIXME: add well management
 	Properties getCurrentDialogProperties() {
 		collectDialogProperty(context.getSelectedFormItem().getParentNode()
 				.getChildNodes());
@@ -256,7 +247,7 @@ public class InternalInterpreter {
 		return dialogProperties;
 	}
 
-	void maxTimeDisconnect() throws ScriptException, IOException, SAXException {
+	void maxTimeDisconnect() throws ScriptException, IOException, SAXException, ParserConfigurationException {
 		try {
 			setTransferResultAndExecute("'maxtime_disconnect'");
 		} catch (InterpreterException e) {
@@ -264,7 +255,7 @@ public class InternalInterpreter {
 		}
 	}
 
-	void destinationBusy() throws ScriptException, IOException, SAXException {
+	void destinationBusy() throws ScriptException, IOException, SAXException, ParserConfigurationException {
 		try {
 			setTransferResultAndExecute("'busy'");
 		} catch (InterpreterException e) {
@@ -272,7 +263,7 @@ public class InternalInterpreter {
 		}
 	}
 
-	void networkBusy() throws ScriptException, SAXException, IOException {
+	void networkBusy() throws ScriptException, SAXException, IOException, ParserConfigurationException {
 		try {
 			setTransferResultAndExecute("'network_busy'");
 		} catch (InterpreterException e) {

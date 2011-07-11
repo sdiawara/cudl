@@ -17,6 +17,7 @@
   <form id="f2">
     <block>
       <conf:comment>In subdialog</conf:comment>
+      <log>In subdialog</log>
       <return/>
     </block>
   </form>
