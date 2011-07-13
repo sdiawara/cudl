@@ -344,6 +344,25 @@ public class W3cInterpreterTest {
 			// attribute which is ignored.
 			// FIXME: implement param and continue ....
 			add("w3c/subdialog268.txml");
+
+			// If the subdialog returns a namelist, the filled element contained
+			// by the subdialog is executed upon return from the subdialog.
+			add("w3c/subdialog271.txml");
+
+			// ====== > add OTHER Sidialog test
+
+			// When is contained in a element, the values specified by it are
+			// used to initialize dialog elements in the subdialog that is
+			// invoked.
+			add("w3c/612.txml");
+
+			// When the attribute evaluates to false, the interpreter does not
+			// execute the element or its contents.
+			add("w3c/614.txml");
+
+			// Subdialog results are accessed through properties of the variable
+			// defined by the name attribute of the subdialog element.
+			add("w3c/a654-driver.txml");
 		}
 
 	};

@@ -196,12 +196,13 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 				String name = getNodeAttributeValue(item, "name");
 				String value = getNodeAttributeValue(item, "expr");
 				internalInterpreter.getContext().addParam(name);
+				System.err.println("Param "+name+"\t"+declaration.evaluateScript(value,50));
 				internalInterpreter
 						.getContext()
 						.getDeclaration()
 						.declareVariable(
 								name,
-								value,
+								"'"+declaration.evaluateScript(value,50)+"'",
 								InterpreterScriptContext.ANONYME_SCOPE);
 			}
 		}

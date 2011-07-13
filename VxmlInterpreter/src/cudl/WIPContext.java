@@ -119,7 +119,6 @@ class WIPContext {
 			throws ScriptException, MalformedURLException, IOException {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node child = childNodes.item(i);
-			System.err.println(child.getNodeName());
 			if (child.getNodeName().equals("var")) {
 				String name = Utils.getNodeAttributeValue(child, "name");
 				String value = Utils.getNodeAttributeValue(child, "expr");

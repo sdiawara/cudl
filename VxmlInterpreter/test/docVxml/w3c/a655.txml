@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+<!--
+ Assertion 655 Section 1.5.2
+ If subdialog execution is transferred to another subdialog using goto,
+ when the second dialog returns, control is returned directly to the dialog.
+
+ Web requirements:
+ none
+
+ a655.txml
+   Invoke a subdialog, a655a, which in turn will transfer to a second document using a goto
+   and the passed URI.  If the correct dialog was transferred to from the goto, when
+   control is returned from the second document, serveral return properties should be set
+   on the subdialog form item variable..  These properties are tested.
+ a655a.txml
+   a short subdialog which does a goto to the passed target: a655b.txml#a655
+ a655b.txml
+   a short document which does a return from dialog a655, hopefully to this document (a655.txml).
+
+ @author Dan Evans dde@nortelnetworks.com
+ @version 1.0, 01/06/2003
+-->
+<catch>
+  <conf:fail expr="'unexpected error: ' + _event"/>
+</catch>
+<form id="a655">
+  <var name="a655"/>
+  <var name="target" expr="'a655b.txml#a655'"/>
+  <block>
+    <assign name="a655" expr="target"/>
+  </block>
+  <subdialog name="sb1" src="a655a.txml">
+    <param name="a655" expr ="a655"/>
+  </subdialog>
+  <block>
+    <if cond="a655 != target">
+      <conf:fail reason="one"/>
+    </if>
+    <if cond="!sb1.a655a">
+      <conf:fail reason="two"/>
+    </if>
+    <if cond="!sb1.a655b">
+      <conf:fail reason="three"/>
+    </if>
+    <conf:pass/>
+  </block>
+</form>
+</vxml>

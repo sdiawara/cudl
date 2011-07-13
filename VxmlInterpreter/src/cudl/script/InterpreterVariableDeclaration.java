@@ -79,7 +79,6 @@ public class InterpreterVariableDeclaration {
 
 	public void declareVariable(String name, String value, int scope)
 			throws ScriptException {
-		System.err.println(name + "   =" + value + scope);
 		getBindings(scope).put(name,
 				engine.eval(getReplaceBindingName(value), context));
 	}
@@ -109,17 +108,13 @@ public class InterpreterVariableDeclaration {
 
 	public Object evaluateScript(String script, int scope)
 			throws ScriptException {
-		System.err.println(script + "=== "
-				+ engine.eval(getReplaceBindingName(script), context) + "");
 		return engine.eval(getReplaceBindingName(script), context) + "";
 	}
 
 	public void setValue(String name, String value, int scope)
 			throws ScriptException {
-		System.err.println("set " + name + "= " + value + " scope =" + scope);
 		String realvalue = engine.eval(getReplaceBindingName(value), context)
 				+ "";
-		System.err.println("realvalue =" + realvalue);
 		getBindings(scope).put(name,
 				realvalue == null ? "undefined" : realvalue);
 	}
@@ -131,8 +126,6 @@ public class InterpreterVariableDeclaration {
 	}
 
 	public void resetScopeBinding(int scope) {
-		System.err.println("clear scope " + getScopeName(scope) + " scope="
-				+ scope);
 		if (scope <= 90)
 			getBindings(scope).clear();
 		try {
@@ -183,7 +176,6 @@ public class InterpreterVariableDeclaration {
 	public Object evaluateFileScript(String fileName, int scope)
 			throws ScriptException, IOException {
 		File remoteFile = RemoteFileAccess.getRemoteFile(fileName);
-		System.err.println(remoteFile.getCanonicalPath());
 		return engine.eval(new FileReader(remoteFile), context);
 	}
 }

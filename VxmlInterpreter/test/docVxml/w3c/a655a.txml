@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+<!--
+ Assertion 655 Section 1.5.2
+ If subdialog execution is transferred to another subdialog using goto,
+ when the second dialog returns, control is returned directly to the dialog.
+
+ See a655.txml
+   
+ a655a.txml (this document)
+   a short subdialog which does a goto to a655b.txml
+
+ @author Dan Evans dde@nortelnetworks.com
+ @version 1.0, 01/06/2003
+-->
+<catch>
+  <conf:fail expr="'unexpected error: ' + _event"/>
+</catch>
+<form id="a655a">
+  <var name="a655"/>
+  <block>
+    <goto expr="a655"/>
+  </block>
+</form>
+</vxml>

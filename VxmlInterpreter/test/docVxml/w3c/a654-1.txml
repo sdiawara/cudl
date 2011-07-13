@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+<!-- Assertion 654: 
+  Subdialog results are accessed through properties of the 
+  variable defined by the name attribute of the subdialog element. -->
+
+  <catch>
+    <conf:fail expr="'a654-1 had unexpected error: '+ _event" />
+  </catch>
+
+  <form>
+    <subdialog name="sd" src="a654-2.txml" />
+    <block>
+      <if cond="sd.a==1">
+        <conf:pass/>
+      <else/>
+        <conf:fail expr="'unexpected values for sd property: '+ sd.a" />
+      </if>
+    </block>
+  </form>
+</vxml>
+
