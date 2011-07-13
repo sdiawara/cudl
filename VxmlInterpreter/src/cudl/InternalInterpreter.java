@@ -24,7 +24,6 @@ import cudl.script.InterpreterVariableDeclaration;
 class InternalInterpreter {
 	private InterpreterVariableDeclaration declaration;
 	private Properties dialogProperties = new Properties();
-	private boolean hangup;
 	private FormInterpreationAlgorithm fia;
 	private WIPContext context;
 	private InterpreterEventHandler interpreterListener;
@@ -219,7 +218,6 @@ class InternalInterpreter {
 				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
-
 	}
 
 	void utterance(String string, String string2) throws ScriptException,
@@ -269,10 +267,6 @@ class InternalInterpreter {
 		} catch (InterpreterException e) {
 			executionHandler(e);
 		}
-	}
-
-	boolean raccrochage() {
-		return hangup;
 	}
 
 	public WIPContext getContext() {

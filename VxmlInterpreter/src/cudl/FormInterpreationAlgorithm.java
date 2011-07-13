@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import javax.script.ScriptException;
@@ -114,30 +115,41 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 			// Exécuter l'élément de formulaire.
 			if ("subdialog".equals(getName(formItem))) {
 				String src = getNodeAttributeValue(formItem, "src");
-				InternalInterpreter internalInterpreter;
+				InternalInterpreter internalInterpreter = null;
 				if (src != null) {
-					internalInterpreter = new InternalInterpreter(
-							context.getCurrentFileName());
+					internalInterpreter = new InternalInterpreter(context
+							.getCurrentFileName());
 					System.err.println("locatio sub " + context.getLocation()
 							+ "\t" + context.getCurrentFileName());
 					setSubdialogRequierement(src, internalInterpreter);
 
 					internalInterpreter.interpretDialog();
 					internalInterpreter.mainLoop();
-					//FIXME: add log
+					// FIXME: add log
 					executor.prompts.addAll(internalInterpreter.getPrompts());
 				}
-				//FIXME: implement return 
 				declaration.evaluateScript(formItemNames.get(formItem)
-						+ "=new Object();" + formItemNames.get(formItem)
-						+ ".result ='passed'",
+						+ "=new Object();",
 						InterpreterScriptContext.DIALOG_SCOPE);
-				
-				
+				if (internalInterpreter != null) {
+					String returnValue = internalInterpreter.getContext()
+							.getReturnValue();
+					System.err.println("return value"+returnValue);
+					StringTokenizer tokenizer = new StringTokenizer(returnValue);
+					while (tokenizer.hasMoreElements()) {
+						String variable = tokenizer.nextToken();
+						InterpreterVariableDeclaration declaration2 = internalInterpreter
+								.getContext().getDeclaration();
+						declaration.evaluateScript(formItemNames.get(formItem)
+								+ "." + variable + "='"
+								+ declaration2.getValue(variable) + "'",
+								InterpreterScriptContext.ANONYME_SCOPE);
+					}
+				}
+
 				Node filled = Utils.serachItem(formItem, "filled");
 				if (filled != null)
 					executor.execute(filled);
-
 			} else if ("transfer".equals(getName(formItem))) {
 				String dest = getNodeAttributeValue(formItem, "dest");
 				String destExpr = getNodeAttributeValue(formItem, "destexpr");
@@ -259,7 +271,6 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 			if (VxmlElementType.isAModalItem(context.getSelectedFormItem())) {
 				grammarActive.add(Utils.serachItem(context
 						.getSelectedFormItem(), "grammar"));
-				System.err.println("modal" + grammarActive.size());
 			} else {
 				Node parent = context.getSelectedFormItem();
 				while (null != parent) {

@@ -47,9 +47,9 @@ class SubmitException extends InterpreterException {
 }
 
 class ReturnException extends Exception{
-	private final String namelist;
+	public final String namelist;
 
 	public ReturnException(String namelist) {
-		this.namelist = namelist;
+		this.namelist = namelist == null ?"":namelist;
 	}
 }

@@ -18,12 +18,12 @@ class InterpreterEventHandler implements InterpreterListener {
 	private Map<String, Integer> eventCounter = new Hashtable<String, Integer>();
 	private final WIPContext context;
 
-InterpreterEventHandler(WIPContext context) {
+	InterpreterEventHandler(WIPContext context) {
 		this.context = context;
 	}
-  
+
 	@Override
-public void doEvent(InterpreterEvent interpreterEvent, Executor executor)
+	public void doEvent(InterpreterEvent interpreterEvent, Executor executor)
 			throws ScriptException, IOException, SAXException,
 			InterpreterException {
 
@@ -41,7 +41,7 @@ public void doEvent(InterpreterEvent interpreterEvent, Executor executor)
 
 		// FIXME: take the first with a correct event counter
 		// a counter who is ≤ at currentCounter
-		System.err.println(catchList);
+		// System.err.println(catchList);
 		executor.execute(catchList.get(0));
 	}
 

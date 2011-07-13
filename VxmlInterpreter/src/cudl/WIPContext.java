@@ -39,6 +39,7 @@ class WIPContext {
 	private boolean inSubdialog;
 	private Node lastDialog;
 	private boolean canExecuteFilled;
+	private String returnValue ="";
 
 	// String method;
 
@@ -229,5 +230,13 @@ class WIPContext {
 
 	public String getCurrentFileName() {
 		return currentFileName;
+	}
+
+	public void setReturnValue(String returnValue) {
+		this.returnValue = returnValue;
+	}
+
+	public String getReturnValue() {
+		return returnValue;
 	}
 }

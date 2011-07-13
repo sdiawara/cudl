@@ -24,9 +24,9 @@ public class W3cInterpreterTest {
 	private List<String> fileNames = new ArrayList<String>() {
 		{
 			/*
-			* These test file is from
-			* http://www.w3.org/Voice/2004/vxml-ir/#test_api
-			*/
+			 * These test file is from
+			 * http://www.w3.org/Voice/2004/vxml-ir/#test_api
+			 */
 
 			// The interpreter must be able to freely sequence TTS and audio
 			// output.
@@ -343,7 +343,7 @@ public class W3cInterpreterTest {
 			// subdialog. A <param> overrides the corresponding <var> expr
 			// attribute which is ignored.
 			// FIXME: implement param and continue ....
-			// add("w3c/subdialog268.txml");
+			add("w3c/subdialog268.txml");
 		}
 
 	};

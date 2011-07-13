@@ -9,5 +9,5 @@ import org.w3c.dom.Node;
 
 public interface NodeExecutor {
 	public void execute(Node node) throws InterpreterException,
-			ScriptException, IOException;
+			ScriptException, IOException, ReturnException;
 }

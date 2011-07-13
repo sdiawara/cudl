@@ -37,7 +37,6 @@ class Executor {
 					Prompt prompt = new Prompt();
 					prompt.tts = "pass";
 					prompts.add(prompt);
-					System.err.println("loll");
 					throw new ExitException();
 				}
 			});
@@ -109,7 +108,7 @@ class Executor {
 
 			put("if", new NodeExecutor() {
 				public void execute(Node node) throws InterpreterException,
-						ScriptException, IOException {
+						ScriptException, IOException, ReturnException {
 					checkConditionAndExecute(node);
 				}
 			});
@@ -181,9 +180,9 @@ class Executor {
 			put("return", new NodeExecutor() {
 				@Override
 				public void execute(Node node) throws InterpreterException,
-						ScriptException, IOException {
+						ScriptException, IOException, ReturnException {
 					System.err.println("return");
-				//	throw new ReturnException();
+					throw new ReturnException(getNodeAttributeValue(node, "namelist"));
 				}
 			});
 			put("disconnect", new NodeExecutor() {
@@ -245,7 +244,12 @@ class Executor {
 			Node node1 = child.item(i);
 			NodeExecutor executor = nodeExecutors.get(node1.getNodeName());
 			if (null != executor) {
-				executor.execute(node1);
+				try {
+					executor.execute(node1);
+				} catch (ReturnException e) {
+					context.setReturnValue(e.namelist);	
+					return;
+				}
 			}
 		}
 		declaration.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
@@ -281,7 +285,7 @@ class Executor {
 	}
 
 	private void checkConditionAndExecute(Node node)
-			throws InterpreterException, ScriptException, IOException {
+			throws InterpreterException, ScriptException, IOException, ReturnException {
 		boolean conditionChecked = this.checkCond(node);
 		NodeList childs = node.getChildNodes();
 
@@ -294,6 +298,7 @@ class Executor {
 							.getNodeName());
 					if (nodeExecutor != null)
 						nodeExecutor.execute(item);
+					
 				}
 			} else if (VxmlElementType.isConditionalItem(item)) {
 				if (conditionChecked) {
