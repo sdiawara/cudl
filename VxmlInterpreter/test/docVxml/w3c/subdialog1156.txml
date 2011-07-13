@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" application="subdialog1156root.txml"
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  
+  <var name="docvar" expr="'3'"/>
+  <form>
+
+    <catch>
+      <conf:fail expr="'catch-all caught ' + _event" />
+    </catch>
+
+    
+    <subdialog name="subtest" src="#subtarget"/>
+    
+    <block>
+      <if cond="docvar==3 &amp;&amp; approotvar=='initialapprootvar' ">
+  <conf:pass/>
+      <else/>                      
+        <conf:fail reason="Subdialog context variable bindings still exist."/>
+      </if>
+    </block>
+
+  </form>
+  
+  <form id="subtarget">
+  
+    <block>
+      <assign name="docvar" expr="docvar+2"/>
+      <assign name="approotvar" expr="'newapprootvar'"/>
+      <return/>
+    </block>
+
+  </form>
+
+</vxml>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+<!--
+ Assertion 656 Section 1.5.3
+ If subdialog execution calls a second subdialog execution, when the second dialog returns,
+ control is returned directly to the calling subdialog dialog.
+
+ See a656.txml
+   
+ a656a.txml (this document)
+   a short subdialog which invokes another subdialog a656b.txml
+
+ @author Dan Evans dde@nortelnetworks.com
+ @version 1.0, 01/06/2003
+-->
+<catch>
+  <conf:fail expr="'unexpected error: ' + _event"/>
+</catch>
+<form id="a656a">
+  <var name="a656"/>
+  <var name="a656a"/>
+  <var name="a656b"/>
+  <subdialog name="sb2" srcexpr="a656">
+  </subdialog>
+  <block>
+    <assign name="a656a" expr="true"/>
+    <assign name="a656b" expr="sb2.a656b"/>
+    <return namelist="a656a a656b"/>
+  </block>
+</form>
+</vxml>

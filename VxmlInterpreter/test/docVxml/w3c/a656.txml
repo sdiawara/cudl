@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+<!--
+ Assertion 656 Section 1.5.3
+ If subdialog execution calls a second subdialog execution, when the second dialog returns,
+ control is returned directly to the calling subdialog dialog.
+
+ Web requirements:
+ none
+
+ a656.txml
+   Invoke a subdialog, a656a, which in turn will invoke a second subdialog using 
+   the passed URI.  If the correct dialog was transferred to from the goto, when
+   control is returned from the second document, serveral return properties should be set
+   on the subdialog form item variable..  These properties are tested.
+ a656a.txml
+   a short subdialog which does a goto to the passed target: a656b.txml
+ a656b.txml
+   a short document which does a return to dialog a656a, and then to this document (a656.txml).
+
+ @author Dan Evans dde@nortelnetworks.com
+ @version 1.0, 01/06/2003
+-->
+<catch>
+  <conf:fail expr="'unexpected error: ' + _event"/>
+</catch>
+<form id="a656">
+  <var name="a656"/>
+  <var name="target" expr="'a656b.txml'"/>
+  <block>
+    <assign name="a656" expr="target"/>
+  </block>
+  <subdialog name="sb1" src="a656a.txml">
+    <param name="a656" expr ="a656"/>
+  </subdialog>
+  <block>
+    <if cond="a656 != target">
+      <conf:fail reason="one"/>
+    </if>
+    <if cond="!sb1.a656a">
+      <conf:fail reason="two"/>
+    </if>
+    <if cond="!sb1.a656b">
+      <conf:fail reason="three"/>
+    </if>
+    <conf:pass/>
+  </block>
+</form>
+</vxml>

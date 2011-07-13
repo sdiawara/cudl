@@ -363,6 +363,25 @@ public class W3cInterpreterTest {
 			// Subdialog results are accessed through properties of the variable
 			// defined by the name attribute of the subdialog element.
 			add("w3c/a654-driver.txml");
+
+			// If subdialog execution calls a second subdialog execution, when
+			// the second dialog returns, control is returned directly to the
+			// calling subdialog dialog.
+			add("w3c/a656.txml");
+
+			// The input item subdialog may contain the filled element. Filled
+			// elements contain an action to execute after the result input item
+			// variable is filled in.
+			add("w3c/1038.txml");
+
+			// When the subdialog returns, its execution context is deleted. All
+			// subdialog context variable bindings are lost.
+			add("w3c/subdialog1156.txml");
+
+			// When there is no fragment, the subdialog invoked is the lexically
+			// first dialog in the document.
+			add("w3c/subdialog1158main.txml");
+
 		}
 
 	};
