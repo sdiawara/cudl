@@ -119,10 +119,9 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 				if (src != null) {
 					internalInterpreter = new InternalInterpreter(context
 							.getCurrentFileName());
-					System.err.println("locatio sub " + context.getLocation()
-							+ "\t" + context.getCurrentFileName());
 					setSubdialogRequierement(src, internalInterpreter);
-
+					NodeList childNodes = formItem.getChildNodes();
+					declareParams(internalInterpreter, childNodes);
 					internalInterpreter.interpretDialog();
 					internalInterpreter.mainLoop();
 					// FIXME: add log
@@ -134,7 +133,7 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 				if (internalInterpreter != null) {
 					String returnValue = internalInterpreter.getContext()
 							.getReturnValue();
-					System.err.println("return value"+returnValue);
+					System.err.println("return value" + returnValue);
 					StringTokenizer tokenizer = new StringTokenizer(returnValue);
 					while (tokenizer.hasMoreElements()) {
 						String variable = tokenizer.nextToken();
@@ -185,6 +184,25 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 			} else {
 				throw new RuntimeException(formItem.getNodeName()
 						+ " non traité");
+			}
+		}
+	}
+
+	private void declareParams(InternalInterpreter internalInterpreter,
+			NodeList childNodes) throws ScriptException {
+		for (int i = 0; i < childNodes.getLength(); i++) {
+			Node item = childNodes.item(i);
+			if (item.getNodeName().equals("param")) {
+				String name = getNodeAttributeValue(item, "name");
+				String value = getNodeAttributeValue(item, "expr");
+				internalInterpreter.getContext().addParam(name);
+				internalInterpreter
+						.getContext()
+						.getDeclaration()
+						.declareVariable(
+								name,
+								value,
+								InterpreterScriptContext.ANONYME_SCOPE);
 			}
 		}
 	}

@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.script.ScriptException;
 import javax.xml.parsers.DocumentBuilder;
@@ -39,7 +42,8 @@ class WIPContext {
 	private boolean inSubdialog;
 	private Node lastDialog;
 	private boolean canExecuteFilled;
-	private String returnValue ="";
+	private String returnValue = "";
+	private List<String> params = new ArrayList<String>();
 
 	// String method;
 
@@ -238,5 +242,13 @@ class WIPContext {
 
 	public String getReturnValue() {
 		return returnValue;
+	}
+
+	public void addParam(String name) {
+		params.add(name);
+	}
+
+	public List<String> getParams() {
+		return params;
 	}
 }

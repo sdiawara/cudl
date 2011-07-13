@@ -86,9 +86,11 @@ class Executor {
 				public void execute(Node node) throws InterpreterException,
 						ScriptException, IOException {
 					String name = getNodeAttributeValue(node, "name");
-					String expr = getNodeAttributeValue(node, "expr");
-					declaration.setValue(name, expr == null ? "undefined"
-							: expr, InterpreterScriptContext.ANONYME_SCOPE);
+					if (!context.getParams().contains(name)) {
+						String expr = getNodeAttributeValue(node, "expr");
+						declaration.setValue(name, expr == null ? "undefined"
+								: expr, InterpreterScriptContext.ANONYME_SCOPE);
+					}
 				}
 			});
 			put("assign", new NodeExecutor() {
@@ -182,7 +184,8 @@ class Executor {
 				public void execute(Node node) throws InterpreterException,
 						ScriptException, IOException, ReturnException {
 					System.err.println("return");
-					throw new ReturnException(getNodeAttributeValue(node, "namelist"));
+					throw new ReturnException(getNodeAttributeValue(node,
+							"namelist"));
 				}
 			});
 			put("disconnect", new NodeExecutor() {
@@ -247,7 +250,7 @@ class Executor {
 				try {
 					executor.execute(node1);
 				} catch (ReturnException e) {
-					context.setReturnValue(e.namelist);	
+					context.setReturnValue(e.namelist);
 					return;
 				}
 			}
@@ -285,7 +288,8 @@ class Executor {
 	}
 
 	private void checkConditionAndExecute(Node node)
-			throws InterpreterException, ScriptException, IOException, ReturnException {
+			throws InterpreterException, ScriptException, IOException,
+			ReturnException {
 		boolean conditionChecked = this.checkCond(node);
 		NodeList childs = node.getChildNodes();
 
@@ -298,7 +302,7 @@ class Executor {
 							.getNodeName());
 					if (nodeExecutor != null)
 						nodeExecutor.execute(item);
-					
+
 				}
 			} else if (VxmlElementType.isConditionalItem(item)) {
 				if (conditionChecked) {
