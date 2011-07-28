@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+  <var name="v" expr="'v'"/>
+   <block>
+   <prompt>
+     <value expr="v"/>
+   </prompt>
+   </block>  
+ </form>
+</vxml>
