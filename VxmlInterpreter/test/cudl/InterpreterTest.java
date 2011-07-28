@@ -13,7 +13,9 @@ import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mozilla.javascript.EcmaError;
 import org.xml.sax.SAXException;
 
 public class InterpreterTest {
@@ -39,7 +41,7 @@ public class InterpreterTest {
 
 		interpreter = new Interpreter(url + "shello2.vxml");
 		interpreter.start();
-		
+
 		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
 		assertEquals(traceLog, interpreter.getTraceLog());
 		// assertTrue(interpreter.raccrochage());
@@ -83,34 +85,6 @@ public class InterpreterTest {
 		assertEquals(traceLog, interpreter.getTraceLog());
 		// assertTrue(interpreter.raccrochage());
 	}
-
-	// @Test
-	// public void testLogTraceWhithVariableWithClear() throws
-	// IOException {
-	// List<String> traceLog = new ArrayList<String>();
-	// traceLog.add("LOG Hello");
-	// traceLog.add("LOG Hello 1");
-	// traceLog.add("LOG Hello 2");
-	// traceLog.add("LOG Hello 3");
-	//
-	// List<String> traceStat = new ArrayList<String>();
-	// traceStat.add("[label:stats] LOG Hello");
-	//
-	// varExcepted = new TreeMap<String, String>();
-	// varExcepted.put("block_0", "defined");
-	// varExcepted.put("block_1", "defined");
-	// varExcepted.put("block_2", "defined");
-	// varExcepted.put("block_3", "defined");
-	// varExcepted.put("telephone", "undefined");
-	// varExcepted.put("telephone1", "undefined");
-	//
-	// interpreter = new Interpreter(url+"shelloVarClear.vxml");
-	// interpreterContext.interpreter.start();
-	//
-	// assertEquals(traceLog, interpreterContext.interpreter.getTraceLog());
-	// assertEquals(traceStat, interpreterContext.interpreter.getTraceStat());
-	// assertEquals(varExcepted, interpreterContext.interpreter.getVar());
-	// }
 
 	@Test
 	public void testLogTraceWithIfElseifAndElse() throws IOException,
@@ -257,7 +231,7 @@ public class InterpreterTest {
 		assertEquals(traceLog, interpreter.getTraceLog());
 	}
 
-	@Test(expected = ScriptException.class)
+	@Test(expected = EcmaError.class)
 	public void anonymeScopeVariable() throws IOException, ScriptException,
 			ParserConfigurationException, SAXException {
 
@@ -265,7 +239,7 @@ public class InterpreterTest {
 		interpreter.start();
 	}
 
-	@Test(expected = ScriptException.class)
+	@Test(expected = EcmaError.class)
 	public void dialogScopeVariable() throws IOException, ScriptException,
 			ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "dialogScopeVariable.vxml");
@@ -316,7 +290,7 @@ public class InterpreterTest {
 		assertEquals(prompts, interpreter.getPrompts());
 	}
 
-	@Test(expected = ScriptException.class)
+	@Test(expected = EcmaError.class)
 	public void WhenRootChangeLastRootVariableIsNotLongerAccessible()
 			throws IOException, ScriptException, ParserConfigurationException,
 			SAXException {
@@ -331,5 +305,14 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url
 				+ "compareTwoVariableDeclaredIndifferentScope");
 		interpreter.start();
+	}
+	@Test
+	public void assignVariables() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
+		interpreter = new Interpreter(url + "assignVariables.vxml");
+		interpreter.start();
+
+		assertEquals(1, interpreter.getPrompts().size());
+		assertEquals("v", interpreter.getPrompts().get(0).tts);
 	}
 }

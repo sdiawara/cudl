@@ -40,7 +40,8 @@ class InternalInterpreter {
 		fia.initializeDialog(context.getCurrentDialog());
 	}
 
-	void mainLoop() throws ScriptException, IOException, SAXException, ParserConfigurationException {
+	void mainLoop() throws ScriptException, IOException, SAXException,
+			ParserConfigurationException {
 		try {
 			fia.mainLoop();
 		} catch (GotoException e) {
@@ -74,7 +75,8 @@ class InternalInterpreter {
 		}
 	}
 
-	void destinationHangup() throws ScriptException, IOException, SAXException, ParserConfigurationException {
+	void destinationHangup() throws ScriptException, IOException, SAXException,
+			ParserConfigurationException {
 		declaration.setValue(
 				fia.getFormItemName(context.getSelectedFormItem()),
 				"'far_end_disconnect'",
@@ -111,12 +113,14 @@ class InternalInterpreter {
 	}
 
 	private void executionHandler(InterpreterException e)
-			throws ScriptException, IOException, SAXException, ParserConfigurationException {
+			throws ScriptException, IOException, SAXException,
+			ParserConfigurationException {
 
 		if (e instanceof GotoException) {
 			declaration
 					.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
 			context.buildDocument(((GotoException) e).next);
+			System.err.println("" + ((GotoException) e).next);
 			fia.initializeDialog(context.getCurrentDialog());
 			mainLoop();
 		} else if (e instanceof SubmitException) {
@@ -126,7 +130,8 @@ class InternalInterpreter {
 		}
 	}
 
-	void callerHangup(int i) throws ScriptException, IOException, SAXException, ParserConfigurationException {
+	void callerHangup(int i) throws ScriptException, IOException, SAXException,
+			ParserConfigurationException {
 		declaration.evaluateScript(
 				"connection.protocol.isdnvn6.transferresult= '" + i + "'",
 				DefaultInterpreterScriptContext.SESSION_SCOPE);
@@ -138,7 +143,8 @@ class InternalInterpreter {
 		}
 	}
 
-	void noAnswer() throws ScriptException, IOException, SAXException, ParserConfigurationException {
+	void noAnswer() throws ScriptException, IOException, SAXException,
+			ParserConfigurationException {
 		declaration.evaluateScript(
 				"connection.protocol.isdnvn6.transferresult= '2'",
 				DefaultInterpreterScriptContext.SESSION_SCOPE);
@@ -177,18 +183,12 @@ class InternalInterpreter {
 		return fia.getPrompts();
 	}
 
-	void resetDocumentScope() {
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
+	void resetDocumentScope() throws ScriptException {
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
 	}
 
-	void resetDialogScope() {
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
+	void resetDialogScope() throws ScriptException {
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
 
@@ -209,22 +209,16 @@ class InternalInterpreter {
 				getNodeAttributeValue(node, "value"));
 	}
 
-	void resetApplicationScope() {
+	void resetApplicationScope() throws ScriptException {
 		declaration
 				.resetScopeBinding(DefaultInterpreterScriptContext.APPLICATION_SCOPE);
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.DOCUMENT_SCOPE);
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.DIALOG_SCOPE);
-		declaration
-				.resetScopeBinding(DefaultInterpreterScriptContext.ANONYME_SCOPE);
 	}
 
 	void utterance(String string, String string2) throws ScriptException,
 			IOException, SAXException, ParserConfigurationException {
-		declaration.evaluateScript("lastresult$[0].utterance =" + string,
+		declaration.evaluateScript("application.lastresult$[0].utterance =" + string,
 				InterpreterScriptContext.APPLICATION_SCOPE);
-		declaration.evaluateScript("lastresult$[0].inputmode =" + string2,
+		declaration.evaluateScript("application.lastresult$[0].inputmode =" + string2,
 				InterpreterScriptContext.APPLICATION_SCOPE);
 		try {
 			fia.executor.execute(serachItem(context.getSelectedFormItem(),
@@ -245,7 +239,8 @@ class InternalInterpreter {
 		return dialogProperties;
 	}
 
-	void maxTimeDisconnect() throws ScriptException, IOException, SAXException, ParserConfigurationException {
+	void maxTimeDisconnect() throws ScriptException, IOException, SAXException,
+			ParserConfigurationException {
 		try {
 			setTransferResultAndExecute("'maxtime_disconnect'");
 		} catch (InterpreterException e) {
@@ -253,7 +248,8 @@ class InternalInterpreter {
 		}
 	}
 
-	void destinationBusy() throws ScriptException, IOException, SAXException, ParserConfigurationException {
+	void destinationBusy() throws ScriptException, IOException, SAXException,
+			ParserConfigurationException {
 		try {
 			setTransferResultAndExecute("'busy'");
 		} catch (InterpreterException e) {
@@ -261,7 +257,8 @@ class InternalInterpreter {
 		}
 	}
 
-	void networkBusy() throws ScriptException, SAXException, IOException, ParserConfigurationException {
+	void networkBusy() throws ScriptException, SAXException, IOException,
+			ParserConfigurationException {
 		try {
 			setTransferResultAndExecute("'network_busy'");
 		} catch (InterpreterException e) {

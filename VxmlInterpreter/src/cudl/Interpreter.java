@@ -24,7 +24,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.mainLoop();
 		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -48,8 +48,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.event("noinput");
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -57,8 +56,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.event("nomatch");
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -70,8 +68,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.noAnswer();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -82,8 +79,7 @@ public class Interpreter {
 					+ URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "")
 					+ "'", "'voice'");
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -93,8 +89,7 @@ public class Interpreter {
 			internalInterpreter.utterance("'" + dtmf.replaceAll(" ", "") + "'",
 					"'dtmf'");
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -102,8 +97,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.event("connection.disconnect.hangup");
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -112,8 +106,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.callerHangup(i);
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -131,8 +124,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.blindTransferSuccess();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -141,8 +133,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.destinationHangup();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -151,8 +142,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.callerHangDestination();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -161,8 +151,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.maxTimeDisconnect();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -171,8 +160,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.destinationBusy();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -180,8 +168,7 @@ public class Interpreter {
 		try {
 			internalInterpreter.networkBusy();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 

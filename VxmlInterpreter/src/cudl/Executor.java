@@ -52,11 +52,21 @@ class Executor {
 				public void execute(Node node) throws ScriptException,
 						InterpreterException, IOException {
 					String nodeValue = getNodeAttributeValue(node, "value");
-					declaration.evaluateScript("lastresult$[0].utterance ='"
-							+ nodeValue + "'",
+					declaration.evaluateScript(
+							"application.lastresult$[0].utterance ='"
+									+ nodeValue + "'",
 							InterpreterScriptContext.APPLICATION_SCOPE);
-					declaration.evaluateScript("lastresult$[0].inputmode ="
-							+ "'voice'",
+					declaration.setValue(
+							"application.lastresult$[0].utterance", "'"
+									+ nodeValue + "'",
+							InterpreterScriptContext.APPLICATION_SCOPE);
+					declaration.evaluateScript(
+							"application.lastresult$[0].inputmode ="
+									+ "'voice'",
+							InterpreterScriptContext.APPLICATION_SCOPE);
+
+					declaration.setValue(
+							"application.lastresult$[0].inputmode", "'voice'",
 							InterpreterScriptContext.APPLICATION_SCOPE);
 
 					Executor.this.execute(serachItem(context
@@ -75,8 +85,7 @@ class Executor {
 					else {
 						String expr = getNodeAttributeValue(node, "expr");
 						if (expr != null)
-							System.err.println("reason ->"
-									+ declaration.evaluateScript(expr, 50));
+							System.err.println("reason ->" + expr);
 					}
 				}
 			});
@@ -88,7 +97,7 @@ class Executor {
 					String name = getNodeAttributeValue(node, "name");
 					if (!context.getParams().contains(name)) {
 						String expr = getNodeAttributeValue(node, "expr");
-						declaration.setValue(name, expr == null ? "undefined"
+						declaration.declareVariable(name, expr == null ? "undefined"
 								: expr, InterpreterScriptContext.ANONYME_SCOPE);
 					}
 				}
@@ -99,7 +108,7 @@ class Executor {
 						ScriptException, IOException {
 					String name = getNodeAttributeValue(node, "name");
 					String expr = getNodeAttributeValue(node, "expr");
-					declaration.evaluateScript(name + "=" + expr, 50);
+					declaration.setValue(name, 	expr, 50);
 				}
 			});
 			put("clear", new NodeExecutor() {
@@ -137,9 +146,6 @@ class Executor {
 			put("goto", new NodeExecutor() {
 				public void execute(Node node) throws GotoException,
 						ScriptException {
-					// FIXME: do same for expritem (script interpretation value
-					// )
-					// add assert163.txml file from to test
 					String nextItemAtt = getNodeAttributeValue(node, "nextitem");
 					String next = getNodeAttributeValue(node, "next");
 
@@ -196,8 +202,7 @@ class Executor {
 			put("script", new NodeExecutor() {
 				public void execute(Node node) throws ScriptException,
 						IOException {
-					declaration.evaluateScript(node,
-							DefaultInterpreterScriptContext.ANONYME_SCOPE);
+
 				}
 			});
 			put("log", new NodeExecutor() {
@@ -318,9 +323,8 @@ class Executor {
 		String cond = getNodeAttributeValue(node, "cond");
 
 		return cond == null
-				|| declaration.evaluateScript(cond,
-						DefaultInterpreterScriptContext.ANONYME_SCOPE).equals(
-						"true");
+				|| ((Boolean) declaration.evaluateScript(cond,
+						DefaultInterpreterScriptContext.ANONYME_SCOPE));
 	}
 
 	private void collectPrompt(Node node) throws ScriptException, IOException {
@@ -370,7 +374,8 @@ class Executor {
 
 	private void addPromptWithValue(Node value, Prompt p)
 			throws ScriptException, IOException {
-		p.tts += declaration.evaluateScript(value,
+		p.tts += declaration.evaluateScript(
+				getNodeAttributeValue(value, "expr"),
 				DefaultInterpreterScriptContext.ANONYME_SCOPE);
 	}
 

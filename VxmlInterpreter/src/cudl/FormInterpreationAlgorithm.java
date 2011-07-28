@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.mozilla.javascript.Undefined;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -79,8 +80,6 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 					promptCounter.put(name, 1);
 				}
 				formItemNames.put(child, name);
-				System.err.println(name + " = "
-						+ (expr == null ? "undefined" : expr));
 			}
 		}
 	}
@@ -125,6 +124,7 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 					internalInterpreter.interpretDialog();
 					internalInterpreter.mainLoop();
 					// FIXME: add log
+					System.err.println(executor.prompts);
 					executor.prompts.addAll(internalInterpreter.getPrompts());
 				}
 				declaration.evaluateScript(formItemNames.get(formItem)
@@ -196,13 +196,13 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 				String name = getNodeAttributeValue(item, "name");
 				String value = getNodeAttributeValue(item, "expr");
 				internalInterpreter.getContext().addParam(name);
-				System.err.println("Param "+name+"\t"+declaration.evaluateScript(value,50));
-				internalInterpreter
-						.getContext()
-						.getDeclaration()
+				System.err.println("Param " + name + "\t"
+						+ declaration.evaluateScript(value, 50));
+				internalInterpreter.getContext().getDeclaration()
 						.declareVariable(
 								name,
-								"'"+declaration.evaluateScript(value,50)+"'",
+								"'" + declaration.evaluateScript(value, 50)
+										+ "'",
 								InterpreterScriptContext.ANONYME_SCOPE);
 			}
 		}
@@ -248,8 +248,8 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 				String name = next.getValue();
 				String cond = Utils.getNodeAttributeValue(nextToVisit, "cond");
 				if (cond == null
-						|| declaration.evaluateScript(cond, 50).equals("true"))
-					if (declaration.getValue(name).equals("undefined")) {
+						|| (Boolean) declaration.evaluateScript(cond, 50))
+					if (declaration.getValue(name).equals(Undefined.instance)) {
 						return nextToVisit;
 					}
 			}
