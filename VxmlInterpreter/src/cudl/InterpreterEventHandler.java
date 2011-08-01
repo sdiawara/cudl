@@ -39,6 +39,7 @@ class InterpreterEventHandler implements InterpreterListener {
 		}
 		// source.selectedItem.getElementsByTagName("vxml").item(0)
 
+		System.err.println("catchLinst =  " +catchList);
 		// FIXME: take the first with a correct event counter
 		// a counter who is ≤ at currentCounter
 		// System.err.println(catchList);

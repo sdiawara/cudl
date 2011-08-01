@@ -5,9 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.script.ScriptException;
 import javax.xml.parsers.DocumentBuilder;
@@ -45,8 +43,6 @@ class WIPContext {
 	private String returnValue = "";
 	private List<String> params = new ArrayList<String>();
 
-	// String method;
-
 	WIPContext(String location, InterpreterVariableDeclaration declaration)
 			throws ParserConfigurationException, MalformedURLException,
 			IOException, ScriptException, SAXException {
@@ -70,9 +66,12 @@ class WIPContext {
 			connection.setRequestProperty("Cookie", cookies);
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
+	
 		NodeList dialogs = currentdDocument.getElementsByTagName("form");
 		if (getNext() != null) {
+			System.err.println("goto " + getNext());
 			currentDialog = Utils.searchDialogByName(dialogs, getNext());
+			setNexted(null);
 		} else
 			currentDialog = dialogs.item(0);
 		Node appplicationRoot = currentdDocument.getElementsByTagName("vxml")
@@ -154,7 +153,6 @@ class WIPContext {
 
 	void setSelectedFormItem(Node selectedFormItem) {
 		this.selectedFormItem = selectedFormItem;
-		// notifyObserver
 	}
 
 	String getLocation() {
@@ -167,7 +165,6 @@ class WIPContext {
 
 	public void setTransfertDestination(String object) {
 		this.transferDestination = object;
-		// notifyobserver
 	}
 
 	public String getTransferDestination() {

@@ -31,7 +31,7 @@ public class SessionFileCreator {
 			add("connection.protocol.isdnvn6['remote']  =  '153908500';");
 			add("connection.protocol.isdnvn6['remote2']  =  '153908500';");
 			add("connection.protocol.isdnvn6['state']  =  'incoming';");
-			add("connection.protocol.isdnvn6.transferresult= '';");
+			add("connection.protocol.isdnvn6.transferresult= undefined;");
 			add("connection.channel = '1';");
 		}
 	};
