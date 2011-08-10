@@ -8,14 +8,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 public class RemoteFileAccess {
-	public static File getRemoteFile(String url, String fileName)
-			throws IOException {
+	public static File getRemoteFile(String url, String fileName) throws IOException {
 		System.err.println("remotefilename " + url + fileName);
 
 		URL url2 = new URL(Utils.tackWeelFormedUrl(url, fileName));
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(url2
-				.openStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(url2.openStream()));
 		File file = new File("tempremotefile");
 		FileWriter fileWriter = new FileWriter(file);
 		String inputLine;
@@ -32,8 +30,7 @@ public class RemoteFileAccess {
 		System.err.println("remotefilename " + fileName);
 
 		URL url2 = new URL(fileName);
-		BufferedReader in = new BufferedReader(new InputStreamReader(url2
-				.openStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(url2.openStream()));
 		File file = new File("tempremotefile");
 		FileWriter fileWriter = new FileWriter(file);
 		String inputLine;

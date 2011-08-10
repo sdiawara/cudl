@@ -14,8 +14,8 @@ import org.xml.sax.SAXException;
 public class Interpreter {
 	private InternalInterpreter internalInterpreter;
 
-	public Interpreter(String fileName) throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public Interpreter(String fileName) throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		internalInterpreter = new InternalInterpreter(fileName);
 	}
 
@@ -72,22 +72,19 @@ public class Interpreter {
 		}
 	}
 
-	public void talk(String sentence) throws UnsupportedEncodingException,
-			ScriptException, IOException, SAXException {
+	public void talk(String sentence) throws UnsupportedEncodingException, ScriptException, IOException,
+			SAXException {
 		try {
-			internalInterpreter.utterance("'"
-					+ URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "")
+			internalInterpreter.utterance("'" + URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "")
 					+ "'", "'voice'");
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void push(String dtmf) throws ScriptException, IOException,
-			SAXException {
+	public void push(String dtmf) throws ScriptException, IOException, SAXException {
 		try {
-			internalInterpreter.utterance("'" + dtmf.replaceAll(" ", "") + "'",
-					"'dtmf'");
+			internalInterpreter.utterance("'" + dtmf.replaceAll(" ", "") + "'", "'dtmf'");
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
@@ -101,8 +98,7 @@ public class Interpreter {
 		}
 	}
 
-	public void callerHangup(int i) throws IOException, ScriptException,
-			SAXException {
+	public void callerHangup(int i) throws IOException, ScriptException, SAXException {
 		try {
 			internalInterpreter.callerHangup(i);
 		} catch (ParserConfigurationException e) {
@@ -111,16 +107,15 @@ public class Interpreter {
 	}
 
 	public String getGrammarActive() {
-		return internalInterpreter.getContext().getGrammarActive().get(0)
-				.getAttributes().getNamedItem("src").getNodeValue().trim();
+		return internalInterpreter.getContext().getGrammarActive().get(0).getAttributes().getNamedItem("src")
+				.getNodeValue().trim();
 	}
 
 	public Properties getCurrentDialogProperties() {
 		return internalInterpreter.getCurrentDialogProperties();
 	}
 
-	public void blindTransferSuccess() throws ScriptException, IOException,
-			SAXException {
+	public void blindTransferSuccess() throws ScriptException, IOException, SAXException {
 		try {
 			internalInterpreter.blindTransferSuccess();
 		} catch (ParserConfigurationException e) {
@@ -128,8 +123,7 @@ public class Interpreter {
 		}
 	}
 
-	public void destinationHangup() throws ScriptException, IOException,
-			SAXException {
+	public void destinationHangup() throws ScriptException, IOException, SAXException {
 		try {
 			internalInterpreter.destinationHangup();
 		} catch (ParserConfigurationException e) {
@@ -137,8 +131,7 @@ public class Interpreter {
 		}
 	}
 
-	public void callerHangDestination() throws ScriptException, IOException,
-			SAXException {
+	public void callerHangDestination() throws ScriptException, IOException, SAXException {
 		try {
 			internalInterpreter.callerHangDestination();
 		} catch (ParserConfigurationException e) {
@@ -146,8 +139,7 @@ public class Interpreter {
 		}
 	}
 
-	public void maxTimeDisconnect() throws ScriptException, IOException,
-			SAXException {
+	public void maxTimeDisconnect() throws ScriptException, IOException, SAXException {
 		try {
 			internalInterpreter.maxTimeDisconnect();
 		} catch (ParserConfigurationException e) {
@@ -155,8 +147,7 @@ public class Interpreter {
 		}
 	}
 
-	public void destinationBusy() throws ScriptException, IOException,
-			SAXException {
+	public void destinationBusy() throws ScriptException, IOException, SAXException {
 		try {
 			internalInterpreter.destinationBusy();
 		} catch (ParserConfigurationException e) {

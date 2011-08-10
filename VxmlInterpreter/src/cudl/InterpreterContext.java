@@ -21,7 +21,7 @@ import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
 import cudl.utils.Utils;
 
-class WIPContext {
+class InterpreterContext {
 	private final String location;
 	private final InterpreterVariableDeclaration declaration;
 	private DocumentBuilder documentBuilder;
@@ -43,7 +43,7 @@ class WIPContext {
 	private String returnValue = "";
 	private List<String> params = new ArrayList<String>();
 
-	WIPContext(String location, InterpreterVariableDeclaration declaration)
+	InterpreterContext(String location, InterpreterVariableDeclaration declaration)
 			throws ParserConfigurationException, MalformedURLException,
 			IOException, ScriptException, SAXException {
 		this.location = location;

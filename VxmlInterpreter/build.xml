@@ -62,7 +62,7 @@
   </target>
 
   <target name="jar" depends="compile" description="Generate jar file" >
-    <jar jarfile="${target.dir}\cudl.jar" 
+    <jar jarfile="${target.dir}\cudl_v0.1.jar" 
       basedir="${build.dir}" />
   </target>
 

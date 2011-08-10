@@ -25,13 +25,13 @@ class InternalInterpreter {
 	private InterpreterVariableDeclaration declaration;
 	private Properties dialogProperties = new Properties();
 	private FormInterpreationAlgorithm fia;
-	private WIPContext context;
+	private InterpreterContext context;
 	private InterpreterEventHandler interpreterListener;
 
 	InternalInterpreter(String location) throws IOException, ScriptException,
 			ParserConfigurationException, SAXException {
 		declaration = new InterpreterVariableDeclaration(location);
-		context = new WIPContext(location, declaration);
+		context = new InterpreterContext(location, declaration);
 		interpreterListener = new InterpreterEventHandler(context);
 	}
 
@@ -214,12 +214,16 @@ class InternalInterpreter {
 				.resetScopeBinding(DefaultInterpreterScriptContext.APPLICATION_SCOPE);
 	}
 
-	void utterance(String string, String string2) throws ScriptException,
-			IOException, SAXException, ParserConfigurationException {
-		declaration.evaluateScript("application.lastresult$[0].utterance =" + string,
-				InterpreterScriptContext.APPLICATION_SCOPE);
-		declaration.evaluateScript("application.lastresult$[0].inputmode =" + string2,
-				InterpreterScriptContext.APPLICATION_SCOPE);
+	void utterance(String utterance, String utteranceType)
+			throws ScriptException, IOException, SAXException,
+			ParserConfigurationException {
+		declaration.evaluateScript("application.lastresult$[0].utterance ="
+				+ utterance, InterpreterScriptContext.APPLICATION_SCOPE);
+		declaration.evaluateScript("application.lastresult$[0].inputmode ="
+				+ utteranceType, InterpreterScriptContext.APPLICATION_SCOPE);
+		declaration.setValue(
+				fia.getFormItemName(context.getSelectedFormItem()), utterance,
+				60);
 		try {
 			fia.executor.execute(serachItem(context.getSelectedFormItem(),
 					"filled"));
@@ -266,7 +270,7 @@ class InternalInterpreter {
 		}
 	}
 
-	public WIPContext getContext() {
+	public InterpreterContext getContext() {
 		return context;
 	}
 }

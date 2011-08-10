@@ -46,7 +46,7 @@ public class SessionFileCreator {
 			String called = InterpreterRequierement.connectionLocalUri;
 			String origin = InterpreterRequierement.connectionOrigin;
 			String channel = InterpreterRequierement.channel;
-			 
+
 			if (caller != null && script.startsWith("connection.remote.uri")) {
 				script = "connection.remote.uri ='tel:" + caller + "';";
 			}
@@ -55,9 +55,7 @@ public class SessionFileCreator {
 				script = "connection.local.uri ='tel:" + called + "';";
 			}
 
-			if (origin != null
-					&& script
-							.startsWith("connection.protocol.isdnvn6['lastsup']")) {
+			if (origin != null && script.startsWith("connection.protocol.isdnvn6['lastsup']")) {
 				script = "connection.protocol.isdnvn6['lastsup']  ='4700830E8307839098720051018A01"
 						+ origin + "8800';";
 			}
@@ -65,10 +63,10 @@ public class SessionFileCreator {
 			if (channel != null && script.startsWith("connection.channel")) {
 				script = "connection.channel='" + channel + "';";
 			}
-			
+
 			fileWriter.write(script);
 		}
-		
+
 		fileWriter.close();
 		return sessionFile;
 	}

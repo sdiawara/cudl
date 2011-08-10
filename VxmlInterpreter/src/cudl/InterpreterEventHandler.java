@@ -16,9 +16,9 @@ import cudl.event.InterpreterEvent;
 
 class InterpreterEventHandler implements InterpreterListener {
 	private Map<String, Integer> eventCounter = new Hashtable<String, Integer>();
-	private final WIPContext context;
+	private final InterpreterContext context;
 
-	InterpreterEventHandler(WIPContext context) {
+	InterpreterEventHandler(InterpreterContext context) {
 		this.context = context;
 	}
 

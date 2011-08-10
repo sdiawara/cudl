@@ -3,7 +3,6 @@ package cudl;
 import org.w3c.dom.Node;
 
 class InterpreterException extends Exception {
-	// Should'nt this class also have package visibility ?
 }
 
 class TransferException extends InterpreterException {
@@ -15,9 +14,6 @@ class FilledException extends InterpreterException {
 }
 
 class ExitException extends InterpreterException {
-}
-
-class DisconnectException extends InterpreterException {
 }
 
 class GotoException extends InterpreterException {
@@ -46,10 +42,10 @@ class SubmitException extends InterpreterException {
 	}
 }
 
-class ReturnException extends Exception{
+class ReturnException extends InterpreterException {
 	public final String namelist;
 
 	public ReturnException(String namelist) {
-		this.namelist = namelist == null ?"":namelist;
+		this.namelist = namelist == null ? "" : namelist;
 	}
 }

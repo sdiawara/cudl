@@ -127,19 +127,15 @@ public class DefaultInterpreterScriptContext extends SimpleScriptContext
 		switch (scope) {
 		case InterpreterScriptContext.SESSION_SCOPE:
 			sessionScope.put(name, value);
-			//sessionScope.put("session." + name, value);
 			break;
 		case InterpreterScriptContext.APPLICATION_SCOPE:
 			applicationScope.put(name, value);
-		//	applicationScope.put("application." + name, value);
 			break;
 		case InterpreterScriptContext.DOCUMENT_SCOPE:
 			documentScope.put(name, value);
-		//	documentScope.put("document." + name, value);
 			break;
 		case InterpreterScriptContext.DIALOG_SCOPE:
 			dialogScope.put(name, value);
-		//	dialogScope.put("dialog." + name, value);
 			break;
 		case InterpreterScriptContext.ANONYME_SCOPE:
 			anonymeScope.put(name, value);

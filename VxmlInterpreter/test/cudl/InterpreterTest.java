@@ -13,7 +13,6 @@ import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mozilla.javascript.EcmaError;
 import org.xml.sax.SAXException;
@@ -306,6 +305,7 @@ public class InterpreterTest {
 				+ "compareTwoVariableDeclaredIndifferentScope");
 		interpreter.start();
 	}
+
 	@Test
 	public void assignVariables() throws IOException, ScriptException,
 			ParserConfigurationException, SAXException {
@@ -315,4 +315,16 @@ public class InterpreterTest {
 		assertEquals(1, interpreter.getPrompts().size());
 		assertEquals("v", interpreter.getPrompts().get(0).tts);
 	}
+
+	@Test
+	public void testScanVoiceGlue() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
+		Interpreter interpreter = new Interpreter(
+				"http://www.ampersand.com/vxml_tests/ex.vxml");
+		interpreter.start();
+		interpreter.push("1");
+		System.err.println(interpreter.getPrompts());
+
+	}
+
 }
