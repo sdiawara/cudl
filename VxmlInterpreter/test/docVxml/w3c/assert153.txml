@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+      xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+<!--
+    153: Using the clear tag on a form item variable will make it
+    eligible to be visited by the FIA (provided that it
+    does not have a cond attribute evaluating to false).
+-->
+
+  <catch>
+    <conf:comment>
+      Toplevel caught event <value expr="_event"/>
+    </conf:comment>
+    <conf:fail expr="_event"/>
+  </catch>
+
+  <var name="condition" expr="false"/>
+
+
+  <form id="first">
+
+    <field name="f1" expr="1234" cond="document.condition">
+      <conf:speech value="alpha"/>
+      <conf:grammar utterance="alpha" interp="alpha"/>
+      <filled>
+      </filled>
+    </field>
+
+    <block name="b1">
+      <!-- First FIA loop: clear f1 but leave cond="false" -->
+      <if cond="f1 == 1234 &amp;&amp; document.condition == false">
+        <clear namelist="f1 b1"/>
+
+      <!-- Second FIA loop: set cond="true" -->
+      <elseif cond="f1 == undefined &amp;&amp; document.condition == false"/>
+        <assign name="document.condition" expr="true"/>
+        <clear namelist="b1"/>
+
+      <!-- Third FIA loop: if field was visited, pass.  -->
+      <elseif cond="f1 == 'alpha' &amp;&amp; document.condition == true"/>
+        <conf:pass/>
+
+      <!-- Something went awry, like field was visited before it was cleared. -->
+      <else/>
+        <conf:fail reason="Field was visited before cleared."/>
+      </if>
+    </block>
+
+    <block>
+        <conf:fail reason="Some sort of flow of control error."/>
+    </block>
+
+  </form>
+
+</vxml>
+
+
+
+

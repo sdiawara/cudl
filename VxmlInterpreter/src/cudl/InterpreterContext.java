@@ -7,7 +7,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.script.ScriptException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -17,7 +16,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
 import cudl.utils.Utils;
 
@@ -44,20 +42,17 @@ class InterpreterContext {
 	private List<String> params = new ArrayList<String>();
 
 	InterpreterContext(String location, InterpreterVariableDeclaration declaration)
-			throws ParserConfigurationException, MalformedURLException,
-			IOException, ScriptException, SAXException {
+			throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
 		this.location = location;
 		this.declaration = declaration;
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-				.newInstance();
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilder = builderFactory.newDocumentBuilder();
 		connection = new URL(location).openConnection();
 		cookies = connection.getHeaderField("Set-Cookie");
 		buildDocument(location);
 	}
 
-	void buildDocument(String fileName) throws ScriptException, IOException,
-			SAXException {
+	void buildDocument(String fileName) throws IOException, SAXException {
 		String url = Utils.tackWeelFormedUrl(location, fileName);
 		System.err.println(url);
 
@@ -66,7 +61,7 @@ class InterpreterContext {
 			connection.setRequestProperty("Cookie", cookies);
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
-	
+
 		NodeList dialogs = currentdDocument.getElementsByTagName("form");
 		if (getNext() != null) {
 			System.err.println("goto " + getNext());
@@ -74,48 +69,41 @@ class InterpreterContext {
 			setNexted(null);
 		} else
 			currentDialog = dialogs.item(0);
-		Node appplicationRoot = currentdDocument.getElementsByTagName("vxml")
-				.item(0).getAttributes().getNamedItem("application");
+		Node appplicationRoot = currentdDocument.getElementsByTagName("vxml").item(0).getAttributes()
+				.getNamedItem("application");
 		if (null != appplicationRoot) {
-			String rootUrl = Utils.tackWeelFormedUrl(location, appplicationRoot
-					.getTextContent());
+			String rootUrl = Utils.tackWeelFormedUrl(location, appplicationRoot.getTextContent());
 			rootDocument = documentBuilder.parse(rootUrl);
 			declareRootScopeVariableIfNeed(rootUrl);
 		} else if (!url.equals(currentRootFileName)) {
-			declaration
-					.resetScopeBinding(InterpreterScriptContext.APPLICATION_SCOPE);
+			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
 		}
 		declareDocumentScopeVariableIfNeed(fileName);
 	}
 
-	private void declareRootScopeVariableIfNeed(String textContent)
-			throws ScriptException, IOException {
+	private void declareRootScopeVariableIfNeed(String textContent) throws IOException {
 		if (!textContent.equals(currentRootFileName)) {
-			declaration
-					.resetScopeBinding(InterpreterScriptContext.APPLICATION_SCOPE);
-			NodeList childNodes = rootDocument.getElementsByTagName("vxml")
-					.item(0).getChildNodes();
-			declareVariable(childNodes,
-					InterpreterScriptContext.APPLICATION_SCOPE);
-			currentRootFileName = Utils
-					.tackWeelFormedUrl(location, textContent);
+			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
+			NodeList childNodes = rootDocument.getElementsByTagName("vxml").item(0).getChildNodes();
+			declareVariable(childNodes, InterpreterVariableDeclaration.APPLICATION_SCOPE);
+			currentRootFileName = Utils.tackWeelFormedUrl(location, textContent);
 		}
 	}
 
-	private void declareDocumentScopeVariableIfNeed(String fileName)
-			throws ScriptException, IOException {
+	private void declareDocumentScopeVariableIfNeed(String fileName) throws IOException {
 		if (!fileName.equals(getCurrentFileName())) {
-			declaration
-					.resetScopeBinding(InterpreterScriptContext.DOCUMENT_SCOPE);
-			NodeList childNodes = currentdDocument.getElementsByTagName("vxml")
-					.item(0).getChildNodes();
-			declareVariable(childNodes, InterpreterScriptContext.DOCUMENT_SCOPE);
+			System.out.println(fileName);
+			System.out.println(currentRootFileName);
+			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
+			NodeList childNodes = currentdDocument.getElementsByTagName("vxml").item(0)
+					.getChildNodes();
+			declareVariable(childNodes, InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			setCurrentFileName(Utils.tackWeelFormedUrl(location, fileName));
 		}
 	}
 
-	private void declareVariable(NodeList childNodes, int scope)
-			throws ScriptException, MalformedURLException, IOException {
+	private void declareVariable(NodeList childNodes, int scope) throws MalformedURLException,
+			IOException {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node child = childNodes.item(i);
 			if (child.getNodeName().equals("var")) {
@@ -127,8 +115,7 @@ class InterpreterContext {
 			} else if (child.getNodeName().equals("script")) {
 				String src = Utils.getNodeAttributeValue(child, "src");
 				if (src != null) {
-					declaration.evaluateFileScript(Utils.tackWeelFormedUrl(
-							location, src), scope);
+					declaration.evaluateFileScript(Utils.tackWeelFormedUrl(location, src), scope);
 				} else
 					declaration.evaluateScript(child.getTextContent(), scope);
 			}

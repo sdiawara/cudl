@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+  xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+    <catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+
+    <form>
+        <block>
+            <log>Debut</log>
+	    <script>
+            <![CDATA[
+                // test both kinds of function declarations.
+                // not redundant!
+                application.funct = function sum(n) {
+                   return (n == 0)? 0 : n + sum(n-1); } 
+
+                function sum2(n) {
+                   return (n == 0)? 0 : n + sum2(n-1); } 
+                application.funct2 = sum2;
+            ]]>
+            </script>
+            <log>Fin</log>
+        </block>
+        <block>
+            <var name="result1" expr="application.funct(4)"/>
+            <var name="result2" expr="application.funct2(4)"/>
+            <if cond="result1 == 10 &amp;&amp; result2 == 10">
+                <conf:pass/>
+            <else/>
+                <conf:fail expr="'failed, results not both 10, result1=' + result1 + ', result2=' + result2"/>
+            </if>
+        </block>
+    </form>
+
+</vxml>
+
+ 
+

@@ -27,8 +27,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTrace() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testLogTrace() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -43,7 +43,6 @@ public class InterpreterTest {
 
 		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
 		assertEquals(traceLog, interpreter.getTraceLog());
-		// assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
@@ -62,12 +61,12 @@ public class InterpreterTest {
 		System.err.println(interpreter.getTraceLog());
 		assertEquals(traceLog, interpreter.getTraceLog());
 		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
-		// assertTrue(interpreter.raccrochage());
+		assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
-	public void testLogTraceWhithVariable() throws IOException,
-			ScriptException, ParserConfigurationException, SAXException {
+	public void testLogTraceWhithVariable() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 2 +356 689999");
@@ -82,12 +81,12 @@ public class InterpreterTest {
 		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
 
 		assertEquals(traceLog, interpreter.getTraceLog());
-		// assertTrue(interpreter.raccrochage());
+		assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
-	public void testLogTraceWithIfElseifAndElse() throws IOException,
-			ScriptException, ParserConfigurationException, SAXException {
+	public void testLogTraceWithIfElseifAndElse() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -98,8 +97,7 @@ public class InterpreterTest {
 		traceLog.add("LOG Hello 4");
 		traceLog.add("LOG Hello 5");
 
-		interpreter = new Interpreter(url
-				+ "shelloWith_if_elseif_and_else.vxml");
+		interpreter = new Interpreter(url + "shelloWith_if_elseif_and_else.vxml");
 		interpreter.start();
 
 		assertTrue(interpreter.getTracetWithLabel("stats").isEmpty());
@@ -107,7 +105,7 @@ public class InterpreterTest {
 		System.err.println(traceLog);
 		System.err.println(interpreter.getTraceLog());
 		assertEquals(traceLog, interpreter.getTraceLog());
-		// assertTrue(interpreter.raccrochage());
+		assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
@@ -180,8 +178,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testCombinattionPromptTrace() throws IOException,
-			ScriptException, ParserConfigurationException, SAXException {
+	public void testCombinattionPromptTrace() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -198,8 +196,8 @@ public class InterpreterTest {
 	}
 
 	@Test()
-	public void testNodeValue() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testNodeValue() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -246,9 +244,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void documentScopeVariableIsVisibleInAllDocument()
-			throws IOException, ScriptException, URISyntaxException,
-			ParserConfigurationException, SAXException {
+	public void documentScopeVariableIsVisibleInAllDocument() throws IOException, ScriptException,
+			URISyntaxException, ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -271,8 +268,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void RootVariableIsAllWaysVisible() throws IOException,
-			ScriptException, ParserConfigurationException, SAXException {
+	public void RootVariableIsAllWaysVisible() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -290,25 +287,23 @@ public class InterpreterTest {
 	}
 
 	@Test(expected = EcmaError.class)
-	public void WhenRootChangeLastRootVariableIsNotLongerAccessible()
-			throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void WhenRootChangeLastRootVariableIsNotLongerAccessible() throws IOException,
+			ScriptException, ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "rootChangeVariable.vxml");
 		interpreter.start();
 	}
 
 	@Test
-	public void comparerTwoVariableInDifferentScope() throws IOException,
-			ScriptException, ParserConfigurationException, SAXException {
+	public void comparerTwoVariableInDifferentScope() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 
-		interpreter = new Interpreter(url
-				+ "compareTwoVariableDeclaredIndifferentScope");
+		interpreter = new Interpreter(url + "compareTwoVariableDeclaredIndifferentScope");
 		interpreter.start();
 	}
 
 	@Test
-	public void assignVariables() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void assignVariables() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		interpreter = new Interpreter(url + "assignVariables.vxml");
 		interpreter.start();
 
@@ -317,14 +312,20 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testScanVoiceGlue() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
-		Interpreter interpreter = new Interpreter(
-				"http://www.ampersand.com/vxml_tests/ex.vxml");
+	public void clearVariable() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
+		List<Prompt> expectedPrompt = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "pass";
+		expectedPrompt.add(prompt);
+		
+		Interpreter interpreter = new Interpreter(url + "clear.vxml");
 		interpreter.start();
-		interpreter.push("1");
-		System.err.println(interpreter.getPrompts());
 
+		
+		
+		assertTrue(interpreter.getPrompts().size() == 1);
+		assertEquals(expectedPrompt, interpreter.getPrompts());
 	}
 
 }

@@ -10,19 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.script.ScriptException;
-
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import cudl.script.DefaultInterpreterScriptContext;
-import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
 import cudl.utils.VxmlElementType;
+import static cudl.script.InterpreterVariableDeclaration.*;
 
 class Executor {
-	private final InterpreterContext context;
+   private final InterpreterContext context;
 	private final InterpreterVariableDeclaration declaration;
 
 	// This contains what would hear by users
@@ -48,26 +45,24 @@ class Executor {
 			});
 
 			put("conf:speech", new NodeExecutor() {
-				public void execute(Node node) throws ScriptException, InterpreterException,
-						IOException {
+				public void execute(Node node) throws InterpreterException, IOException {
 					String nodeValue = getNodeAttributeValue(node, "value");
-					declaration.evaluateScript("application.lastresult$[0].utterance ='"
-							+ nodeValue + "'", InterpreterScriptContext.APPLICATION_SCOPE);
-					declaration.setValue("application.lastresult$[0].utterance", "'" + nodeValue
-							+ "'", InterpreterScriptContext.APPLICATION_SCOPE);
-					declaration.evaluateScript(
-							"application.lastresult$[0].inputmode =" + "'voice'",
-							InterpreterScriptContext.APPLICATION_SCOPE);
+					declaration.evaluateScript("application.lastresult$[0].utterance ='" + nodeValue
+							+ "'", APPLICATION_SCOPE);
+					declaration.setValue("application.lastresult$[0].utterance", "'" + nodeValue + "'",
+							APPLICATION_SCOPE);
+					declaration.evaluateScript("application.lastresult$[0].inputmode =" + "'voice'",
+							APPLICATION_SCOPE);
 
 					declaration.setValue("application.lastresult$[0].inputmode", "'voice'",
-							InterpreterScriptContext.APPLICATION_SCOPE);
+							APPLICATION_SCOPE);
 
 					Executor.this.execute(serachItem(context.getSelectedFormItem(), "filled"));
 				}
 			});
 			// Just for W3C test
 			put("conf:fail", new NodeExecutor() {
-				public void execute(Node node) throws DOMException, ScriptException {
+				public void execute(Node node) throws DOMException {
 					// w3cNodeConfSuite.add(node.toString());
 
 					String reason = getNodeAttributeValue(node, "reason");
@@ -83,46 +78,40 @@ class Executor {
 
 			put("var", new NodeExecutor() {
 				@Override
-				public void execute(Node node) throws InterpreterException, ScriptException,
-						IOException {
+				public void execute(Node node) throws InterpreterException, IOException {
 					String name = getNodeAttributeValue(node, "name");
 					if (!context.getParams().contains(name)) {
 						String expr = getNodeAttributeValue(node, "expr");
 						declaration.declareVariable(name, expr == null ? "undefined" : expr,
-								InterpreterScriptContext.ANONYME_SCOPE);
+								InterpreterVariableDeclaration.ANONYME_SCOPE);
 					}
 				}
 			});
 
 			put("assign", new NodeExecutor() {
 				@Override
-				public void execute(Node node) throws InterpreterException, ScriptException,
-						IOException {
+				public void execute(Node node) throws InterpreterException, IOException {
 					String name = getNodeAttributeValue(node, "name");
 					String expr = getNodeAttributeValue(node, "expr");
 					declaration.setValue(name, expr, 50);
 				}
 			});
 			put("clear", new NodeExecutor() {
-				public void execute(Node node) throws ScriptException {
+				public void execute(Node node) {
 					clearVariable(node);
 				}
 			});
-
 			put("if", new NodeExecutor() {
-				public void execute(Node node) throws InterpreterException, ScriptException,
-						IOException, ReturnException {
+				public void execute(Node node) throws InterpreterException, IOException,
+						ReturnException {
 					checkConditionAndExecute(node);
 				}
 			});
-
 			put("prompt", new NodeExecutor() {
-				public void execute(Node node) throws ScriptException, IOException {
+				public void execute(Node node) throws IOException {
 					collectPrompt(node);
-
 				}
 			});
-
 			put("#text", new NodeExecutor() {
 				public void execute(Node node) {
 					collectSimpleSpeechPrompt(node);
@@ -135,7 +124,7 @@ class Executor {
 				}
 			});
 			put("goto", new NodeExecutor() {
-				public void execute(Node node) throws GotoException, ScriptException {
+				public void execute(Node node) throws GotoException {
 					String nextItemAtt = getNodeAttributeValue(node, "nextitem");
 					String next = getNodeAttributeValue(node, "next");
 
@@ -146,9 +135,8 @@ class Executor {
 					throw new GotoException(next, nextItemAtt);
 				}
 			});
-
 			put("submit", new NodeExecutor() {
-				public void execute(Node node) throws InterpreterException, ScriptException {
+				public void execute(Node node) throws InterpreterException {
 					String next = getNodeAttributeValue(node, "next");
 
 					String nameList = getNodeAttributeValue(node, "namelist");
@@ -164,20 +152,17 @@ class Executor {
 					throw new SubmitException(next);
 				}
 			});
-
 			put("exit", new NodeExecutor() {
 				@Override
-				public void execute(Node node) throws InterpreterException, ScriptException,
-						IOException {
+				public void execute(Node node) throws InterpreterException, IOException {
 					context.setHangup(true);
 					throw new ExitException();
 				}
 			});
 			put("return", new NodeExecutor() {
 				@Override
-				public void execute(Node node) throws InterpreterException, ScriptException,
-						IOException, ReturnException {
-					System.err.println("return");
+				public void execute(Node node) throws InterpreterException, IOException,
+						ReturnException {
 					throw new ReturnException(getNodeAttributeValue(node, "namelist"));
 				}
 			});
@@ -186,15 +171,9 @@ class Executor {
 					throw new EventException("connection.disconnect.hangup");
 				}
 			});
-			put("script", new NodeExecutor() {
-				public void execute(Node node) throws ScriptException, IOException {
-
-				}
-			});
 			put("log", new NodeExecutor() {
 				@Override
-				public void execute(Node node) throws InterpreterException, ScriptException,
-						IOException {
+				public void execute(Node node) throws InterpreterException, IOException {
 					Log log = new Log();
 
 					String label = getNodeAttributeValue(node, "label");
@@ -214,7 +193,6 @@ class Executor {
 					throw new EventException(getNodeAttributeValue(node, "event"));
 				}
 			});
-
 			put("filled", new NodeExecutor() {
 				public void execute(Node node) throws DOMException, FilledException {
 					throw new FilledException(context.getSelectedFormItem());
@@ -228,7 +206,7 @@ class Executor {
 		this.declaration = declaration;
 	}
 
-	void execute(Node node) throws InterpreterException, ScriptException, IOException {
+	void execute(Node node) throws InterpreterException, IOException {
 		NodeList child = node.getChildNodes();
 		for (int i = 0; i < child.getLength(); i++) {
 			Node node1 = child.item(i);
@@ -242,10 +220,10 @@ class Executor {
 				}
 			}
 		}
-		declaration.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
+		declaration.resetScopeBinding(ANONYME_SCOPE);
 	}
 
-	private String getNodeValue(Node node) throws ScriptException {
+	private String getNodeValue(Node node) {
 		NodeList childs = node.getChildNodes();
 		String value = "";
 		for (int i = 0; i < childs.getLength(); i++) {
@@ -258,23 +236,19 @@ class Executor {
 		return value;
 	}
 
-	private void clearVariable(Node node) throws ScriptException {
-
+	private void clearVariable(Node node) {
 		String namelist = getNodeAttributeValue(node, "namelist");
-
 		if (namelist != null) {
 			StringTokenizer tokenizer = new StringTokenizer(namelist);
 			while (tokenizer.hasMoreElements()) {
 				String name = (String) tokenizer.nextElement();
 				declaration.setValue(name, "undefined", 50);
 			}
-		} else {
-			// TODO: reinit all formItem
 		}
 	}
 
-	private void checkConditionAndExecute(Node node) throws InterpreterException, ScriptException,
-			IOException, ReturnException {
+	private void checkConditionAndExecute(Node node) throws InterpreterException, IOException,
+			ReturnException {
 		boolean conditionChecked = this.checkCond(node);
 		NodeList childs = node.getChildNodes();
 
@@ -285,7 +259,6 @@ class Executor {
 					NodeExecutor nodeExecutor = nodeExecutors.get(item.getNodeName());
 					if (nodeExecutor != null)
 						nodeExecutor.execute(item);
-
 				}
 			} else if (VxmlElementType.isConditionalItem(item)) {
 				if (conditionChecked) {
@@ -297,15 +270,15 @@ class Executor {
 		}
 	}
 
-	private boolean checkCond(Node node) throws ScriptException, IOException {
+	private boolean checkCond(Node node) throws IOException {
 		String cond = getNodeAttributeValue(node, "cond");
 
 		return cond == null
 				|| ((Boolean) declaration.evaluateScript(cond,
-						DefaultInterpreterScriptContext.ANONYME_SCOPE));
+						InterpreterVariableDeclaration.ANONYME_SCOPE));
 	}
 
-	private void collectPrompt(Node node) throws ScriptException, IOException {
+	private void collectPrompt(Node node) throws IOException {
 		Prompt p = new Prompt();
 		if (node.getNodeName().equals("prompt")) {
 			String timeout = getNodeAttributeValue(node, "timeout");
@@ -348,9 +321,9 @@ class Executor {
 		}
 	}
 
-	private void addPromptWithValue(Node value, Prompt p) throws ScriptException, IOException {
+	private void addPromptWithValue(Node value, Prompt p) throws IOException {
 		p.tts += declaration.evaluateScript(getNodeAttributeValue(value, "expr"),
-				DefaultInterpreterScriptContext.ANONYME_SCOPE);
+				InterpreterVariableDeclaration.ANONYME_SCOPE);
 	}
 
 	private void collectSimpleSpeechPrompt(Node node) {

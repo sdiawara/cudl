@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
-import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.mozilla.javascript.Undefined;
@@ -22,7 +21,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import cudl.script.InterpreterScriptContext;
 import cudl.script.InterpreterVariableDeclaration;
 import cudl.utils.Utils;
 import cudl.utils.VxmlElementType;
@@ -38,14 +36,13 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 
 	Executor executor;
 
-	FormInterpreationAlgorithm(InterpreterContext context,
-			InterpreterVariableDeclaration declaration) {
+	FormInterpreationAlgorithm(InterpreterContext context, InterpreterVariableDeclaration declaration) {
 		this.context = context;
 		this.declaration = declaration;
 		this.executor = new Executor(context, declaration);
 	}
 
-	void initializeDialog(Node dialog) throws ScriptException, IOException {
+	void initializeDialog(Node dialog) throws IOException {
 		form_item_generated = 0;
 		lastIteraionEndWithGotoNextItem = false;
 		formItemNames.clear();
@@ -57,21 +54,21 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 			String expr = getNodeAttributeValue(child, "expr");
 			if ("var".equals(getName(child))) {
 				declaration.declareVariable(name, expr == null ? "undefined" : expr,
-						InterpreterScriptContext.DIALOG_SCOPE);
+						InterpreterVariableDeclaration.DIALOG_SCOPE);
 			} else if ("script".equals(getName(child))) {
 				String src = getNodeAttributeValue(child, "src");
 				if (src == null) {
 					declaration.evaluateScript(child.getTextContent(),
-							InterpreterScriptContext.DIALOG_SCOPE);
+							InterpreterVariableDeclaration.DIALOG_SCOPE);
 				} else {
-					declaration.evaluateFileScript(src, InterpreterScriptContext.DIALOG_SCOPE);
+					declaration.evaluateFileScript(src, InterpreterVariableDeclaration.DIALOG_SCOPE);
 				}
 			} else if (isFormItem(child)) {
 				if (name == null) {
 					name = "form_item_generated_name_by_cudl_" + form_item_generated++;
 				}
 				declaration.declareVariable(name, expr == null ? "undefined" : expr,
-						InterpreterScriptContext.DIALOG_SCOPE);
+						InterpreterVariableDeclaration.DIALOG_SCOPE);
 
 				if (isInputItem(child) || "initial".equals(getName(child))) {
 					promptCounter.put(name, 1);
@@ -81,8 +78,8 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 		}
 	}
 
-	void mainLoop() throws ScriptException, IOException, InterpreterException,
-			ParserConfigurationException, SAXException {
+	void mainLoop() throws IOException, InterpreterException, ParserConfigurationException,
+			SAXException {
 		while (true) {
 			// PHASE SELECT
 			Node formItem = selectNextFormItem();
@@ -124,18 +121,18 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 					executor.prompts.addAll(internalInterpreter.getPrompts());
 				}
 				declaration.evaluateScript(formItemNames.get(formItem) + "=new Object();",
-						InterpreterScriptContext.DIALOG_SCOPE);
+						InterpreterVariableDeclaration.DIALOG_SCOPE);
 				if (internalInterpreter != null) {
 					String returnValue = internalInterpreter.getContext().getReturnValue();
 					System.err.println("return value" + returnValue);
 					StringTokenizer tokenizer = new StringTokenizer(returnValue);
 					while (tokenizer.hasMoreElements()) {
 						String variable = tokenizer.nextToken();
-						InterpreterVariableDeclaration declaration2 = internalInterpreter
-								.getContext().getDeclaration();
-						declaration.evaluateScript(formItemNames.get(formItem) + "." + variable
-								+ "='" + declaration2.getValue(variable) + "'",
-								InterpreterScriptContext.ANONYME_SCOPE);
+						InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext()
+								.getDeclaration();
+						declaration.evaluateScript(formItemNames.get(formItem) + "." + variable + "='"
+								+ declaration2.getValue(variable) + "'",
+								InterpreterVariableDeclaration.ANONYME_SCOPE);
 					}
 				}
 
@@ -153,7 +150,7 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 				executor.execute(formItem);
 			} else if ("block".equals(getName(formItem))) {
 				declaration.setValue(formItemNames.get(formItem), "true",
-						InterpreterScriptContext.DIALOG_SCOPE);
+						InterpreterVariableDeclaration.DIALOG_SCOPE);
 				try {
 					executor.execute(formItem);
 				} catch (GotoException e) {
@@ -161,8 +158,8 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 						gotoNextItem = e.nextItem;
 						lastIteraionEndWithGotoNextItem = true;
 					} else {
-						declaration.resetScopeBinding(InterpreterScriptContext.DIALOG_SCOPE);
-						declaration.resetScopeBinding(InterpreterScriptContext.ANONYME_SCOPE);
+						declaration.resetScopeBinding(InterpreterVariableDeclaration.DIALOG_SCOPE);
+						declaration.resetScopeBinding(InterpreterVariableDeclaration.ANONYME_SCOPE);
 						int indexOf = e.next.indexOf("#");
 						if (indexOf >= 0)
 							context.setNexted(e.next.substring(indexOf + 1));
@@ -179,8 +176,7 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 		}
 	}
 
-	private void declareParams(InternalInterpreter internalInterpreter, NodeList childNodes)
-			throws ScriptException {
+	private void declareParams(InternalInterpreter internalInterpreter, NodeList childNodes) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node item = childNodes.item(i);
 			if (item.getNodeName().equals("param")) {
@@ -190,24 +186,24 @@ class FormInterpreationAlgorithm /* TODO: make it observer */{
 				System.err.println("Param " + name + "\t" + declaration.evaluateScript(value, 50));
 				internalInterpreter.getContext().getDeclaration().declareVariable(name,
 						"'" + declaration.evaluateScript(value, 50) + "'",
-						InterpreterScriptContext.ANONYME_SCOPE);
+						InterpreterVariableDeclaration.ANONYME_SCOPE);
 			}
 		}
 	}
 
 	private void setSubdialogRequierement(String src, InternalInterpreter internalInterpreter)
-			throws ScriptException, IOException, SAXException {
+			throws IOException, SAXException {
 		String[] split = src.split("#");
 
 		if (split.length == 2)
 			internalInterpreter.getContext().setCurrentDialog(
-					Utils.searchDialogByName(context.getCurrentDialog().getParentNode()
-							.getChildNodes(), split[1]));
+					Utils.searchDialogByName(context.getCurrentDialog().getParentNode().getChildNodes(),
+							split[1]));
 		if (!split[0].equals(""))
 			internalInterpreter.getContext().buildDocument(split[0]);
 	}
 
-	Node selectNextFormItem() throws ScriptException {
+	Node selectNextFormItem() {
 		Node node = null;
 		if (lastIteraionEndWithGotoNextItem) {
 			node = Utils.searchItemByName(context.getCurrentDialog(), gotoNextItem);

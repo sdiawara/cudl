@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+  <var name="x" expr="'toto'"/>
+  <var name="y" expr="'toto'"/>
+    <block>
+         <clear namelist="x y"/>
+    	 <if cond="typeof(x) == 'undefined' &amp;&amp; typeof(y) == 'undefined'">
+    	     <log>pass</log>
+    	     <prompt>pass</prompt>
+    	  <else/>
+              <log>fail</log>
+    	      <prompt>fail</prompt>
+         </if>
+    </block>
+    </form>
+</vxml>

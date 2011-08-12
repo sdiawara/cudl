@@ -22,8 +22,8 @@ public class Prompt {
 
 	@Override
 	public String toString() {
-		return "prompt[" + "audio:" + audio + "," + "timeout:" + timeout + "," + "bargein:"
-				+ bargein + "," + "bargeinType:" + bargeinType + "," + "tts:" + tts + "]";
+		return "prompt[" + "audio:" + audio + "," + "timeout:" + timeout + "," + "bargein:" + bargein
+				+ "," + "bargeinType:" + bargeinType + "," + "tts:" + tts + "]";
 	}
 
 	private boolean equalOrBothNull(Object o1, Object o2) {

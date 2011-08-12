@@ -6,8 +6,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import javax.script.ScriptException;
-
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -23,23 +22,20 @@ class InterpreterEventHandler implements InterpreterListener {
 	}
 
 	@Override
-	public void doEvent(InterpreterEvent interpreterEvent, Executor executor)
-			throws ScriptException, IOException, SAXException,
-			InterpreterException {
+	public void doEvent(InterpreterEvent interpreterEvent, Executor executor) throws IOException,
+			SAXException, InterpreterException {
 
 		String type = interpreterEvent.type;
-		eventCounter.put(type, (eventCounter.get(type) == null) ? 1
-				: eventCounter.get(type) + 1);
+		eventCounter.put(type, (eventCounter.get(type) == null) ? 1 : eventCounter.get(type) + 1);
 
 		List<Node> catchList = searchEvent(type, context.getSelectedFormItem());
 		if (catchList.size() == 0) {
 			if (context.getRootDocument() != null)
-				catchList = searchEvent(type, context.getRootDocument()
-						.getElementsByTagName("vxml").item(0));
+				catchList = searchEvent(type, context.getRootDocument().getElementsByTagName("vxml")
+						.item(0));
 		}
-		// source.selectedItem.getElementsByTagName("vxml").item(0)
 
-		System.err.println("catchLinst =  " +catchList);
+		System.err.println("catchLinst =  " + catchList);
 		// FIXME: take the first with a correct event counter
 		// a counter who is ≤ at currentCounter
 		// System.err.println(catchList);
@@ -52,8 +48,7 @@ class InterpreterEventHandler implements InterpreterListener {
 			NodeList nodeList = parent.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
-				if (node.getNodeName().equals(eventName)
-						|| isCatchItemAndContainEvent(node, eventName)) {
+				if (node.getNodeName().equals(eventName) || isCatchItemAndContainEvent(node, eventName)) {
 					eventList.add(node);
 				}
 			}
@@ -64,9 +59,8 @@ class InterpreterEventHandler implements InterpreterListener {
 	}
 
 	private boolean isCatchItemAndContainEvent(Node node, String eventName) {
-		return (node.getNodeName().equals("catch")
-				&& (node.getAttributes().getLength() > 0) && (node
-				.getAttributes().getNamedItem("event").getNodeValue()
-				.contains(eventName)));
+		NamedNodeMap attributes = node.getAttributes();
+		return (node.getNodeName().equals("catch") && (attributes.getLength() > 0) && (attributes
+				.getNamedItem("event").getNodeValue().contains(eventName)));
 	}
 }
