@@ -16,7 +16,7 @@ import cudl.event.InterpreterEvent;
 import cudl.utils.Utils;
 
 class InterpreterEventHandler implements InterpreterListener {
-	private  Map<String, Integer> eventCounter;
+	private Map<String, Integer> eventCounter;
 	private final InterpreterContext context;
 
 	InterpreterEventHandler(InterpreterContext context) {
@@ -25,8 +25,8 @@ class InterpreterEventHandler implements InterpreterListener {
 	}
 
 	@Override
-	public void doEvent(InterpreterEvent interpreterEvent) throws IOException,
-			SAXException, InterpreterException {
+	public void doEvent(InterpreterEvent interpreterEvent) throws IOException, SAXException,
+			InterpreterException {
 
 		String type = interpreterEvent.type;
 		eventCounter.put(type, (eventCounter.get(type) == null) ? 1 : eventCounter.get(type) + 1);
@@ -40,9 +40,6 @@ class InterpreterEventHandler implements InterpreterListener {
 		}
 
 		System.err.println("catchLinst =  " + catchList + "   " + interpreterEvent.type);
-		// FIXME: take the first with a correct event counter
-		// a counter who is ≤ at currentCounter
-		// System.err.println(catchList);
 		for (Iterator<Node> iterator = catchList.iterator(); iterator.hasNext();) {
 			Node node = (Node) iterator.next();
 			String c = Utils.getNodeAttributeValue(node, "count");
@@ -56,7 +53,6 @@ class InterpreterEventHandler implements InterpreterListener {
 			}
 		}
 		TagInterpreterFactory.getTagInterpreter(catchList.get(0), context).interpret(context);
-		// executor.execute(catchList.get(0));
 	}
 
 	private List<Node> searchEvent(String eventName, Node parent) {

@@ -10,7 +10,7 @@ import org.xml.sax.SAXException;
 class VxmlIRTag {
 }
 
-class ConfpassTag extends AbstractVxmlElement {
+class ConfpassTag extends DefaultVxmlElementInterpreter {
 
 	public ConfpassTag(Node node, InterpreterContext context) {
 		super(node, context);
@@ -27,7 +27,7 @@ class ConfpassTag extends AbstractVxmlElement {
 
 }
 
-class ConffailTag extends AbstractVxmlElement {
+class ConffailTag extends DefaultVxmlElementInterpreter {
 
 	public ConffailTag(Node node, InterpreterContext context) {
 		super(node, context);

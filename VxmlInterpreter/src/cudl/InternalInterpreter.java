@@ -123,7 +123,7 @@ public class InternalInterpreter implements VxmlElement {
 			try {
 				ieh.doEvent(new InterpreterEvent(this, ((EventException) e).type));
 			} catch (InterpreterException e1) {
-				System.out.println("--------" + e.getClass().getSimpleName());
+				executionHandler(e1);
 			}
 		}
 	}

@@ -483,8 +483,8 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3cEnumerateCanProduceApromptIMenuElement() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void w3c218Test() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
 		// Assertion:
 		// "An enumerate element can be used inside prompts associated with a menu element."
 		// Pass if user hears utterances that alpha, bravo, charlie and delta
@@ -504,12 +504,10 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3cEnumerateCanProduceApromptICatchElement() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
-		// Assertion:
-		// "An enumerate element can be used inside prompts associated with a menu element."
-		// Pass if user hears utterances that alpha, bravo, charlie and delta
-		// expand to in order, otherwise fail.
+	public void w3c219Test() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
+		// An enumerate element can be used inside catch element elements
+		// associated with a menu element.
 
 		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();
 		prompt = new Prompt();
@@ -525,4 +523,22 @@ public class W3cInterpreterTest {
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 	}
 
+	@Test
+	public void w3c216Test() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
+		// The enumerate element without content inside a prompt lists all the
+		// choices, following the order in which they appear in the menu.
+
+		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();
+		prompt = new Prompt();
+		prompt.tts = "alpha; bravo; charlie; delta;";
+		exceptedPrompts.add(prompt);
+
+		interpreter = new Interpreter(url + "w3c/216.txml");
+		interpreter.start();
+		interpreter.noInput();
+
+		assertTrue(interpreter.raccrochage());
+		assertEquals(exceptedPrompts, interpreter.getPrompts());
+	}
 }

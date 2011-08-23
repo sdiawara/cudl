@@ -26,7 +26,7 @@ interface VxmlElement {
 			SAXException;
 }
 
-class FormTag extends AbstractVxmlElement {
+class FormTag extends DefaultVxmlElementInterpreter {
 	private static final String initChild = "var script";
 	private int form_item_generated = 0;
 	private String formItems = "block transfer subdialog field";
@@ -141,7 +141,7 @@ class FormTag extends AbstractVxmlElement {
 	}
 }
 
-class MenuTag extends AbstractVxmlElement {
+class MenuTag extends DefaultVxmlElementInterpreter {
 	private String execute = "prompt";
 
 	public MenuTag(Node node, InterpreterContext context) {
@@ -163,7 +163,7 @@ class MenuTag extends AbstractVxmlElement {
 	}
 }
 
-class VarTag extends AbstractVxmlElement {
+class VarTag extends DefaultVxmlElementInterpreter {
 	public VarTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -181,7 +181,7 @@ class VarTag extends AbstractVxmlElement {
 	}
 }
 
-class LogTag extends AbstractVxmlElement {
+class LogTag extends DefaultVxmlElementInterpreter {
 	public LogTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -210,7 +210,7 @@ class LogTag extends AbstractVxmlElement {
 	}
 }
 
-class PromptTag extends AbstractVxmlElement {
+class PromptTag extends DefaultVxmlElementInterpreter {
 	String prompt = "audio";
 
 	public PromptTag(Node node, InterpreterContext context) {
@@ -254,7 +254,7 @@ class PromptTag extends AbstractVxmlElement {
 	}
 }
 
-class ExitTag extends AbstractVxmlElement {
+class ExitTag extends DefaultVxmlElementInterpreter {
 	public ExitTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -266,7 +266,7 @@ class ExitTag extends AbstractVxmlElement {
 	}
 }
 
-class AssignTag extends AbstractVxmlElement {
+class AssignTag extends DefaultVxmlElementInterpreter {
 	public AssignTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -280,7 +280,7 @@ class AssignTag extends AbstractVxmlElement {
 	}
 }
 
-class ClearTag extends AbstractVxmlElement {
+class ClearTag extends DefaultVxmlElementInterpreter {
 	public ClearTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -300,7 +300,7 @@ class ClearTag extends AbstractVxmlElement {
 	}
 }
 
-class IfTag extends AbstractVxmlElement {
+class IfTag extends DefaultVxmlElementInterpreter {
 	public IfTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -337,7 +337,7 @@ class IfTag extends AbstractVxmlElement {
 	}
 }
 
-class TextTag extends AbstractVxmlElement {
+class TextTag extends DefaultVxmlElementInterpreter {
 	public TextTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -354,7 +354,7 @@ class TextTag extends AbstractVxmlElement {
 	}
 }
 
-class CommentTag extends AbstractVxmlElement {
+class CommentTag extends DefaultVxmlElementInterpreter {
 	public CommentTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -365,7 +365,7 @@ class CommentTag extends AbstractVxmlElement {
 	}
 }
 
-class GotoTag extends AbstractVxmlElement {
+class GotoTag extends DefaultVxmlElementInterpreter {
 	public GotoTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -383,20 +383,7 @@ class GotoTag extends AbstractVxmlElement {
 	}
 }
 
-// Non implementer
-
-// class RepromptTag extends AbstractVxmlElement {
-// public RepromptTag(Node node, InterpreterContext context) {
-// super(node, context);
-// }
-//
-// @Override
-// public Object interpret(InterpreterContext context) {
-// return null;
-// }
-// }
-
-class SubmitTag extends AbstractVxmlElement {
+class SubmitTag extends DefaultVxmlElementInterpreter {
 	public SubmitTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -420,7 +407,7 @@ class SubmitTag extends AbstractVxmlElement {
 	}
 }
 
-class ReturnTag extends AbstractVxmlElement {
+class ReturnTag extends DefaultVxmlElementInterpreter {
 	public ReturnTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -432,7 +419,7 @@ class ReturnTag extends AbstractVxmlElement {
 	}
 }
 
-class DisconnectTag extends AbstractVxmlElement {
+class DisconnectTag extends DefaultVxmlElementInterpreter {
 	public DisconnectTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -443,7 +430,7 @@ class DisconnectTag extends AbstractVxmlElement {
 	}
 }
 
-class ValueTag extends AbstractVxmlElement {
+class ValueTag extends DefaultVxmlElementInterpreter {
 	public ValueTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -454,7 +441,7 @@ class ValueTag extends AbstractVxmlElement {
 	}
 }
 
-class ThrowTag extends AbstractVxmlElement {
+class ThrowTag extends DefaultVxmlElementInterpreter {
 	public ThrowTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -466,7 +453,7 @@ class ThrowTag extends AbstractVxmlElement {
 	}
 }
 
-class FilledTag extends AbstractVxmlElement {
+class FilledTag extends DefaultVxmlElementInterpreter {
 	private boolean execute = false;
 
 	public FilledTag(Node node, InterpreterContext context) {
@@ -478,11 +465,7 @@ class FilledTag extends AbstractVxmlElement {
 			SAXException {
 		if (!execute)
 			throw new FilledException(node.getParentNode());
-		NodeList childs = node.getChildNodes();
-		for (int i = 0; i < childs.getLength(); i++) {
-			TagInterpreterFactory.getTagInterpreter(childs.item(i), context).interpret(context);
-		}
-		return null;
+		return super.interpret(context);
 	}
 
 	public void setExecute(boolean execute) {
@@ -490,7 +473,7 @@ class FilledTag extends AbstractVxmlElement {
 	}
 }
 
-class ScriptTag extends AbstractVxmlElement {
+class ScriptTag extends DefaultVxmlElementInterpreter {
 	public ScriptTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -509,8 +492,7 @@ class ScriptTag extends AbstractVxmlElement {
 	}
 }
 
-class BlockTag extends AbstractVxmlElement {
-
+class BlockTag extends DefaultVxmlElementInterpreter {
 	public BlockTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -518,19 +500,13 @@ class BlockTag extends AbstractVxmlElement {
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException,
 			SAXException {
-		System.err.println("Block -----> " + context.getFormItemNames().get(node));
 		context.getDeclaration().setValue(context.getFormItemNames().get(node), "true",
 				InterpreterVariableDeclaration.DIALOG_SCOPE);
-		NodeList childs = node.getChildNodes();
-		for (int i = 0; i < childs.getLength(); i++) {
-			TagInterpreterFactory.getTagInterpreter(childs.item(i), context).interpret(context);
-		}
-		return null;
+		return super.interpret(context);
 	}
-
 }
 
-class SubdialogTag extends AbstractVxmlElement {
+class SubdialogTag extends DefaultVxmlElementInterpreter {
 	public SubdialogTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -538,11 +514,9 @@ class SubdialogTag extends AbstractVxmlElement {
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException,
 			SAXException {
-		System.err.println("subdialog *****" + node);
 		context.getDeclaration().setValue(context.getFormItemNames().get(node), "true",
 				InterpreterVariableDeclaration.DIALOG_SCOPE);
 		String src = getNodeAttributeValue(node, "src");
-		System.err.println("subdialog src =" + src);
 		InternalInterpreter internalInterpreter = null;
 		if (src != null) {
 			InterpreterContext subdialogContext;
@@ -550,11 +524,9 @@ class SubdialogTag extends AbstractVxmlElement {
 				String location = Utils.tackWeelFormedUrl(context.getLocation(), src);
 				subdialogContext = new InterpreterContext(location, new InterpreterVariableDeclaration(
 						location));
-
 				internalInterpreter = new InternalInterpreter(subdialogContext);
 				declareParams(internalInterpreter, node.getChildNodes());
 				internalInterpreter.interpret(subdialogContext);
-				System.err.println("FIN interpretation subdialog");
 			} catch (ParserConfigurationException e1) {
 				throw new RuntimeException(e1);
 			}
@@ -608,7 +580,7 @@ class SubdialogTag extends AbstractVxmlElement {
 	}
 }
 
-class TransferTag extends AbstractVxmlElement {
+class TransferTag extends DefaultVxmlElementInterpreter {
 	public TransferTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -624,7 +596,7 @@ class TransferTag extends AbstractVxmlElement {
 	}
 }
 
-class FieldTag extends AbstractVxmlElement {
+class FieldTag extends DefaultVxmlElementInterpreter {
 	private String tags = "prompt var assign if goto submit filled";
 
 	public FieldTag(Node node, InterpreterContext context) {
@@ -645,7 +617,7 @@ class FieldTag extends AbstractVxmlElement {
 	}
 }
 
-class AudioTag extends AbstractVxmlElement {
+class AudioTag extends DefaultVxmlElementInterpreter {
 	public AudioTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -660,58 +632,25 @@ class AudioTag extends AbstractVxmlElement {
 	}
 }
 
-class NoinputTag extends AbstractVxmlElement {
+class NoinputTag extends DefaultVxmlElementInterpreter {
 	public NoinputTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
-
-	@Override
-	public Object interpret(InterpreterContext context) throws InterpreterException, IOException,
-			SAXException {
-		NodeList childs = node.getChildNodes();
-		for (int i = 0; i < childs.getLength(); i++) {
-			Node child = childs.item(i);
-			System.err.println(child.getNodeName() + " noooooo input");
-			TagInterpreterFactory.getTagInterpreter(child, context).interpret(context);
-		}
-		return null;
-	}
 }
 
-class CatchTag extends AbstractVxmlElement {
+class CatchTag extends DefaultVxmlElementInterpreter {
 	public CatchTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
-
-	@Override
-	public Object interpret(InterpreterContext context) throws InterpreterException, IOException,
-			SAXException {
-		NodeList childs = node.getChildNodes();
-		for (int i = 0; i < childs.getLength(); i++) {
-			Node child = childs.item(i);
-			TagInterpreterFactory.getTagInterpreter(child, context).interpret(context);
-		}
-		return null;
-	}
 }
 
-class NomatchTag extends AbstractVxmlElement {
+class NomatchTag extends DefaultVxmlElementInterpreter {
 	public NomatchTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
-
-	@Override
-	public Object interpret(InterpreterContext context) throws InterpreterException, IOException,
-			SAXException {
-		NodeList childs = node.getChildNodes();
-		for (int i = 0; i < childs.getLength(); i++) {
-			TagInterpreterFactory.getTagInterpreter(childs.item(i), context).interpret(context);
-		}
-		return null;
-	}
 }
 
-class EnumerateTag extends AbstractVxmlElement {
+class EnumerateTag extends DefaultVxmlElementInterpreter {
 	public EnumerateTag(Node node, InterpreterContext context) {
 		super(node, context);
 	}
@@ -732,12 +671,22 @@ class EnumerateTag extends AbstractVxmlElement {
 
 }
 
-abstract class AbstractVxmlElement implements VxmlElement {
+class DefaultVxmlElementInterpreter implements VxmlElement {
 	protected final Node node;
 	protected final InterpreterContext context;
 
-	AbstractVxmlElement(Node node, InterpreterContext context) {
+	DefaultVxmlElementInterpreter(Node node, InterpreterContext context) {
 		this.node = node;
 		this.context = context;
+	}
+
+	@Override
+	public Object interpret(InterpreterContext context) throws InterpreterException, IOException,
+			SAXException {
+		NodeList childs = node.getChildNodes();
+		for (int i = 0; i < childs.getLength(); i++) {
+			TagInterpreterFactory.getTagInterpreter(childs.item(i), context).interpret(context);
+		}
+		return null;
 	}
 }
