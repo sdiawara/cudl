@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.w3.org/2001/vxml 
+   http://www.w3.org/TR/voicexml20/vxml.xsd">
+<menu>
+  <choice next="choix1.vxml">
+     choix 1
+  </choice>
+  <choice next="choix2.vxml">
+	choix 2
+  </choice>
+  <choice next="choixd.vxml">
+   dernier choix
+  </choice>
+</menu>
+</vxml>
