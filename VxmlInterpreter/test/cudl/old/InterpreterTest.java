@@ -24,14 +24,12 @@ public class InterpreterTest extends TestCase {
 
 	@Before
 	public void setUp() throws IOException {
-		url = "file://" + new File(".").getCanonicalPath()
-				+ "/test/docVxml/oldtestfile/";
+		url = "file://" + new File(".").getCanonicalPath() + "/test/docVxml/oldtestfile/";
 	}
 
 	@Test
 	public void testCallServiceNavigateUntilNextInteractionAndCollectsNavigationTraces()
-			throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+			throws IOException, ScriptException, ParserConfigurationException, SAXException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("new call");
@@ -54,16 +52,14 @@ public class InterpreterTest extends TestCase {
 		expectedPrompt = new Prompt();
 		expectedPrompt.timeout = "100ms";
 		expectedPrompt.bargein = "false";
-		expectedPrompt.audio = "file:///usr2/sons/3900sonsappli/AT_REROUTAGE_SAUI.wav ";
+		expectedPrompt.audio = "file:///usr2/sons/3900sonsappli/AT_REROUTAGE_SAUI.wav";
 		expectedPrompts.add(expectedPrompt);
 
 		expectedPrompt = new Prompt();
 		expectedPrompt.timeout = "200ms";
 		expectedPrompt.bargein = "true";
-		// expectedPrompt.bargeinType = "hotword";
-		expectedPrompt.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav ";
+		expectedPrompt.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav";
 		expectedPrompt.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».";
-		// expectedPrompt.interruptionGrammar = "/data/modeles/TARIF.srg";
 		expectedPrompts.add(expectedPrompt);
 
 		interpreter = new Interpreter(url + "VxmlGlobalServletService");
@@ -73,14 +69,14 @@ public class InterpreterTest extends TestCase {
 		assertEquals(expectedStats, interpreter.getTracetWithLabel("stats"));
 		System.err.println(expectedPrompts);
 		System.err.println(interpreter.getPrompts());
+
 		assertEquals(expectedPrompts, interpreter.getPrompts());
 		assertFalse(interpreter.raccrochage());
 	}
 
 	@Test
-	public void testNoInputAndNoMatchNavigatesUntilNextInteraction()
-			throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void testNoInputAndNoMatchNavigatesUntilNextInteraction() throws IOException,
+			ScriptException, ParserConfigurationException, SAXException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("new call");
@@ -103,9 +99,8 @@ public class InterpreterTest extends TestCase {
 	}
 
 	@Test
-	public void testNavigationCollectsTransfertInformationButDoNotTransfer()
-			throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void testNavigationCollectsTransfertInformationButDoNotTransfer() throws IOException,
+			ScriptException, ParserConfigurationException, SAXException {
 
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
@@ -114,8 +109,7 @@ public class InterpreterTest extends TestCase {
 		interpreter = new Interpreter(url + "transfer/VxmlGlobalServletService");
 		interpreter.start();
 
-		assertEquals("sup:4700810C810106830783105506911808", interpreter
-				.getTranferDestination());
+		assertEquals("sup:4700810C810106830783105506911808", interpreter.getTranferDestination());
 		// assertFalse(interpreter.raccrochage());
 		// si
 		// transfert
@@ -128,9 +122,8 @@ public class InterpreterTest extends TestCase {
 	}
 
 	@Test
-	public void testTransferOKSimulatesTransferOnTransferPage()
-			throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void testTransferOKSimulatesTransferOnTransferPage() throws IOException, ScriptException,
+			ParserConfigurationException, SAXException {
 
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
@@ -141,8 +134,7 @@ public class InterpreterTest extends TestCase {
 		interpreter.start();
 		interpreter.callerHangup(0);
 
-		assertEquals("sup:4700810C810106830783105506911808", interpreter
-				.getTranferDestination());
+		assertEquals("sup:4700810C810106830783105506911808", interpreter.getTranferDestination());
 		// si
 		// transfert
 		// alors il
@@ -150,14 +142,13 @@ public class InterpreterTest extends TestCase {
 		// a pas raccrochage
 		assertFalse(interpreter.getTraceLog().isEmpty());
 		assertEquals(expectedLogs, interpreter.getTraceLog());
-		// System.err.println(interpreter.raccrochage() + "   ---->");
+		// System.err.println(interpreter.raccrochage() + " ---->");
 		// assertTrue(interpreter.raccrochage());
 	}
 
 	@Test
-	public void testTransferKOSimulatesBadTransferOnTransferPage()
-			throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void testTransferKOSimulatesBadTransferOnTransferPage() throws IOException,
+			ScriptException, ParserConfigurationException, SAXException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
 		expectedLogs.add("LOG PHASE transfert");
@@ -167,8 +158,7 @@ public class InterpreterTest extends TestCase {
 		interpreter.start();
 		interpreter.noAnswer();
 
-		assertEquals("sup:4700810C810106830783105506911808", interpreter
-				.getTranferDestination());
+		assertEquals("sup:4700810C810106830783105506911808", interpreter.getTranferDestination());
 		// assertTrue(interpreter.raccrochage());
 		assertFalse(interpreter.getTraceLog().isEmpty());
 		assertEquals(expectedLogs, interpreter.getTraceLog());

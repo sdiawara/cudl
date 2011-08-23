@@ -7,7 +7,6 @@
   </catch>
     
   <form>
-
       <subdialog name="subtest" src="#subtarget"/>
       <block>
         <if cond="subtest==undefined || subtest.result!='passed'">

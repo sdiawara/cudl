@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
@@ -27,8 +26,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTrace() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void testLogTrace() throws IOException, ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -46,8 +44,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTraceWithExit() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testLogTraceWithExit() throws IOException, ParserConfigurationException,
+			SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -65,8 +63,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTraceWhithVariable() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testLogTraceWhithVariable() throws IOException, ParserConfigurationException,
+			SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 2 +356 689999");
@@ -85,8 +83,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogTraceWithIfElseifAndElse() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testLogTraceWithIfElseifAndElse() throws IOException, ParserConfigurationException,
+			SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -109,8 +107,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogManyBlock() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testLogManyBlock() throws IOException, ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -124,8 +121,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testLogGotoInASameDialog() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testLogGotoInASameDialog() throws IOException, ParserConfigurationException,
+			SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("LOG Hello");
 		traceLog.add("LOG Hello 1");
@@ -144,15 +141,14 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testCollectPrompt() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testCollectPrompt() throws IOException, ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
 		promptExecepeted = new Prompt();
 		promptExecepeted.timeout = "200ms";
 		promptExecepeted.bargein = "true";
-		promptExecepeted.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav ";
+		promptExecepeted.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav";
 		promptExecepeted.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».";
 		prompts.add(promptExecepeted);
 
@@ -163,7 +159,7 @@ public class InterpreterTest {
 		promptExecepeted = new Prompt();
 		promptExecepeted.timeout = "300ms";
 		promptExecepeted.bargein = "true";
-		promptExecepeted.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav ";
+		promptExecepeted.audio = "/ROOT/prompts/WAV/ACCUEIL_CHOIX_TARIFS.wav";
 		promptExecepeted.tts = "Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».";
 		prompts.add(promptExecepeted);
 
@@ -174,30 +170,34 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "prompt.vxml");
 		interpreter.start();
 
+		System.err.println(prompts);
+		System.err.println(interpreter.getPrompts());
 		assertEquals(prompts, interpreter.getPrompts());
 	}
 
 	@Test
-	public void testCombinattionPromptTrace() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void testCombinattionPromptTrace() throws IOException, ParserConfigurationException,
+			SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
 		promptExecepeted = new Prompt();
-		promptExecepeted.audio = "rtsp://www.piafcauserie.example.com/grive.wav http://www.piafcauserie.example.com/tourterelle.wav ";
+		promptExecepeted.audio = "rtsp://www.piafcauserie.example.com/grive.wav http://www.piafcauserie.example.com/tourterelle.wav";
 		promptExecepeted.tts = "Bienvenue chez Graines a gogo. Ce mois-ci nous proposons le barril de 250 kg de graines de chardon a 299.95€ frais d'expédition et de transport compris.";
 		prompts.add(promptExecepeted);
 
 		interpreter = new Interpreter(url + "prompt1.vxml");
 		interpreter.start();
 
+		System.err.println(prompts);
+		System.err.println(interpreter.getPrompts());
+
 		assertTrue(interpreter.getPrompts().size() == 1);
 		assertEquals(prompts, interpreter.getPrompts());
 	}
 
 	@Test()
-	public void testNodeValue() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void testNodeValue() throws IOException, ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -216,8 +216,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void sideEffectInScript() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void sideEffectInScript() throws IOException, ParserConfigurationException, SAXException {
 		List<String> traceLog = new ArrayList<String>();
 		traceLog.add("bla bla");
 		traceLog.add("un exemple de variable de global avec effet de bord");
@@ -229,22 +228,21 @@ public class InterpreterTest {
 	}
 
 	@Test(expected = EcmaError.class)
-	public void anonymeScopeVariable() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void anonymeScopeVariable() throws IOException, ParserConfigurationException,
+			SAXException {
 
 		interpreter = new Interpreter(url + "anonymeScopeVariable.vxml");
 		interpreter.start();
 	}
 
 	@Test(expected = EcmaError.class)
-	public void dialogScopeVariable() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void dialogScopeVariable() throws IOException, ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "dialogScopeVariable.vxml");
 		interpreter.start();
 	}
 
 	@Test
-	public void documentScopeVariableIsVisibleInAllDocument() throws IOException, ScriptException,
+	public void documentScopeVariableIsVisibleInAllDocument() throws IOException,
 			URISyntaxException, ParserConfigurationException, SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
@@ -268,8 +266,8 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void RootVariableIsAllWaysVisible() throws IOException, ScriptException,
-			ParserConfigurationException, SAXException {
+	public void RootVariableIsAllWaysVisible() throws IOException, ParserConfigurationException,
+			SAXException {
 		List<Prompt> prompts = new ArrayList<Prompt>();
 		Prompt promptExecepeted;
 
@@ -288,13 +286,13 @@ public class InterpreterTest {
 
 	@Test(expected = EcmaError.class)
 	public void WhenRootChangeLastRootVariableIsNotLongerAccessible() throws IOException,
-			ScriptException, ParserConfigurationException, SAXException {
+			ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "rootChangeVariable.vxml");
 		interpreter.start();
 	}
 
 	@Test
-	public void comparerTwoVariableInDifferentScope() throws IOException, ScriptException,
+	public void comparerTwoVariableInDifferentScope() throws IOException,
 			ParserConfigurationException, SAXException {
 
 		interpreter = new Interpreter(url + "compareTwoVariableDeclaredIndifferentScope");
@@ -302,8 +300,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void assignVariables() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void assignVariables() throws IOException, ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "assignVariables.vxml");
 		interpreter.start();
 
@@ -312,20 +309,44 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void clearVariable() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void clearVariable() throws IOException, ParserConfigurationException, SAXException {
 		List<Prompt> expectedPrompt = new ArrayList<Prompt>();
 		Prompt prompt = new Prompt();
 		prompt.tts = "pass";
 		expectedPrompt.add(prompt);
-		
+
 		Interpreter interpreter = new Interpreter(url + "clear.vxml");
 		interpreter.start();
 
-		
-		
+		System.err.println(interpreter.getPrompts());
 		assertTrue(interpreter.getPrompts().size() == 1);
 		assertEquals(expectedPrompt, interpreter.getPrompts());
 	}
+
+	// @Test
+	// public void testMenuNodeCanBeSelectAndExecute() throws IOException,
+	// ParserConfigurationException, SAXException {
+	//
+	// interpreter = new Interpreter(url + "selectMenu.vxml");
+	// interpreter.start();
+	//
+	// System.err.println(interpreter.getPrompts());
+	// assertFalse(interpreter.getPrompts().isEmpty());
+	// assertTrue(interpreter.raccrochage());
+	// }
+	//
+	// @Test
+	// public void ifMenuUserInputMatchWithChoiceThatChoiceIsExecuted() throws
+	// IOException,
+	// ParserConfigurationException, SAXException {
+	//
+	// interpreter = new Interpreter(url + "menuChoice.vxml");
+	// interpreter.start();
+	// interpreter.talk("choix 1");
+	//
+	// System.err.println(interpreter.getPrompts());
+	// assertFalse(interpreter.getPrompts().isEmpty());
+	// assertTrue(interpreter.raccrochage());
+	// }
 
 }

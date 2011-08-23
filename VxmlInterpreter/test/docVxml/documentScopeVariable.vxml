@@ -16,6 +16,7 @@
 </form>
 <form id="forme2">
    <block> 
+   <log> OK DOC </log>
  	 <prompt><value expr="document_scope_var"/>3</prompt>
    </block>
 </form>

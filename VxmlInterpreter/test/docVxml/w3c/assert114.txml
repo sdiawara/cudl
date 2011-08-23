@@ -28,6 +28,7 @@
   <form id="prompt">
     <var name="a" expr="123"/>
     <block>
+      <log>Return in 114</log>
       <return namelist="a"/>
       <conf:fail reason="FIA did not end when encountered a return!"/>
     </block>

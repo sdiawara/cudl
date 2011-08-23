@@ -7,15 +7,13 @@
         <exit/>
          <log>LOG Hello 1 affter exit</log>
       </block>
-    
-     <block>
+         <block>
         <log >LOG Hello 2</log>    
      </block>
      <block>
         <log>LOG Hello 3</log> 
     </block>
    <block> 
-   
-   </block>  
+      </block>  
    </form>
 </vxml>

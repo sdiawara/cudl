@@ -9,7 +9,7 @@ class TransferException extends InterpreterException {
 }
 
 class FilledException extends InterpreterException {
-	public FilledException(Node formItem) {
+	FilledException(Node formItem) {
 	}
 }
 
@@ -17,35 +17,35 @@ class ExitException extends InterpreterException {
 }
 
 class GotoException extends InterpreterException {
-	public String next;
-	public String nextItem;
+	String next;
+	String nextItem;
 
-	public GotoException(String next, String nextItem) {
+	GotoException(String next, String nextItem) {
 		this.next = next;
 		this.nextItem = nextItem;
 	}
 }
 
 class EventException extends InterpreterException {
-	public String type;
+	String type;
 
-	public EventException(String type) {
+	EventException(String type) {
 		this.type = type;
 	}
 }
 
 class SubmitException extends InterpreterException {
-	public String next;
+	String next;
 
-	public SubmitException(String next) {
+	SubmitException(String next) {
 		this.next = next;
 	}
 }
 
 class ReturnException extends InterpreterException {
-	public final String namelist;
+	final String namelist;
 
-	public ReturnException(String namelist) {
+	ReturnException(String namelist) {
 		this.namelist = namelist == null ? "" : namelist;
 	}
 }

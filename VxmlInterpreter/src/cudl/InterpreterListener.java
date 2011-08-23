@@ -10,6 +10,6 @@ import org.xml.sax.SAXException;
 import cudl.event.InterpreterEvent;
 
 interface InterpreterListener extends EventListener {
-	void doEvent(InterpreterEvent interpreterEvent, Executor executor) throws ScriptException,
+	void doEvent(InterpreterEvent interpreterEvent) throws ScriptException,
 			IOException, SAXException, InterpreterException;
 }

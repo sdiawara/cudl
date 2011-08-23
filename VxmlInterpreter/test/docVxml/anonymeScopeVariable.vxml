@@ -2,12 +2,13 @@
 <vxml version="2.0">
 
 <form>
-	   <block> 
+  <block> 
 		<var name="block_0_scope_var" expr="toto='variable de global'; 'variable de block'"/>
-		<assign name="block_0_scope_var" expr="'variable de '"/>
+		<assign name="block_0_scope_var" expr="'variable anonyme'"/>
 		<prompt><value expr="block_0_scope_var"/></prompt>
    </block>
-   <block> 
+   <block>
+   		<log>Block 2 <value expr="block_0_scope_var"/></log> 
  		<prompt><value expr="block_0_scope_var"/></prompt>
    </block>
 </form>

@@ -1,11 +1,15 @@
 package cudl;
 
+import static cudl.utils.Utils.tackWeelFormedUrl;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,30 +27,34 @@ class InterpreterContext {
 	private final String location;
 	private final InterpreterVariableDeclaration declaration;
 	private DocumentBuilder documentBuilder;
+	private Document currentdDocument;
+	private Document rootDocument;
 	private URLConnection connection;
 	private String cookies;
-	private Object currentRootFileName;
+	private String currentRootFileName;
 	private String currentFileName;
-	private Document rootDocument;
-	private Document currentdDocument;
 	private Node currentDialog;
 	private Node selectedFormItem;
 	private String transferDestination;
-	private boolean hangup;
-	private List<Node> grammarActive;
+	private boolean hangup = false;
+	private List<Node> grammarActive = new ArrayList<Node>();
 	private String next;
 	private boolean inSubdialog;
 	private Node lastDialog;
 	private boolean canExecuteFilled;
 	private String returnValue = "";
 	private List<String> params = new ArrayList<String>();
+	private List<Log> logs = new ArrayList<Log>();
+	private String nextItemToVisit;
+	private Map<Node, String> formItemNames = new LinkedHashMap<Node, String>();
+	private List<Prompt> prompts = new ArrayList<Prompt>();
 
 	InterpreterContext(String location, InterpreterVariableDeclaration declaration)
 			throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
 		this.location = location;
 		this.declaration = declaration;
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-		documentBuilder = builderFactory.newDocumentBuilder();
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		documentBuilder = dbf.newDocumentBuilder();
 		connection = new URL(location).openConnection();
 		cookies = connection.getHeaderField("Set-Cookie");
 		buildDocument(location);
@@ -62,43 +70,50 @@ class InterpreterContext {
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
 
-		NodeList dialogs = currentdDocument.getElementsByTagName("form");
-		if (getNext() != null) {
-			System.err.println("goto " + getNext());
-			currentDialog = Utils.searchDialogByName(dialogs, getNext());
-			setNexted(null);
-		} else
-			currentDialog = dialogs.item(0);
-		Node appplicationRoot = currentdDocument.getElementsByTagName("vxml").item(0).getAttributes()
-				.getNamedItem("application");
+		Node vxmlTag = currentdDocument.getDocumentElement();
+		NodeList dialogs = vxmlTag.getChildNodes();
+		int lastIndexOf = url.lastIndexOf("#");
+		if (lastIndexOf > 0) {
+			currentDialog = Utils.searchDialogByName(dialogs, url.substring(lastIndexOf + 1));
+		} else {
+			for (int i = 0; i < dialogs.getLength(); i++) {
+				String nodeName = dialogs.item(i).getNodeName();
+				if (nodeName.equals("menu") || nodeName.equals("form")) {
+					currentDialog = dialogs.item(i);
+					break;
+				}
+			}
+		}
+
+		Node appplicationRoot = vxmlTag.getAttributes().getNamedItem("application");
 		if (null != appplicationRoot) {
-			String rootUrl = Utils.tackWeelFormedUrl(location, appplicationRoot.getTextContent());
+			String rootUrl = tackWeelFormedUrl(location, appplicationRoot.getTextContent());
 			rootDocument = documentBuilder.parse(rootUrl);
 			declareRootScopeVariableIfNeed(rootUrl);
-		} else if (!url.equals(currentRootFileName)) {
+		} else if (!url.equals(currentRootFileName) && currentRootFileName != null) {
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
 		}
-		declareDocumentScopeVariableIfNeed(fileName);
+
+		declareDocumentScopeVariableIfNeed(url.split("#")[0]);
 	}
 
 	private void declareRootScopeVariableIfNeed(String textContent) throws IOException {
 		if (!textContent.equals(currentRootFileName)) {
+			NodeList childNodes = rootDocument.getDocumentElement().getChildNodes();
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
-			NodeList childNodes = rootDocument.getElementsByTagName("vxml").item(0).getChildNodes();
 			declareVariable(childNodes, InterpreterVariableDeclaration.APPLICATION_SCOPE);
-			currentRootFileName = Utils.tackWeelFormedUrl(location, textContent);
+			currentRootFileName = tackWeelFormedUrl(location, textContent);
 		}
 	}
 
 	private void declareDocumentScopeVariableIfNeed(String fileName) throws IOException {
 		if (!fileName.equals(getCurrentFileName())) {
-			System.out.println(fileName);
-			System.out.println(currentRootFileName);
-			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
+			System.out.println(getCurrentFileName());
 			NodeList childNodes = currentdDocument.getElementsByTagName("vxml").item(0)
 					.getChildNodes();
+			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			declareVariable(childNodes, InterpreterVariableDeclaration.DOCUMENT_SCOPE);
-			setCurrentFileName(Utils.tackWeelFormedUrl(location, fileName));
+			setCurrentFileName(fileName);
 		}
 	}
 
@@ -115,7 +130,7 @@ class InterpreterContext {
 			} else if (child.getNodeName().equals("script")) {
 				String src = Utils.getNodeAttributeValue(child, "src");
 				if (src != null) {
-					declaration.evaluateFileScript(Utils.tackWeelFormedUrl(location, src), scope);
+					declaration.evaluateFileScript(tackWeelFormedUrl(location, src), scope);
 				} else
 					declaration.evaluateScript(child.getTextContent(), scope);
 			}
@@ -233,5 +248,33 @@ class InterpreterContext {
 
 	public List<String> getParams() {
 		return params;
+	}
+
+	public List<Log> getLogs() {
+		return logs;
+	}
+
+	public void setNextItemToVisit(String nextItemAtt) {
+		nextItemToVisit = nextItemAtt;
+	}
+
+	public String getNextItemToVisit() {
+		return nextItemToVisit;
+	}
+
+	public void addFormItemName(Node node, String name) {
+		formItemNames.put(node, name);
+	}
+
+	public Map<Node, String> getFormItemNames() {
+		return formItemNames;
+	}
+
+	public void addPrompt(Prompt p) {
+		prompts.add(p);
+	}
+
+	public List<Prompt> getPrompts() {
+		return prompts;
 	}
 }

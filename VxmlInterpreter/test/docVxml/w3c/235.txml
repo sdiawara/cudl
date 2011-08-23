@@ -14,6 +14,7 @@
         <conf:fail reason="field result variable should be undefined by default"/>
       </if>
   </noinput>
+  <filled/>
   </field>
 
 </form>

@@ -11,9 +11,9 @@ public class Prompt {
 	public boolean equals(Object obj) {
 		if (obj != null && obj instanceof Prompt) {
 			Prompt other = (Prompt) obj;
-			return equalOrBothNull(audio, other.audio) && equalOrBothNull(timeout, other.timeout)
-					&& equalOrBothNull(bargein, other.bargein) && equalOrBothNull(tts, other.tts)
-					&& equalOrBothNull(bargeinType, other.bargeinType);
+			return audio.equals(other.audio) && timeout.equals(other.timeout)
+					&& bargein.equals(other.bargein) && tts.equals(other.tts)
+					&& bargeinType.equals(other.bargeinType);
 
 		} else {
 			return false;
@@ -25,13 +25,4 @@ public class Prompt {
 		return "prompt[" + "audio:" + audio + "," + "timeout:" + timeout + "," + "bargein:" + bargein
 				+ "," + "bargeinType:" + bargeinType + "," + "tts:" + tts + "]";
 	}
-
-	private boolean equalOrBothNull(Object o1, Object o2) {
-		if (o1 == "") {
-			return o2 == "";
-		} else {
-			return o1.equals(o2);
-		}
-	}
-
 }

@@ -65,6 +65,8 @@ public class VxmlElementType {
 			add("disconnect");
 			add("script");
 			add("log");
+			add("conf:pass");
+			add("conf:fail");
 		}
 	};
 
