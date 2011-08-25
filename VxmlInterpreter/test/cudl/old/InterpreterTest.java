@@ -65,13 +65,13 @@ public class InterpreterTest extends TestCase {
 		interpreter = new Interpreter(url + "VxmlGlobalServletService");
 		interpreter.start();
 
-		assertEquals(expectedLogs, interpreter.getTraceLog());
-		assertEquals(expectedStats, interpreter.getTracetWithLabel("stats"));
+		assertEquals(expectedLogs, interpreter.getLogs());
+		assertEquals(expectedStats, interpreter.getLogsWithLabel("stats"));
 		System.err.println(expectedPrompts);
 		System.err.println(interpreter.getPrompts());
 
 		assertEquals(expectedPrompts, interpreter.getPrompts());
-		assertFalse(interpreter.raccrochage());
+		assertFalse(interpreter.hungup());
 	}
 
 	@Test
@@ -94,8 +94,8 @@ public class InterpreterTest extends TestCase {
 		interpreter.noMatch();
 
 		System.err.println(expectedLogs);
-		System.err.println(interpreter.getTraceLog());
-		assertEquals(expectedLogs, interpreter.getTraceLog());
+		System.err.println(interpreter.getLogs());
+		assertEquals(expectedLogs, interpreter.getLogs());
 	}
 
 	@Test
@@ -110,15 +110,15 @@ public class InterpreterTest extends TestCase {
 		interpreter.start();
 
 		assertEquals("sup:4700810C810106830783105506911808", interpreter.getTranferDestination());
-		// assertFalse(interpreter.raccrochage());
+		// assertFalse(interpreter.hungup());
 		// si
 		// transfert
 		// alors il
 		// n'y
-		// a pas raccrochage
-		assertFalse(interpreter.getTraceLog().isEmpty());
-		assertEquals(expectedLogs, interpreter.getTraceLog());
-		assertFalse(interpreter.raccrochage());
+		// a pas hungup
+		assertFalse(interpreter.getLogs().isEmpty());
+		assertEquals(expectedLogs, interpreter.getLogs());
+		assertFalse(interpreter.hungup());
 	}
 
 	@Test
@@ -132,18 +132,18 @@ public class InterpreterTest extends TestCase {
 
 		interpreter = new Interpreter(url + "transfer/VxmlGlobalServletService");
 		interpreter.start();
-		interpreter.callerHangup(0);
+		interpreter.blindTransferSuccess();
 
 		assertEquals("sup:4700810C810106830783105506911808", interpreter.getTranferDestination());
 		// si
 		// transfert
 		// alors il
 		// n'y
-		// a pas raccrochage
-		assertFalse(interpreter.getTraceLog().isEmpty());
-		assertEquals(expectedLogs, interpreter.getTraceLog());
-		// System.err.println(interpreter.raccrochage() + " ---->");
-		// assertTrue(interpreter.raccrochage());
+		// a pas hungup
+		assertFalse(interpreter.getLogs().isEmpty());
+		assertEquals(expectedLogs, interpreter.getLogs());
+		// System.err.println(interpreter.hungup() + " ---->");
+		// assertTrue(interpreter.hungup());
 	}
 
 	@Test
@@ -159,8 +159,8 @@ public class InterpreterTest extends TestCase {
 		interpreter.noAnswer();
 
 		assertEquals("sup:4700810C810106830783105506911808", interpreter.getTranferDestination());
-		// assertTrue(interpreter.raccrochage());
-		assertFalse(interpreter.getTraceLog().isEmpty());
-		assertEquals(expectedLogs, interpreter.getTraceLog());
+		// assertTrue(interpreter.hungup());
+		assertFalse(interpreter.getLogs().isEmpty());
+		assertEquals(expectedLogs, interpreter.getLogs());
 	}
 }

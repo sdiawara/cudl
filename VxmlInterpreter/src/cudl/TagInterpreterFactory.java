@@ -4,19 +4,27 @@ import java.lang.reflect.Constructor;
 
 import org.w3c.dom.Node;
 
-import cudl.utils.Utils;
-
-public class TagInterpreterFactory {
-	public static VxmlElement getTagInterpreter(Node node, InterpreterContext context) {
+class TagInterpreterFactory {
+	static VxmlTag getTagInterpreter(Node node) {
 		String nodeName = node.getNodeName().replaceAll("#|:", "");
+		String className = getClassName(nodeName);
 		try {
-			Constructor<?> constructor = Class.forName(Utils.getClassName(nodeName)).getConstructor(
-					new Class[] { Node.class, InterpreterContext.class });
-			return (VxmlElement) constructor.newInstance(node, context);
+			Constructor<?> constructor = Class.forName(className).getConstructor(
+					new Class[] { Node.class });
+			return (VxmlTag) constructor.newInstance(node);
 		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("Not supported tag " + nodeName);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			//FIXME check expected vxml behavior if unknown tag in page
+			throw new UnsupportedOperationException("Not supported tag " + nodeName);
+		} catch(Exception e) {
+			throw new RuntimeException("Error while trying to instanciate " + nodeName + " tag handler (" + className + "): " + e, e);
 		}
+	}
+	
+	private static String getClassName(String tagName) {
+		return "cudl." + capitalize(tagName) + "Tag";
+	}
+
+	private static String capitalize(String tagName) {
+		return ((tagName.charAt(0) + "").toUpperCase()) + tagName.substring(1);
 	}
 }

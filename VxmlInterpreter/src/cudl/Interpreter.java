@@ -1,5 +1,17 @@
 package cudl;
 
+import static cudl.InternalInterpreter.BLIND_TRANSFER_SUCCESSSS;
+import static cudl.InternalInterpreter.CALLER_HUNGUP_DURING_TRANSFER;
+import static cudl.InternalInterpreter.CONNECTION_DISCONNECT_HANGUP;
+import static cudl.InternalInterpreter.DESTINATION_BUSY;
+import static cudl.InternalInterpreter.DTMF;
+import static cudl.InternalInterpreter.NETWORK_BUSY;
+import static cudl.InternalInterpreter.NOANSWER;
+import static cudl.InternalInterpreter.NOINPUT;
+import static cudl.InternalInterpreter.NOMATCH;
+import static cudl.InternalInterpreter.START;
+import static cudl.InternalInterpreter.TALK;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -12,45 +24,95 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import cudl.script.InterpreterVariableDeclaration;
+import cudl.utils.Utils;
 
 public class Interpreter {
-	private InternalInterpreter internalInterpreter1;
+	private InternalInterpreter internalInterpreter;
 	private InterpreterContext context;
 
-	public Interpreter(String fileName) throws IOException, ParserConfigurationException,
-			SAXException {
-		context = new InterpreterContext(fileName, new InterpreterVariableDeclaration(fileName));
-		internalInterpreter1 = new InternalInterpreter(context);
+	public Interpreter(String url) throws IOException, ParserConfigurationException, SAXException {
+		context = new InterpreterContext(url);
+		internalInterpreter = new InternalInterpreter(context);
+
 	}
 
-	public void start() throws IOException, SAXException {
-		internalInterpreter1.interpret(context);
+	public void start() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(START, null);
 	}
 
-	public List<String> getTracetWithLabel(String... label) {
-		List<String> labeledLog = new ArrayList<String>();
+	public void noInput() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(NOINPUT, null);
+	}
+
+	public void noMatch() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(NOMATCH, null);
+	}
+
+	public void blindTransferSuccess() throws IOException, SAXException,
+			ParserConfigurationException {
+		internalInterpreter.interpret(BLIND_TRANSFER_SUCCESSSS, null);
+	}
+
+	public void disconnect() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(CONNECTION_DISCONNECT_HANGUP, null);
+	}
+
+	public void noAnswer() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(NOANSWER, null);
+	}
+
+	public void callerHangupDuringTransfer() throws IOException, SAXException,
+			ParserConfigurationException {
+		internalInterpreter.interpret(CALLER_HUNGUP_DURING_TRANSFER, null);
+	}
+
+	public void networkBusy() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(NETWORK_BUSY, null);
+	}
+
+	public void destinationBusy() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(DESTINATION_BUSY, null);
+	}
+
+	public void transferTimeout() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(11, null);
+	}
+
+	public void talk(String sentence) throws UnsupportedEncodingException, IOException,
+			SAXException, ParserConfigurationException {
+		String utterance = "'" + URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "") + "'";
+		internalInterpreter.interpret(TALK, utterance);
+	}
+
+	public void submitDtmf(String dtmf) throws IOException, SAXException,
+			ParserConfigurationException {
+		String utterance = "'" + dtmf.replaceAll(" ", "") + "'";
+		internalInterpreter.interpret(DTMF, utterance);
+	}
+
+	public List<String> getLogsWithLabel(String... label) {
+		List<String> logs = new ArrayList<String>();
 		for (Iterator<Log> iterator = context.getLogs().iterator(); iterator.hasNext();) {
 			Log log = (Log) iterator.next();
 			for (int i = 0; i < label.length; i++) {
 				if (log.label.equals(label[i])) {
-					labeledLog.add(log.value);
+					logs.add(log.value);
 				}
 			}
 		}
-		return labeledLog;
+		return logs;
 	}
 
-	public List<String> getTraceLog() {
-		List<String> lLog = new ArrayList<String>();
+	public List<String> getLogs() {
+		List<String> logs = new ArrayList<String>();
 		for (Iterator<Log> iterator = context.getLogs().iterator(); iterator.hasNext();) {
-			lLog.add(((Log) iterator.next()).value);
+			logs.add(((Log) iterator.next()).value);
 		}
 
-		return lLog;
+		return logs;
 	}
 
-	public boolean raccrochage() {
+	public boolean hungup() {
 		return context.isHangup();
 	}
 
@@ -58,72 +120,20 @@ public class Interpreter {
 		return context.getPrompts();
 	}
 
-	public void noInput() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.event("noinput");
-	}
-
-	public void noMatch() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.event("nomatch");
-	}
-
 	public String getTranferDestination() {
-		return internalInterpreter1.getContext().getTransferDestination();
+		return context.getTransferDestination();
 	}
 
-	public void noAnswer() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.noAnswer();
-	}
-
-	public void talk(String sentence) throws UnsupportedEncodingException, IOException,
-			SAXException, ParserConfigurationException {
-		internalInterpreter1.utterance("'" + URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "")
-				+ "'", "'voice'");
-	}
-
-	public void push(String dtmf) throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.utterance("'" + dtmf.replaceAll(" ", "") + "'", "'dtmf'");
-	}
-
-	public void disconnect() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.event("connection.disconnect.hangup");
-	}
-
-	public void callerHangup(int i) throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.callerHangup(i);
-	}
-
-	public String getGrammarActive() {
-		return internalInterpreter1.getContext().getGrammarActive().get(0).getAttributes()
-				.getNamedItem("src").getNodeValue().trim();
+	public String getActiveGrammar() {
+		// FIXME: Return all grammar active
+		return Utils.getNodeAttributeValue(context.getGrammarActive().get(0), "src").trim();
 	}
 
 	public Properties getCurrentDialogProperties() {
-		return internalInterpreter1.getCurrentDialogProperties();
-	}
-
-	public void blindTransferSuccess() throws IOException, SAXException,
-			ParserConfigurationException {
-		internalInterpreter1.blindTransferSuccess();
+		return internalInterpreter.getCurrentDialogProperties();
 	}
 
 	public void destinationHangup() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.destinationHangup();
-	}
-
-	public void callerHangDestination() throws IOException, SAXException,
-			ParserConfigurationException {
-		internalInterpreter1.callerHangDestination();
-	}
-
-	public void maxTimeDisconnect() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.maxTimeDisconnect();
-	}
-
-	public void destinationBusy() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.destinationBusy();
-	}
-
-	public void networkBusy() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter1.networkBusy();
+		internalInterpreter.interpret(12, null);
 	}
 }

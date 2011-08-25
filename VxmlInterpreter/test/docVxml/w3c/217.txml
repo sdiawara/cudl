@@ -8,7 +8,7 @@ otherwise fail.
 -->
   <menu id="menu0" dtmf="true">
   <prompt>
-    <enumerate>
+   <enumerate>
       For <value expr="_prompt"/>, press <value expr="_dtmf"/>
     </enumerate>
   </prompt>

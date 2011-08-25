@@ -56,11 +56,4 @@ public class Utils {
 		Node attributeValue = attributes.getNamedItem(attributeName);
 		return attributeValue == null ? null : attributeValue.getNodeValue();
 	}
-
-	public static String getClassName(String tagName) {
-		String string = "cudl." + ((tagName.charAt(0) + "").toUpperCase()) + tagName.substring(1)
-				+ "Tag";
-		return string;
-	}
-
 }

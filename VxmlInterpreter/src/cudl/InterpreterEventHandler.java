@@ -1,79 +1,95 @@
 package cudl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import org.w3c.dom.NamedNodeMap;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import cudl.event.InterpreterEvent;
 import cudl.utils.Utils;
 
-class InterpreterEventHandler implements InterpreterListener {
+//TODO inline this code inside InternalInterpreter ???
+
+//FIXME:
+/*The occurrence of the event (default is 1). The count allows you to handle different occurrences of the same event differently.
+
+ Each <form>, <menu>, and form item maintains a counter for each event that occurs while it is being visited. Item-level event counters are used for events thrown while visiting individual form items and while executing <filled> elements contained within those items. Form-level and menu-level counters are used for events thrown during dialog initialization and while executing form-level <filled> elements.
+
+ Form-level and menu-level event counters are reset each time the <menu> or <form> is re-entered. Form-level and menu-level event counters are not reset by the <clear> element.
+
+ Item-level event counters are reset each time the <form> containing the item is re-entered. Item-level event counters are also reset when the item is reset with the <clear> element. An item's event counters are not reset when the item is re-entered without leaving the <form>.
+
+ Counters are incremented against the full event name and every prefix matching event name; for example, occurrence of the event "event.foo.1" increments the counters for "event.foo.1" plus "event.foo" and "event".*/
+class InterpreterEventHandler {
 	private Map<String, Integer> eventCounter;
 	private final InterpreterContext context;
 
 	InterpreterEventHandler(InterpreterContext context) {
 		this.context = context;
 		this.eventCounter = new Hashtable<String, Integer>();
+		// FIXME this is a
+		// global counter...
+		// check in vxml
+		// spec when a
+		// counter should be
+		// reset to 0 ?
 	}
 
-	@Override
-	public void doEvent(InterpreterEvent interpreterEvent) throws IOException, SAXException,
-			InterpreterException {
+	public void doEvent(String eventType) throws IOException, SAXException, InterpreterException,
+			ParserConfigurationException {
+		System.err.println("---> "+eventType);
+		int counter = (eventCounter.get(eventType) == null) ? 1 : eventCounter.get(eventType) + 1;
 
-		String type = interpreterEvent.type;
-		eventCounter.put(type, (eventCounter.get(type) == null) ? 1 : eventCounter.get(type) + 1);
+		eventCounter.put(eventType, counter);
+		Node node = searchEventHandlers(eventType, counter, context.getSelectedFormItem());
+		Document rootDocument = context.getRootDocument();
+		node = node == null && rootDocument != null ? searchEventHandlers(eventType, counter,
+				rootDocument.getElementsByTagName("vxml").item(0)) : node;
 
-		List<Node> catchList = searchEvent(type, context.getSelectedFormItem());
-		System.err.println(context.getSelectedFormItem());
-		if (catchList.size() == 0) {
-			if (context.getRootDocument() != null)
-				catchList = searchEvent(type, context.getRootDocument().getElementsByTagName("vxml")
-						.item(0));
+		if (node == null) {
+			// FIXME what are we supposed to do here ? Check the spec...
+			throw new RuntimeException("No event handler found for event " + eventType);
 		}
-
-		System.err.println("catchLinst =  " + catchList + "   " + interpreterEvent.type);
-		for (Iterator<Node> iterator = catchList.iterator(); iterator.hasNext();) {
-			Node node = (Node) iterator.next();
-			String c = Utils.getNodeAttributeValue(node, "count");
-			if (c == null)
-				continue;
-			Integer count = Integer.parseInt(c);
-
-			if (count != null && eventCounter.get(type) == count) {
-				TagInterpreterFactory.getTagInterpreter(node, context).interpret(context);
-				return;
-			}
-		}
-		TagInterpreterFactory.getTagInterpreter(catchList.get(0), context).interpret(context);
+		TagInterpreterFactory.getTagInterpreter(node).interpret(context);
 	}
 
-	private List<Node> searchEvent(String eventName, Node parent) {
-		ArrayList<Node> eventList = new ArrayList<Node>();
+	private Node searchEventHandlers(String eventType, int eventCounter, Node parent) {
 		while (parent != null) {
 			NodeList nodeList = parent.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
-				if (node.getNodeName().equals(eventName) || isCatchItemAndContainEvent(node, eventName)) {
-					eventList.add(node);
+				if (isHandlerForEventType(eventType, node)) {
+					String countAsString = Utils.getNodeAttributeValue(node, "count");
+					int nodeCount = countAsString == null ? 1 : Integer.parseInt(countAsString);
+					if (nodeCount == eventCounter) {
+						// FIXME we should select the event handler with the count
+						// closer to counter
+						// here we check only equality
+						return node;
+					}
 				}
 			}
 			parent = parent.getParentNode();
 		}
-
-		return eventList;
+		return null;
 	}
 
-	private boolean isCatchItemAndContainEvent(Node node, String eventName) {
-		NamedNodeMap attributes = node.getAttributes();
-		return (node.getNodeName().equals("catch") && (attributes.getLength() > 0) && (attributes
-				.getNamedItem("event").getNodeValue().contains(eventName)));
+	private boolean isHandlerForEventType(String eventType, Node node) {
+		return node.getNodeName().equals(eventType) || isCatchItemAndContainsEvent(node, eventType);
+	}
+
+	private boolean isCatchItemAndContainsEvent(Node node, String eventName) {
+		String eventAttribute = Utils.getNodeAttributeValue(node, "event");
+		return node.getNodeName().equals("catch") && eventAttribute != null
+				&& eventAttribute.contains(eventName);
+	}
+
+	public void resetEventCounter() {
+		this.eventCounter = new Hashtable<String, Integer>();
 	}
 }

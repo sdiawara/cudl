@@ -13,6 +13,7 @@ import javax.script.ScriptException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -437,13 +438,13 @@ public class W3cInterpreterTest {
 			} else if (fileName.endsWith("288.txml")) {
 				interpreter.destinationHangup();
 			} else if (fileName.endsWith("290.txml")) {
-				interpreter.callerHangDestination();
+				interpreter.callerHangupDuringTransfer();
 			} else if (fileName.endsWith("300.txml")) {
-				interpreter.callerHangup(0);
+				interpreter.disconnect();
 			} else if (fileName.endsWith("295.txml")) {
 				interpreter.noAnswer();
 			} else if (fileName.endsWith("296.txml")) {
-				interpreter.maxTimeDisconnect();
+				interpreter.transferTimeout();
 			} else if (fileName.endsWith("301.txml")) {
 				interpreter.destinationBusy();
 			} else if (fileName.endsWith("302.txml")) {
@@ -479,7 +480,7 @@ public class W3cInterpreterTest {
 		interpreter = new Interpreter(url + "w3c/assert165.txml");
 		interpreter.start();
 
-		assertTrue(interpreter.raccrochage());
+		assertTrue(interpreter.hungup());
 	}
 
 	@Test
@@ -499,7 +500,7 @@ public class W3cInterpreterTest {
 		interpreter.start();
 		interpreter.noInput();
 
-		assertTrue(interpreter.raccrochage());
+		assertTrue(interpreter.hungup());
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 	}
 
@@ -519,7 +520,7 @@ public class W3cInterpreterTest {
 		interpreter.noInput();
 		interpreter.noInput();
 
-		assertTrue(interpreter.raccrochage());
+		assertTrue(interpreter.hungup());
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 	}
 
@@ -538,7 +539,43 @@ public class W3cInterpreterTest {
 		interpreter.start();
 		interpreter.noInput();
 
-		assertTrue(interpreter.raccrochage());
+		assertTrue(interpreter.hungup());
+		assertEquals(exceptedPrompts, interpreter.getPrompts());
+	}
+
+	@Test
+	@Ignore
+	public void w3c217Test() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
+		// The enumerate element with content defines a template specifier that
+		// will list all the choices. Two special variables are defined
+
+		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();
+		prompt = new Prompt();
+		prompt.tts = " For alpha, press 1. For bravo, press 2. For charlie, press 3. For delta, press 4.";
+		exceptedPrompts.add(prompt);
+
+		interpreter = new Interpreter(url + "w3c/217.txml");
+		interpreter.start();
+		interpreter.noInput();
+
+		assertTrue(interpreter.hungup());
+		assertEquals(exceptedPrompts, interpreter.getPrompts());
+	}
+
+	@Test
+	@Ignore
+	public void w3c236Test() throws IOException, ScriptException, ParserConfigurationException,
+			SAXException {
+		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();
+		prompt = new Prompt();
+		prompt.tts = "pass";
+		exceptedPrompts.add(prompt);
+
+		interpreter = new Interpreter(url + "w3c/236.txml");
+		interpreter.start();
+		interpreter.noInput();
+
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 	}
 }

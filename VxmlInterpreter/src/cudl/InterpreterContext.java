@@ -38,10 +38,6 @@ class InterpreterContext {
 	private String transferDestination;
 	private boolean hangup = false;
 	private List<Node> grammarActive = new ArrayList<Node>();
-	private String next;
-	private boolean inSubdialog;
-	private Node lastDialog;
-	private boolean canExecuteFilled;
 	private String returnValue = "";
 	private List<String> params = new ArrayList<String>();
 	private List<Log> logs = new ArrayList<Log>();
@@ -49,10 +45,10 @@ class InterpreterContext {
 	private Map<Node, String> formItemNames = new LinkedHashMap<Node, String>();
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 
-	InterpreterContext(String location, InterpreterVariableDeclaration declaration)
+	InterpreterContext(String location)
 			throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
 		this.location = location;
-		this.declaration = declaration;
+		this.declaration = new InterpreterVariableDeclaration(location);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		documentBuilder = dbf.newDocumentBuilder();
 		connection = new URL(location).openConnection();
@@ -62,7 +58,6 @@ class InterpreterContext {
 
 	void buildDocument(String fileName) throws IOException, SAXException {
 		String url = Utils.tackWeelFormedUrl(location, fileName);
-		System.err.println(url);
 
 		connection = new URL(url).openConnection();
 		if (cookies != null)
@@ -89,15 +84,15 @@ class InterpreterContext {
 		if (null != appplicationRoot) {
 			String rootUrl = tackWeelFormedUrl(location, appplicationRoot.getTextContent());
 			rootDocument = documentBuilder.parse(rootUrl);
-			declareRootScopeVariableIfNeed(rootUrl);
+			declareRootScopeVariableIfNeeded(rootUrl);
 		} else if (!url.equals(currentRootFileName) && currentRootFileName != null) {
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
 		}
 
-		declareDocumentScopeVariableIfNeed(url.split("#")[0]);
+		declareDocumentScopeVariableIfNeeded(url.split("#")[0]);
 	}
 
-	private void declareRootScopeVariableIfNeed(String textContent) throws IOException {
+	private void declareRootScopeVariableIfNeeded(String textContent) throws IOException {
 		if (!textContent.equals(currentRootFileName)) {
 			NodeList childNodes = rootDocument.getDocumentElement().getChildNodes();
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
@@ -106,9 +101,8 @@ class InterpreterContext {
 		}
 	}
 
-	private void declareDocumentScopeVariableIfNeed(String fileName) throws IOException {
+	private void declareDocumentScopeVariableIfNeeded(String fileName) throws IOException {
 		if (!fileName.equals(getCurrentFileName())) {
-			System.out.println(getCurrentFileName());
 			NodeList childNodes = currentdDocument.getElementsByTagName("vxml").item(0)
 					.getChildNodes();
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
@@ -143,10 +137,6 @@ class InterpreterContext {
 
 	void setCurrentDialog(Node dialog) {
 		currentDialog = dialog;
-	}
-
-	public boolean getCurrentChange() {
-		return false;
 	}
 
 	Node getSelectedFormItem() {
@@ -192,38 +182,6 @@ class InterpreterContext {
 
 	public List<Node> getGrammarActive() {
 		return grammarActive;
-	}
-
-	public void setNexted(String next) {
-		this.next = next;
-	}
-
-	public String getNext() {
-		return next;
-	}
-
-	public boolean isInSubdialog() {
-		return inSubdialog;
-	}
-
-	public void setInSubdialog(boolean inSubdialog) {
-		this.inSubdialog = inSubdialog;
-	}
-
-	public Node getLastDialog() {
-		return lastDialog;
-	}
-
-	public void setLastDialog(Node lastDialog) {
-		this.lastDialog = lastDialog;
-	}
-
-	public void setCanExecuteFilled(boolean canExecuteFilled) {
-		this.canExecuteFilled = canExecuteFilled;
-	}
-
-	public boolean canExecuteFilled() {
-		return this.canExecuteFilled;
 	}
 
 	public void setCurrentFileName(String currentFileName) {

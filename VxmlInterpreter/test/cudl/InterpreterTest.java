@@ -1,6 +1,7 @@
 package cudl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mozilla.javascript.EcmaError;
 import org.xml.sax.SAXException;
@@ -39,8 +41,8 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "shello2.vxml");
 		interpreter.start();
 
-		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
-		assertEquals(traceLog, interpreter.getTraceLog());
+		assertEquals(traceStat, interpreter.getLogsWithLabel("stats"));
+		assertEquals(traceLog, interpreter.getLogs());
 	}
 
 	@Test
@@ -56,10 +58,10 @@ public class InterpreterTest {
 		interpreter.start();
 
 		System.err.println(traceLog);
-		System.err.println(interpreter.getTraceLog());
-		assertEquals(traceLog, interpreter.getTraceLog());
-		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
-		assertTrue(interpreter.raccrochage());
+		System.err.println(interpreter.getLogs());
+		assertEquals(traceLog, interpreter.getLogs());
+		assertEquals(traceStat, interpreter.getLogsWithLabel("stats"));
+		assertTrue(interpreter.hungup());
 	}
 
 	@Test
@@ -76,10 +78,10 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "shelloVar.vxml");
 		interpreter.start();
 
-		assertEquals(traceStat, interpreter.getTracetWithLabel("stats"));
+		assertEquals(traceStat, interpreter.getLogsWithLabel("stats"));
 
-		assertEquals(traceLog, interpreter.getTraceLog());
-		assertTrue(interpreter.raccrochage());
+		assertEquals(traceLog, interpreter.getLogs());
+		assertTrue(interpreter.hungup());
 	}
 
 	@Test
@@ -98,12 +100,12 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "shelloWith_if_elseif_and_else.vxml");
 		interpreter.start();
 
-		assertTrue(interpreter.getTracetWithLabel("stats").isEmpty());
+		assertTrue(interpreter.getLogsWithLabel("stats").isEmpty());
 
 		System.err.println(traceLog);
-		System.err.println(interpreter.getTraceLog());
-		assertEquals(traceLog, interpreter.getTraceLog());
-		assertTrue(interpreter.raccrochage());
+		System.err.println(interpreter.getLogs());
+		assertEquals(traceLog, interpreter.getLogs());
+		assertTrue(interpreter.hungup());
 	}
 
 	@Test
@@ -116,8 +118,8 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "manyBlocks.vxml");
 		interpreter.start();
 
-		assertTrue(interpreter.getTracetWithLabel("stats").isEmpty());
-		assertEquals(traceLog, interpreter.getTraceLog());
+		assertTrue(interpreter.getLogsWithLabel("stats").isEmpty());
+		assertEquals(traceLog, interpreter.getLogs());
 	}
 
 	@Test
@@ -133,11 +135,11 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "goto.vxml");
 		interpreter.start();
 
-		assertTrue(interpreter.getTracetWithLabel("stats").isEmpty());
+		assertTrue(interpreter.getLogsWithLabel("stats").isEmpty());
 		System.err.println(traceLog);
-		System.err.println(interpreter.getTraceLog());
+		System.err.println(interpreter.getLogs());
 
-		assertEquals(traceLog, interpreter.getTraceLog());
+		assertEquals(traceLog, interpreter.getLogs());
 	}
 
 	@Test
@@ -224,7 +226,7 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "sideEffectInScope.vxml");
 		interpreter.start();
 
-		assertEquals(traceLog, interpreter.getTraceLog());
+		assertEquals(traceLog, interpreter.getLogs());
 	}
 
 	@Test(expected = EcmaError.class)
@@ -318,35 +320,85 @@ public class InterpreterTest {
 		Interpreter interpreter = new Interpreter(url + "clear.vxml");
 		interpreter.start();
 
-		System.err.println(interpreter.getPrompts());
 		assertTrue(interpreter.getPrompts().size() == 1);
 		assertEquals(expectedPrompt, interpreter.getPrompts());
 	}
 
-	// @Test
-	// public void testMenuNodeCanBeSelectAndExecute() throws IOException,
-	// ParserConfigurationException, SAXException {
-	//
-	// interpreter = new Interpreter(url + "selectMenu.vxml");
-	// interpreter.start();
-	//
-	// System.err.println(interpreter.getPrompts());
-	// assertFalse(interpreter.getPrompts().isEmpty());
-	// assertTrue(interpreter.raccrochage());
-	// }
-	//
-	// @Test
-	// public void ifMenuUserInputMatchWithChoiceThatChoiceIsExecuted() throws
-	// IOException,
-	// ParserConfigurationException, SAXException {
-	//
-	// interpreter = new Interpreter(url + "menuChoice.vxml");
-	// interpreter.start();
-	// interpreter.talk("choix 1");
-	//
-	// System.err.println(interpreter.getPrompts());
-	// assertFalse(interpreter.getPrompts().isEmpty());
-	// assertTrue(interpreter.raccrochage());
-	// }
+	@Test
+	public void testEventCounterIsOneWhenDialogEntered() throws IOException, SAXException,
+			ParserConfigurationException {
+		List<Prompt> expectedPrompt = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "pass";
+		expectedPrompt.add(prompt);
+
+		Interpreter interpreter = new Interpreter(url + "EventCounterIsOne.txml");
+		interpreter.start();
+		interpreter.noInput();
+		interpreter.noInput();
+		assertTrue(interpreter.getPrompts().size() == 1);
+		assertEquals(expectedPrompt, interpreter.getPrompts());
+
+	}
+
+	@Test
+	public void testMenuChoiceDtmfAutoGenerateForChoice() throws IOException,
+			ParserConfigurationException, SAXException {
+		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "Pour le français tapez 1, pour l'anglais tapez 2, Pour le chinois tapez 3";
+		exceptedPrompts.add(prompt);
+
+		interpreter = new Interpreter(url + "menuBasic.txml");
+		interpreter.start();
+		interpreter.submitDtmf("3");
+
+		System.err.println(interpreter.getPrompts());
+		assertEquals(exceptedPrompts, interpreter.getPrompts());
+		assertTrue(interpreter.hungup());
+	}
+
+	@Test
+	public void testMenuChoiceVoiceAutoGenerateForChoice() throws IOException,
+			ParserConfigurationException, SAXException {
+		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "Pour le français tapez 1, pour l'anglais tapez 2, Pour le chinois tapez 3";
+		exceptedPrompts.add(prompt);
+
+		interpreter = new Interpreter(url + "menuBasic.txml");
+		interpreter.start();
+		interpreter.talk("anglais");
+
+		System.err.println(interpreter.getPrompts());
+		assertEquals(exceptedPrompts, interpreter.getPrompts());
+		assertTrue(interpreter.hungup());
+	}
+
+	@Test
+	public void testMenuNodeCanBeSelectAndExecute() throws IOException,
+			ParserConfigurationException, SAXException {
+
+		interpreter = new Interpreter(url + "selectMenu.vxml");
+		interpreter.start();
+
+		System.err.println(interpreter.getPrompts());
+		assertFalse(interpreter.getPrompts().isEmpty());
+		assertTrue(interpreter.hungup());
+	}
+
+	@Test
+	@Ignore
+	public void ifMenuUserInputMatchWithChoiceThatChoiceIsExecuted() throws IOException,
+			ParserConfigurationException, SAXException {
+
+		interpreter = new Interpreter(url + "menuChoice.vxml");
+		interpreter.start();
+		interpreter.talk("choix 1");
+
+		System.err.println(interpreter.getPrompts());
+		assertFalse(interpreter.getPrompts().isEmpty());
+		assertTrue(interpreter.hungup());
+	}
 
 }

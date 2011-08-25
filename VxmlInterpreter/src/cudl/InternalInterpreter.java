@@ -12,100 +12,137 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import cudl.event.InterpreterEvent;
 import cudl.script.InterpreterVariableDeclaration;
 
-public class InternalInterpreter implements VxmlElement {
+class InternalInterpreter {
+	public static final int START = 1;
+	public static final int NOINPUT = 2;
+	public static final int NOMATCH = 3;
+	public static final int EVENT = 4;
+	public static final int BLIND_TRANSFER_SUCCESSSS = 5;
+	public static final int CONNECTION_DISCONNECT_HANGUP = 6;
+	public static final int NOANSWER = 7;
+	public static final int CALLER_HUNGUP_DURING_TRANSFER = 8;
+	public static final int NETWORK_BUSY = 9;
+	public static final int DESTINATION_BUSY = 10;
+	public static final int MAX_TIME_DISCONNECT = 11;
+	public static final int DESTINATION_HANGUP = 12;
+	public static final int TALK = 13;
+	public static final int DTMF = 14;
+
 	private final InterpreterContext context;
 	private InterpreterEventHandler ieh;
 	private Properties properties = new Properties();
 	private boolean test;
+	private String eventType;
 
-	public InternalInterpreter(InterpreterContext context) throws IOException, SAXException {
+	InternalInterpreter(InterpreterContext context) throws IOException, SAXException {
 		this.context = context;
 		ieh = new InterpreterEventHandler(context);
 	}
 
-	@Override
-	public Object interpret(InterpreterContext context) throws IOException, SAXException {
+	public void interpret(int action, String arg) throws IOException, SAXException,
+			ParserConfigurationException {
 		Node node = context.getCurrentDialog();
-		while (node != null) {
-			try {
-				VxmlElement dialog = TagInterpreterFactory.getTagInterpreter(node, context);
+		try {
+			VxmlTag dialog;
+			switch (action) {
+			case START:
+				System.err.println(node);
+				dialog = TagInterpreterFactory.getTagInterpreter(node);
 				if (test) {
 					((FormTag) dialog).setInitVar(false);
 				} else
 					context.getFormItemNames().clear();
 				dialog.interpret(context);
 				break;
-			} catch (GotoException e) {
-				context.buildDocument(e.next);
-				node = context.getCurrentDialog();
-			} catch (SubmitException e) {
-				context.buildDocument(e.next);
-				node = context.getCurrentDialog();
-			} catch (FilledException e) {
+			// FIXME : remove duplicate code
+			case NOINPUT:
+				ieh.doEvent("noinput");
 				break;
-			} catch (EventException e) {
-				try {
-					ieh.doEvent(new InterpreterEvent(this, e.type));
-				} catch (InterpreterException e1) {
-					break;
-				}
-			} catch (TransferException e) {
+			case NOMATCH:
+				ieh.doEvent("nomatch");
+			case EVENT:
+				ieh.doEvent(eventType);
 				break;
-			} catch (ReturnException e) {
-				context.setReturnValue(e.namelist);
+			case BLIND_TRANSFER_SUCCESSSS:
+				context.getDeclaration().evaluateScript(
+						"connection.protocol.isdnvn6.transferresult= '0'",
+						InterpreterVariableDeclaration.SESSION_SCOPE);
+				ieh.doEvent("connection.disconnect.transfer");
 				break;
-			} catch (InterpreterException e) {
+			case CONNECTION_DISCONNECT_HANGUP:
+				ieh.doEvent("connection.disconnect.hangup");
+				break;
+			case NOANSWER:
+				context.getDeclaration().evaluateScript(
+						"connection.protocol.isdnvn6.transferresult= '2'",
+						InterpreterVariableDeclaration.SESSION_SCOPE);
+				setTransferResultAndExecute("'noanswer'");
+				break;
+
+			case CALLER_HUNGUP_DURING_TRANSFER:
+				setTransferResultAndExecute("'near_end_disconnect'");
+				break;
+			case NETWORK_BUSY:
+				context.getDeclaration().evaluateScript(
+						"connection.protocol.isdnvn6.transferresult= '5'",
+						InterpreterVariableDeclaration.SESSION_SCOPE);
+				setTransferResultAndExecute("'network_busy'");
+				break;
+			case DESTINATION_BUSY:
+				setTransferResultAndExecute("'busy'");
+				break;
+			case MAX_TIME_DISCONNECT:
+				setTransferResultAndExecute("'maxtime_disconnect'");
+				break;
+			case DESTINATION_HANGUP:
+				context.getDeclaration().setValue(
+						context.getFormItemNames().get(context.getSelectedFormItem()),
+						"'far_end_disconnect'", InterpreterVariableDeclaration.DIALOG_SCOPE);
+				test = true;
+				interpret(1, null);
+				break;
+			case TALK:
+				utterance(arg, "'voice'");
+				break;
+			case DTMF:
+				utterance(arg, "'dtmf'");
+				break;
 			}
-		}
-
-		return null;
-	}
-
-	void blindTransferSuccess() throws IOException, SAXException, ParserConfigurationException {
-		try {
-			ieh.doEvent(new InterpreterEvent(this, "connection.disconnect.transfer"));
+		} catch (GotoException e) {
+			ieh.resetEventCounter();
+			context.buildDocument(e.next);
+			node = context.getCurrentDialog();
+			interpret(1, null);
+		} catch (SubmitException e) {
+			ieh.resetEventCounter();
+			context.buildDocument(e.next);
+			node = context.getCurrentDialog();
+			interpret(1, null);
+		} catch (FilledException e) {
+		} catch (EventException e) {
+			eventType = e.type;
+			interpret(EVENT, null);
+		} catch (TransferException e) {
+			ieh.resetEventCounter();
+		} catch (ReturnException e) {
+			context.setReturnValue(e.namelist);
 		} catch (InterpreterException e) {
-			executionHandler(e);
-		}
-	}
-
-	void destinationHangup() throws IOException, SAXException, ParserConfigurationException {
-		context.getDeclaration().setValue(
-				context.getFormItemNames().get(context.getSelectedFormItem()), "'far_end_disconnect'",
-				InterpreterVariableDeclaration.DIALOG_SCOPE);
-		System.err.println("Verif");
-		test = true;
-		interpret(context);
-	}
-
-	void callerHangDestination() throws IOException, SAXException, ParserConfigurationException {
-		try {
-			setTransferResultAndExecute("'near_end_disconnect'");
-		} catch (InterpreterException e) {
-			executionHandler(e);
+			System.err.println(e);
 		}
 	}
 
 	private void setTransferResultAndExecute(String transferResult) throws InterpreterException,
-			IOException, SAXException {
+			IOException, SAXException, ParserConfigurationException {
 		context.getDeclaration().setValue(
 				context.getFormItemNames().get(context.getSelectedFormItem()), transferResult,
 				InterpreterVariableDeclaration.DIALOG_SCOPE);
 		FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context
-				.getSelectedFormItem(), "filled"), context);
+				.getSelectedFormItem(), "filled"));
 		filled.setExecute(true);
-		filled.interpret(context);
-	}
-
-	void event(String eventType) throws IOException, SAXException, ParserConfigurationException {
-		try {
-			ieh.doEvent(new InterpreterEvent(this, eventType));
-		} catch (InterpreterException e) {
-			executionHandler(e);
-		}
+		filled.interpret(context); // FIXME raise disconnect event instead to be
+		// closer to OMS buggy interpretation.
 	}
 
 	private void executionHandler(InterpreterException e) throws IOException, SAXException,
@@ -113,39 +150,17 @@ public class InternalInterpreter implements VxmlElement {
 
 		if (e instanceof GotoException) {
 			context.buildDocument(((GotoException) e).next);
-			System.err.println("GOTO" + ((GotoException) e).next);
-			interpret(context);
+			interpret(1, null);
 		} else if (e instanceof SubmitException) {
 			context.buildDocument(((SubmitException) e).next);
-			interpret(context);
+			interpret(1, null);
 		}
 		if (e instanceof EventException) {
 			try {
-				ieh.doEvent(new InterpreterEvent(this, ((EventException) e).type));
+				ieh.doEvent(((EventException) e).type);
 			} catch (InterpreterException e1) {
 				executionHandler(e1);
 			}
-		}
-	}
-
-	void callerHangup(int i) throws IOException, SAXException, ParserConfigurationException {
-		context.getDeclaration().evaluateScript(
-				"connection.protocol.isdnvn6.transferresult= '" + i + "'",
-				InterpreterVariableDeclaration.SESSION_SCOPE);
-		try {
-			ieh.doEvent(new InterpreterEvent(this, "connection.disconnect.hangup"));
-		} catch (InterpreterException e) {
-			executionHandler(e);
-		}
-	}
-
-	void noAnswer() throws IOException, SAXException, ParserConfigurationException {
-		context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '2'",
-				InterpreterVariableDeclaration.SESSION_SCOPE);
-		try {
-			setTransferResultAndExecute("'noanswer'");
-		} catch (InterpreterException e) {
-			executionHandler(e);
 		}
 	}
 
@@ -164,26 +179,41 @@ public class InternalInterpreter implements VxmlElement {
 	}
 
 	void utterance(String utterance, String utteranceType) throws IOException, SAXException,
-			ParserConfigurationException {
-		context.getDeclaration().evaluateScript("application.lastresult$[0].utterance =" + utterance,
-				InterpreterVariableDeclaration.APPLICATION_SCOPE);
-		context.getDeclaration().evaluateScript(
-				"application.lastresult$[0].inputmode =" + utteranceType,
-				InterpreterVariableDeclaration.APPLICATION_SCOPE);
-		context.getDeclaration().setValue(
-				context.getFormItemNames().get(context.getSelectedFormItem()), utterance, 60);
-		try {
+			ParserConfigurationException, InterpreterException {
+		Node currentDialog = context.getCurrentDialog();
+		if (currentDialog.getNodeName().equals("form")) {
+			context.getDeclaration().evaluateScript(
+					"application.lastresult$[0].utterance =" + utterance,
+					InterpreterVariableDeclaration.APPLICATION_SCOPE);
+			context.getDeclaration().evaluateScript(
+					"application.lastresult$[0].inputmode =" + utteranceType,
+					InterpreterVariableDeclaration.APPLICATION_SCOPE);
+			context.getDeclaration().setValue(
+					context.getFormItemNames().get(context.getSelectedFormItem()), utterance, 60);
 			FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context
-					.getSelectedFormItem(), "filled"), context);
+					.getSelectedFormItem(), "filled"));
 			filled.setExecute(true);
 			filled.interpret(context);
-		} catch (InterpreterException e) {
-			executionHandler(e);
+		} else {
+			NodeList childNodes = currentDialog.getChildNodes();
+			int choiceCount = 0;
+			for (int i = 0; i < childNodes.getLength(); i++) {
+				Node child = childNodes.item(i);
+				if (child.getNodeName().equals("choice")) {
+					choiceCount++;
+					try {
+						if (choiceCount == Integer.parseInt(utterance.replaceAll("'", ""))) {
+							throw new GotoException(getNodeAttributeValue(child, "next"), null);
+						}
+					} catch (NumberFormatException e) {
+						System.err.println("toto");
+						if (child.getTextContent().contains(utterance.replaceAll("'", ""))) {
+							throw new GotoException(getNodeAttributeValue(child, "next"), null);
+						}
+					}
+				}
+			}
 		}
-	}
-
-	void setCurrentDialogProperties(Properties currentDialogProperties) {
-		this.properties = currentDialogProperties;
 	}
 
 	Properties getCurrentDialogProperties() {
@@ -192,31 +222,8 @@ public class InternalInterpreter implements VxmlElement {
 		return properties;
 	}
 
-	void maxTimeDisconnect() throws IOException, SAXException, ParserConfigurationException {
-		try {
-			setTransferResultAndExecute("'maxtime_disconnect'");
-		} catch (InterpreterException e) {
-			executionHandler(e);
-		}
-	}
-
-	void destinationBusy() throws IOException, SAXException, ParserConfigurationException {
-		try {
-			setTransferResultAndExecute("'busy'");
-		} catch (InterpreterException e) {
-			executionHandler(e);
-		}
-	}
-
-	void networkBusy() throws SAXException, IOException, ParserConfigurationException {
-		try {
-			setTransferResultAndExecute("'network_busy'");
-		} catch (InterpreterException e) {
-			executionHandler(e);
-		}
-	}
-
 	public InterpreterContext getContext() {
 		return context;
 	}
+
 }
