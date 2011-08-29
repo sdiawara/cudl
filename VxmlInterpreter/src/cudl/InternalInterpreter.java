@@ -34,7 +34,6 @@ class InternalInterpreter {
 	private InterpreterEventHandler ieh;
 	private Properties properties = new Properties();
 	private boolean test;
-	private String eventType;
 
 	InternalInterpreter(InterpreterContext context) throws IOException, SAXException {
 		this.context = context;
@@ -56,23 +55,14 @@ class InternalInterpreter {
 					context.getFormItemNames().clear();
 				dialog.interpret(context);
 				break;
-			// FIXME : remove duplicate code
-			case NOINPUT:
-				ieh.doEvent("noinput");
-				break;
-			case NOMATCH:
-				ieh.doEvent("nomatch");
 			case EVENT:
-				ieh.doEvent(eventType);
+				ieh.doEvent(arg);
 				break;
 			case BLIND_TRANSFER_SUCCESSSS:
 				context.getDeclaration().evaluateScript(
 						"connection.protocol.isdnvn6.transferresult= '0'",
 						InterpreterVariableDeclaration.SESSION_SCOPE);
 				ieh.doEvent("connection.disconnect.transfer");
-				break;
-			case CONNECTION_DISCONNECT_HANGUP:
-				ieh.doEvent("connection.disconnect.hangup");
 				break;
 			case NOANSWER:
 				context.getDeclaration().evaluateScript(
@@ -112,8 +102,13 @@ class InternalInterpreter {
 			}
 		} catch (GotoException e) {
 			ieh.resetEventCounter();
-			context.buildDocument(e.next);
-			node = context.getCurrentDialog();
+			if (e.next != null) {
+				context.buildDocument(e.next);
+				node = context.getCurrentDialog();
+			} else {
+				node = context.getCurrentDialog();
+				context.setNextItemToVisit(e.nextItem);
+			}
 			interpret(1, null);
 		} catch (SubmitException e) {
 			ieh.resetEventCounter();
@@ -122,8 +117,7 @@ class InternalInterpreter {
 			interpret(1, null);
 		} catch (FilledException e) {
 		} catch (EventException e) {
-			eventType = e.type;
-			interpret(EVENT, null);
+			interpret(EVENT, e.type);
 		} catch (TransferException e) {
 			ieh.resetEventCounter();
 		} catch (ReturnException e) {
@@ -143,25 +137,6 @@ class InternalInterpreter {
 		filled.setExecute(true);
 		filled.interpret(context); // FIXME raise disconnect event instead to be
 		// closer to OMS buggy interpretation.
-	}
-
-	private void executionHandler(InterpreterException e) throws IOException, SAXException,
-			ParserConfigurationException {
-
-		if (e instanceof GotoException) {
-			context.buildDocument(((GotoException) e).next);
-			interpret(1, null);
-		} else if (e instanceof SubmitException) {
-			context.buildDocument(((SubmitException) e).next);
-			interpret(1, null);
-		}
-		if (e instanceof EventException) {
-			try {
-				ieh.doEvent(((EventException) e).type);
-			} catch (InterpreterException e1) {
-				executionHandler(e1);
-			}
-		}
 	}
 
 	private void collectDialogProperty(NodeList nodeList) {
@@ -203,12 +178,19 @@ class InternalInterpreter {
 					choiceCount++;
 					try {
 						if (choiceCount == Integer.parseInt(utterance.replaceAll("'", ""))) {
-							throw new GotoException(getNodeAttributeValue(child, "next"), null);
+							String next = getNodeAttributeValue(child, "next");
+							if (null != next)
+								throw new GotoException(next, null);
+							else
+								throw new EventException(getNodeAttributeValue(child, "event"));
 						}
 					} catch (NumberFormatException e) {
-						System.err.println("toto");
 						if (child.getTextContent().contains(utterance.replaceAll("'", ""))) {
-							throw new GotoException(getNodeAttributeValue(child, "next"), null);
+							String next = getNodeAttributeValue(child, "next");
+							if (null != next)
+								throw new GotoException(next, null);
+							else
+								throw new EventException(getNodeAttributeValue(child, "event"));
 						}
 					}
 				}

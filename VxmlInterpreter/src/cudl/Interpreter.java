@@ -2,15 +2,13 @@ package cudl;
 
 import static cudl.InternalInterpreter.BLIND_TRANSFER_SUCCESSSS;
 import static cudl.InternalInterpreter.CALLER_HUNGUP_DURING_TRANSFER;
-import static cudl.InternalInterpreter.CONNECTION_DISCONNECT_HANGUP;
 import static cudl.InternalInterpreter.DESTINATION_BUSY;
 import static cudl.InternalInterpreter.DTMF;
 import static cudl.InternalInterpreter.NETWORK_BUSY;
 import static cudl.InternalInterpreter.NOANSWER;
-import static cudl.InternalInterpreter.NOINPUT;
-import static cudl.InternalInterpreter.NOMATCH;
 import static cudl.InternalInterpreter.START;
 import static cudl.InternalInterpreter.TALK;
+import static cudl.InternalInterpreter.EVENT;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -41,20 +39,20 @@ public class Interpreter {
 	}
 
 	public void noInput() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(NOINPUT, null);
+		internalInterpreter.interpret(EVENT, "noinput");
 	}
 
 	public void noMatch() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(NOMATCH, null);
+		internalInterpreter.interpret(EVENT, "nomatch");
+	}
+
+	public void disconnect() throws IOException, SAXException, ParserConfigurationException {
+		internalInterpreter.interpret(EVENT, "connection.disconnect.hangup");
 	}
 
 	public void blindTransferSuccess() throws IOException, SAXException,
 			ParserConfigurationException {
 		internalInterpreter.interpret(BLIND_TRANSFER_SUCCESSSS, null);
-	}
-
-	public void disconnect() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(CONNECTION_DISCONNECT_HANGUP, null);
 	}
 
 	public void noAnswer() throws IOException, SAXException, ParserConfigurationException {

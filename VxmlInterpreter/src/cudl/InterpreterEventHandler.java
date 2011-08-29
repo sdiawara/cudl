@@ -42,7 +42,6 @@ class InterpreterEventHandler {
 
 	public void doEvent(String eventType) throws IOException, SAXException, InterpreterException,
 			ParserConfigurationException {
-		System.err.println("---> "+eventType);
 		int counter = (eventCounter.get(eventType) == null) ? 1 : eventCounter.get(eventType) + 1;
 
 		eventCounter.put(eventType, counter);

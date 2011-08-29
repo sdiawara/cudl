@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Undefined;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -23,6 +26,7 @@ import cudl.utils.VxmlElementType;
 
 abstract class VxmlTag {
 	protected final Node node;
+	protected List<String> parentTag;
 
 	VxmlTag(Node node) {
 		this.node = node;
@@ -73,6 +77,7 @@ class FormTag extends VxmlTag {
 			Node formItem = selectNextFormItem(context);
 			if (formItem == null) {
 				context.setHangup(true);
+				System.err.println("SORTIE");
 				break;
 			}
 			context.setSelectedFormItem(formItem);
@@ -89,6 +94,7 @@ class FormTag extends VxmlTag {
 					return null;
 				} catch (GotoException e) {
 					context.setNextItemToVisit(e.nextItem);
+					System.err.println(e.next + "   " + e.nextItem);
 					if (e.next != null) {
 						context.getDeclaration().resetScopeBinding(
 								InterpreterVariableDeclaration.DIALOG_SCOPE);
@@ -171,8 +177,12 @@ class VarTag extends VxmlTag {
 	}
 
 	@Override
-	public Object interpret(InterpreterContext context) {
+	public Object interpret(InterpreterContext context) throws EventException {
 		String name = Utils.getNodeAttributeValue(node, "name");
+		String[] split = name.split("\\.");
+		if (Utils.scopeNames().contains(split[0]) && split.length > 1) {
+			throw new EventException("error.semantic");
+		}
 		if (!context.getParams().contains(name)) {
 			String expr = Utils.getNodeAttributeValue(node, "expr");
 			context.getDeclaration().declareVariable(name, expr == null ? "undefined" : expr,
@@ -269,12 +279,16 @@ class AssignTag extends VxmlTag {
 	}
 
 	@Override
-	public Object interpret(InterpreterContext context) {
+	public Object interpret(InterpreterContext context) throws EventException {
 		String name = getNodeAttributeValue(node, "name");
 		String expr = getNodeAttributeValue(node, "expr");
-		// String value =context.getDeclaration().evaluateScript(expr, 50)+"";
-		// System.err.println("value  ****");
-		context.getDeclaration().setValue(name, expr, 50);
+		try {
+			context.getDeclaration().getValue(name); // Dont'n remove this, he
+			// check variable declaration
+			context.getDeclaration().setValue(name, expr, 50);
+		} catch (EcmaError error) {
+			throw new EventException("error.semantic");
+		}
 		return null;
 	}
 }
@@ -285,16 +299,27 @@ class ClearTag extends VxmlTag {
 	}
 
 	@Override
-	public Object interpret(InterpreterContext context) {
+	public Object interpret(InterpreterContext context) throws EventException {
 		String namelist = getNodeAttributeValue(node, "namelist");
 		if (namelist != null) {
 			StringTokenizer tokenizer = new StringTokenizer(namelist);
 			while (tokenizer.hasMoreElements()) {
 				String name = (String) tokenizer.nextElement();
+				try {
+					context.getDeclaration().getValue(name);
+				} catch (Exception e) {
+					throw new EventException("error.semantic");
+				}
 				context.getDeclaration().setValue(name, "undefined", 50);
 			}
+		} else {
+			for (Iterator<Map.Entry<Node, String>> iterator = context.getFormItemNames().entrySet()
+					.iterator(); iterator.hasNext();) {
+				Map.Entry<Node, String> FormItem = (Map.Entry<Node, String>) iterator.next();
+				context.getDeclaration().setValue(FormItem.getValue(), "undefined", 50);
+			}
 		}
-		// else clear set formItem to undefined
+
 		return null;
 	}
 }
@@ -372,14 +397,30 @@ class GotoTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException {
-		String nextItemAtt = getNodeAttributeValue(node, "nextitem");
-		String next = getNodeAttributeValue(node, "next");
+		String nextItemTmp = getNodeAttributeValue(node, "nextitem");
+		String exprItemTmp = getNodeAttributeValue(node, "expritem");
 
-		if (nextItemAtt == null)
-			nextItemAtt = getNodeAttributeValue(node, "expritem");
-		if (next == null)
-			next = getNodeAttributeValue(node, "expr");
-		throw new GotoException(next, nextItemAtt);
+		String nextItem;
+		if (nextItemTmp != null && exprItemTmp != null) {
+			throw new EventException("error.badfetch");
+		} else {
+			nextItem = nextItemTmp != null ? nextItemTmp : exprItemTmp != null ? context
+					.getDeclaration().getValue(exprItemTmp)
+					+ "" : null;
+		}
+		if (nextItem != null)
+			throw new GotoException(null, nextItem);
+
+		String nextTmp = getNodeAttributeValue(node, "next");
+		String exprTmp = getNodeAttributeValue(node, "expr");
+
+		String next;
+		if (nextTmp != null && exprTmp != null) {
+			throw new EventException("error.badfetch");
+		} else {
+			next = nextTmp != null ? nextTmp : context.getDeclaration().getValue(exprTmp) + "";
+		}
+		throw new GotoException(next, null);
 	}
 }
 
@@ -390,8 +431,13 @@ class SubmitTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException {
-
 		String next = getNodeAttributeValue(node, "next");
+		String expr = getNodeAttributeValue(node, "expr");
+		if (next != null && expr != null) {
+			throw new EventException("error.badfetch");
+		}
+
+		next = next != null ? next : context.getDeclaration().getValue(expr) + "";
 
 		String nameList = getNodeAttributeValue(node, "namelist");
 		if (nameList != null) {
@@ -447,7 +493,10 @@ class ThrowTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException {
-		System.err.println(getNodeAttributeValue(node, "event") + " throw");
+		NamedNodeMap attributes = node.getAttributes();
+		if (attributes.getNamedItem("event") != null && attributes.getNamedItem("eventexpr") != null) {
+			throw new EventException("error.badfetch");
+		}
 		throw new EventException(getNodeAttributeValue(node, "event"));
 	}
 }
@@ -485,11 +534,11 @@ class SubdialogTag extends VxmlTag {
 		InternalInterpreter internalInterpreter = null;
 		if (src != null) {
 			String url = Utils.tackWeelFormedUrl(context.getCurrentFileName(), src);
-			
+
 			internalInterpreter = new InternalInterpreter(new InterpreterContext(url));
-			
+
 			declareParams(internalInterpreter, node.getChildNodes(), context);
-			internalInterpreter.interpret(1,null);
+			internalInterpreter.interpret(1, null);
 			context.getLogs().addAll(internalInterpreter.getContext().getLogs());
 			context.getPrompts().addAll(internalInterpreter.getContext().getPrompts());
 		}
@@ -608,9 +657,9 @@ class EnumerateTag extends VxmlTag {
 
 }
 
-class ChildrenInterpreterTag extends VxmlTag {
+class ProceduralsTag extends VxmlTag {
 
-	ChildrenInterpreterTag(Node node) {
+	ProceduralsTag(Node node) {
 		super(node);
 	}
 
@@ -625,7 +674,7 @@ class ChildrenInterpreterTag extends VxmlTag {
 	}
 }
 
-class BlockTag extends ChildrenInterpreterTag {
+class BlockTag extends ProceduralsTag {
 	public BlockTag(Node node) {
 		super(node);
 	}
@@ -639,7 +688,7 @@ class BlockTag extends ChildrenInterpreterTag {
 	}
 }
 
-class FilledTag extends ChildrenInterpreterTag {
+class FilledTag extends ProceduralsTag {
 	private boolean execute = false;
 
 	public FilledTag(Node node) {
@@ -659,19 +708,19 @@ class FilledTag extends ChildrenInterpreterTag {
 	}
 }
 
-class NoinputTag extends ChildrenInterpreterTag {
+class NoinputTag extends ProceduralsTag {
 	public NoinputTag(Node node) {
 		super(node);
 	}
 }
 
-class CatchTag extends ChildrenInterpreterTag {
+class CatchTag extends ProceduralsTag {
 	public CatchTag(Node node) {
 		super(node);
 	}
 }
 
-class NomatchTag extends ChildrenInterpreterTag {
+class NomatchTag extends ProceduralsTag {
 	public NomatchTag(Node node) {
 		super(node);
 	}

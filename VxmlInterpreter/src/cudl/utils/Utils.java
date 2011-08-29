@@ -1,7 +1,12 @@
 package cudl.utils;
 
+import static cudl.utils.VxmlElementType.isAnExecutableItem;
+import static cudl.utils.VxmlElementType.isFormItem;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -55,5 +60,23 @@ public class Utils {
 
 		Node attributeValue = attributes.getNamedItem(attributeName);
 		return attributeValue == null ? null : attributeValue.getNodeValue();
+	}
+
+	public static List<String> scopeNames() {
+		return new ArrayList<String>() {
+			{
+				add("dialog");
+				add("document");
+				add("application");
+				add("session");
+			}
+		};
+	}
+
+	public static int getScope(Node node, String rootFileUri) {
+		Node parentNode = node.getParentNode();
+		return isAnExecutableItem(node.getParentNode()) || isFormItem(node.getParentNode()) ? 50
+				: VxmlElementType.isADialog(parentNode) ? 60 : parentNode.getNodeName().equals("vxml")
+						&& parentNode.getOwnerDocument().getDocumentURI().equals(rootFileUri) ? 70 : 80;
 	}
 }

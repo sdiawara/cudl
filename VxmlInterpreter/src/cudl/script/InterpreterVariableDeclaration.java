@@ -4,15 +4,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import cudl.utils.RemoteFileAccess;
 import cudl.utils.SessionFileCreator;
+import cudl.utils.Utils;
 
 public class InterpreterVariableDeclaration {
 	public static final int SESSION_SCOPE = 90;
@@ -116,14 +119,39 @@ public class InterpreterVariableDeclaration {
 
 	public void setValue(String name, String value, int scope) {
 		Context ctxt = Context.enter();
-		ctxt.evaluateString(getScope(scope), name + "=" + value, name + "=" + value, 1, null);
+		// ctxt.evaluateString(getScope(scope), name, sourceName, lineno,
+		// securityDomain);
+		// ctxt.evaluateString(getScope(scope), name + "=" + value, name + "=" +
+		// value, 1, null);
 
-		ScriptableObject start = getScope(scope);
-		while (start != null) {
-			if (start.has(name, start))
-				start.put(name, start, evaluateScript(value, scope));
-			start = (ScriptableObject) start.getPrototype();
+		ctxt.compileString(name + "=" + value, name + "=" + value, 1, null);
+		String[] split = name.split("\\.");
+		if (Utils.scopeNames().contains(split[0])) {
+			ctxt.evaluateString(getScopeByName(split[0]), split[1] + "=" + value, name + "=" + value,
+					1, null);
+		} else {
+			ScriptableObject start = getScope(scope);
+			while (start != null) {
+				if (start.has(name, start)) {
+					ctxt.evaluateString(start, split[0] + "=" + value, name + "=" + value, 1, null);
+					System.err.println(name +"is here");
+					break;
+				}
+				start = (ScriptableObject) start.getPrototype();
+			}
 		}
+
+	}
+
+	private Scriptable getScopeByName(String name) {
+		return new HashMap<String, Scriptable>() {
+			{
+				put("application", applicationScope);
+				put("anonyme", anonymeScope);
+				put("document", documentScope);
+				put("dialog", dialogScope);
+			}
+		}.get(name);
 	}
 
 	public Object getValue(String name) {

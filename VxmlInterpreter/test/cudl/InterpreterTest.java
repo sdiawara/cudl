@@ -1,7 +1,6 @@
 package cudl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -13,7 +12,6 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mozilla.javascript.EcmaError;
 import org.xml.sax.SAXException;
@@ -370,35 +368,92 @@ public class InterpreterTest {
 		interpreter.start();
 		interpreter.talk("anglais");
 
-		System.err.println(interpreter.getPrompts());
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 		assertTrue(interpreter.hungup());
 	}
 
 	@Test
-	public void testMenuNodeCanBeSelectAndExecute() throws IOException,
+	public void choiceInMenuElementCanThrowEventWhenItSelected() throws IOException,
 			ParserConfigurationException, SAXException {
+		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "Pour le français tapez 1, pour l'anglais tapez 2, Pour le chinois tapez 3";
+		exceptedPrompts.add(prompt);
 
-		interpreter = new Interpreter(url + "selectMenu.vxml");
+		prompt = new Prompt();
+		prompt.tts = "vous avez choisi anglais";
+		exceptedPrompts.add(prompt);
+
+		interpreter = new Interpreter(url + "choiceThrowEvent.txml");
 		interpreter.start();
+		interpreter.talk("anglais");
 
-		System.err.println(interpreter.getPrompts());
-		assertFalse(interpreter.getPrompts().isEmpty());
+		assertEquals(exceptedPrompts, interpreter.getPrompts());
 		assertTrue(interpreter.hungup());
 	}
 
 	@Test
-	@Ignore
-	public void ifMenuUserInputMatchWithChoiceThatChoiceIsExecuted() throws IOException,
+	public void whenThrowElementDefineExprEventandEventAnErrorOccur() throws IOException,
 			ParserConfigurationException, SAXException {
 
-		interpreter = new Interpreter(url + "menuChoice.vxml");
-		interpreter.start();
-		interpreter.talk("choix 1");
+		List<Prompt> expectedprompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "a badfetch error occur";
+		expectedprompts.add(prompt);
 
-		System.err.println(interpreter.getPrompts());
-		assertFalse(interpreter.getPrompts().isEmpty());
-		assertTrue(interpreter.hungup());
+		interpreter = new Interpreter(url
+				+ "whenThrowElementDefineExprEventandEventAnErrorOccur.vxml");
+		interpreter.start();
+
+		assertEquals(expectedprompts, interpreter.getPrompts());
+	}
+
+	@Test
+	public void whenThenVarNameBeginByScopeNameTheInterpreterThrowAsemanticError()
+			throws IOException, ParserConfigurationException, SAXException {
+
+		List<Prompt> expectedprompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "an semantic error occur";
+		expectedprompts.add(prompt);
+
+		interpreter = new Interpreter(url
+				+ "whenThenVarNameBeginByScopeNameTheInterpreterThrowAsemanticError.vxml");
+		interpreter.start();
+
+		assertEquals(expectedprompts, interpreter.getPrompts());
+	}
+
+	@Test
+	public void ifClearNameListContainsUndeclaredVariableHeThrowSemanticError() throws IOException,
+			ParserConfigurationException, SAXException {
+
+		List<Prompt> expectedprompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "semantic error";
+		expectedprompts.add(prompt);
+
+		interpreter = new Interpreter(url
+				+ "ifClearNameListContainsUndeclaredVariableHeThrowSemanticError.vxml");
+		interpreter.start();
+
+		assertEquals(expectedprompts, interpreter.getPrompts());
+	}
+
+	@Test
+	public void whenClearTagNotIndicateNamelistAllFormitemIsCleared() throws IOException,
+			ParserConfigurationException, SAXException {
+
+		List<Prompt> expectedprompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "It is good toto and tata is cleared.";
+		expectedprompts.add(prompt);
+
+		interpreter = new Interpreter(url
+				+ "whenClearTagNotIndicateNamelistAllFormitemIsCleared.vxml");
+		interpreter.start();
+
+		assertEquals(expectedprompts, interpreter.getPrompts());
 	}
 
 }

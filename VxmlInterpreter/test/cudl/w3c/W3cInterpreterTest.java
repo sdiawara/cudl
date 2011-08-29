@@ -15,6 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mozilla.javascript.EcmaError;
 import org.xml.sax.SAXException;
 
 import cudl.Interpreter;
@@ -56,15 +57,15 @@ public class W3cInterpreterTest {
 			// transition to the chosen form item.
 			add("w3c/assert154.txml");
 
+			// If the last main FIA loop resulted in a goto nextitem or goto
+			// expritem then the specified form item is selected.
+			add("w3c/assert163.txml");
+
 			// FIA ends when it encounters an <submit>.
 			add("w3c/assert112.txml");
 
 			// FIA ends when it encounters an <return>.
 			add("w3c/assert114.txml");
-
-			// A variable declared at document scope is accessible within an
-			// anonymous scope contained within the same document.
-			// add("w3c/510.txml");
 
 			// Common ECMAScript code can be defined in the application root
 			// and used in leaf documents.
@@ -107,6 +108,18 @@ public class W3cInterpreterTest {
 			// as the form item variable's initial value.
 			add("w3c/234.txml");
 
+			// A variable declared at document scope is accessible within an
+			// anonymous scope contained within the same document.
+			add("w3c/510.txml");
+
+			// Declaring a variable at an anonymous scope, the variable is not
+			// accessible within another anonymous scope.
+			add("w3c/511.txml");
+
+			// A variable declared at a higher scope (e.g. document) is shadowed by
+			// a variable at a lower scope (e.g. anonymous).
+			add("w3c/512.txml");
+
 			// When declaring the same variable multiple times with different
 			// initial values in the same scope, declarations will apply in
 			// document order.
@@ -115,6 +128,18 @@ public class W3cInterpreterTest {
 			// When expr is set to a valid expression in an assign, the named
 			// variable is set correctly.
 			add("w3c/514.txml");
+
+			// If name is set to an undefined variable in an assign, error.semantic
+			// is thrown.
+			add("w3c/515.txml");
+
+			// If expr contains an undefined variable in an assign, error.semantic
+			// is thrown.
+			add("w3c/516.txml");
+
+			// If expr contains a semantic error (e.g.it contains a non-existent
+			// function named x), an error.semantic is thrown.
+			add("w3c/517.txml");
 
 			// "session", "application", "document", and "dialog" are not
 			// reserved words.
@@ -303,14 +328,11 @@ public class W3cInterpreterTest {
 			// The use of the log element has no side-effects on interpretation.
 			add("w3c/562.txml");
 
+			// FIXME: FIX fied and filled
 			// When the namelist attribute of the clear element specifies a
 			// specific set of one or more form item variables, only those form
 			// items are cleared.
 			// add("w3c/518.txml");
-
-			// When the namelist attribute of the clear element is omitted, all
-			// form items in the current form are cleared.
-			// add("w3c/519.txml");
 
 			// A form may contain form items, which are subdivided into input
 			// items ( <field>, <record>, <transfer>, <object>, <subdialog>) and
@@ -404,6 +426,12 @@ public class W3cInterpreterTest {
 			// When there is no fragment, the subdialog invoked is the lexically
 			// first dialog in the document.
 			add("w3c/subdialog1158main.txml");
+
+			// When an ECMAScript object, e.g. "obj", has been properly initialized
+			// then its properties, for instance "obj.prop1", can be assigned
+			// without explicit declaration.
+			// FIXME: assign or script fix fix
+			// add("w3c/1179.txml");
 		}
 
 	};
@@ -453,6 +481,9 @@ public class W3cInterpreterTest {
 				interpreter.talk("alpha");
 			} else if (fileName.endsWith("235.txml")) {
 				interpreter.noInput();
+			} else if (fileName.endsWith("assert163.txml")) {
+				interpreter.talk("alpha");
+				interpreter.talk("alpha");
 			}
 
 			List<Prompt> prompts = interpreter.getPrompts();
@@ -467,6 +498,24 @@ public class W3cInterpreterTest {
 			System.out.println(fileName + " test pass");
 		}
 		System.out.println(count + " tests of " + fileNames.size());
+	}
+
+	@Test
+	@Ignore
+	public void automatiqueW3cTest() throws IOException, ParserConfigurationException, SAXException {
+		url = new File(".").getCanonicalPath() + "/test/docVxml/w3c/automatic_test/";
+		File file = new File(url);
+
+		String[] list = file.list();
+		for (int i = 0; i < list.length; i++) {
+			String url2 = "file:///" + url + list[i];
+			System.err.println(url2);
+			interpreter = new Interpreter(url2);
+			interpreter.start();
+
+			assertTrue(interpreter.hungup());
+			System.out.println("Test " + list[i] + "  passed");
+		}
 	}
 
 	@Test
@@ -563,6 +612,14 @@ public class W3cInterpreterTest {
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 	}
 
+	@Test(expected = EcmaError.class)
+	public void WhenErrorOccureTheInterpreterThrowError() throws IOException,
+			ParserConfigurationException, SAXException {
+		interpreter = new Interpreter(url + "w3c/a32.txml");
+		interpreter.start();
+		interpreter.noInput();
+	}
+
 	@Test
 	@Ignore
 	public void w3c236Test() throws IOException, ScriptException, ParserConfigurationException,
@@ -575,7 +632,7 @@ public class W3cInterpreterTest {
 		interpreter = new Interpreter(url + "w3c/236.txml");
 		interpreter.start();
 		interpreter.noInput();
-
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 	}
+
 }
