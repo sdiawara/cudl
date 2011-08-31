@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+    <block name="toto">
+    </block>
+  
+  	<block name="tata">
+    </block>
+    
+    <block name="FIN">
+    	<clear/>
+    	<if cond="toto == undefined &amp;&amp; tata== undefined">
+    		<prompt>It is good toto and tata is cleared.</prompt>
+    		<exit/>
+    	</if>
+    </block>
+    </form>
+</vxml>

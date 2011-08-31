@@ -16,19 +16,17 @@ import cudl.script.InterpreterVariableDeclaration;
 
 class InternalInterpreter {
 	public static final int START = 1;
-	public static final int NOINPUT = 2;
-	public static final int NOMATCH = 3;
-	public static final int EVENT = 4;
-	public static final int BLIND_TRANSFER_SUCCESSSS = 5;
-	public static final int CONNECTION_DISCONNECT_HANGUP = 6;
-	public static final int NOANSWER = 7;
-	public static final int CALLER_HUNGUP_DURING_TRANSFER = 8;
-	public static final int NETWORK_BUSY = 9;
-	public static final int DESTINATION_BUSY = 10;
-	public static final int MAX_TIME_DISCONNECT = 11;
-	public static final int DESTINATION_HANGUP = 12;
-	public static final int TALK = 13;
-	public static final int DTMF = 14;
+	public static final int EVENT = 2;
+	public static final int BLIND_TRANSFER_SUCCESSSS = 3;
+	public static final int CONNECTION_DISCONNECT_HANGUP = 4;
+	public static final int NOANSWER = 5;
+	public static final int CALLER_HUNGUP_DURING_TRANSFER = 7;
+	public static final int NETWORK_BUSY = 8;
+	public static final int DESTINATION_BUSY = 9;
+	public static final int MAX_TIME_DISCONNECT = 10;
+	public static final int DESTINATION_HANGUP = 11;
+	public static final int TALK = 12;
+	public static final int DTMF = 13;
 
 	private final InterpreterContext context;
 	private InterpreterEventHandler ieh;
@@ -170,6 +168,8 @@ class InternalInterpreter {
 			filled.setExecute(true);
 			filled.interpret(context);
 		} else {
+
+			// TODO: Refactor to add choice bailise
 			NodeList childNodes = currentDialog.getChildNodes();
 			int choiceCount = 0;
 			for (int i = 0; i < childNodes.getLength(); i++) {

@@ -40,14 +40,13 @@ class ConffailTag extends TxmlTag {
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException,
 			SAXException {
 		String reason = getNodeAttributeValue(node, "reason");
-		if (reason != null)
-			System.err.println("reason ->" + reason);
-		else {
+		if (reason == null) {
 			String expr = getNodeAttributeValue(node, "expr");
 			if (expr != null)
-				System.err.println("reason ->" + context.getDeclaration().evaluateScript(expr, 50));
+				reason = "" + context.getDeclaration().evaluateScript(expr, 50);
+			
 		}
-		return null;
+		throw new RuntimeException(reason == null ? "Fail" : "Fail reason -> " + reason);
 	}
 }
 

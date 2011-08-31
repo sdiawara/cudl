@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<vxml>
+	<menu>
+	  <choice next="fail.txml">mauvais cgoice</choice>
+	  <choice next="fail.txml">chinois</choice>
+	  <choice event="goodEvent">anglais</choice>
+	  <choice next="fail.txml">helllo</choice>
+	  <choice next="fail.txml">blabla</choice>
+      <prompt>Pour le français tapez 1, pour l'anglais tapez 2, Pour le chinois tapez 3</prompt>
+      
+      <catch event="goodEvent">
+      	<prompt>vous avez choisi anglais</prompt>
+      	<goto next="pass.txml"/>
+      </catch>
+    </menu>
+</vxml>

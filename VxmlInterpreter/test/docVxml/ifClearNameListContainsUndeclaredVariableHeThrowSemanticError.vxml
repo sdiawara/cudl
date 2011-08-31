@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+    <block name="toto">
+    </block>
+  
+  	<block name="tata">
+    </block>
+    <catch event="error.semantic">
+    	<prompt>semantic error</prompt>
+    	<exit/>
+    </catch>
+    <block name="FIN">
+    	<clear namelist="banana"/>
+    	<if cond="toto == undefined &amp;&amp; tata== undefined">
+    		<prompt>It is good toto and tata is cleared.</prompt>
+    	</if>
+    </block>
+    </form>
+</vxml>

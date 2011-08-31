@@ -4,11 +4,12 @@ import static cudl.InternalInterpreter.BLIND_TRANSFER_SUCCESSSS;
 import static cudl.InternalInterpreter.CALLER_HUNGUP_DURING_TRANSFER;
 import static cudl.InternalInterpreter.DESTINATION_BUSY;
 import static cudl.InternalInterpreter.DTMF;
+import static cudl.InternalInterpreter.EVENT;
+import static cudl.InternalInterpreter.MAX_TIME_DISCONNECT;
 import static cudl.InternalInterpreter.NETWORK_BUSY;
 import static cudl.InternalInterpreter.NOANSWER;
 import static cudl.InternalInterpreter.START;
-import static cudl.InternalInterpreter.TALK;
-import static cudl.InternalInterpreter.EVENT;
+import static cudl.InternalInterpreter.*;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -73,7 +74,7 @@ public class Interpreter {
 	}
 
 	public void transferTimeout() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(11, null);
+		internalInterpreter.interpret(MAX_TIME_DISCONNECT, null);
 	}
 
 	public void talk(String sentence) throws UnsupportedEncodingException, IOException,
@@ -132,6 +133,6 @@ public class Interpreter {
 	}
 
 	public void destinationHangup() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(12, null);
+		internalInterpreter.interpret(DESTINATION_HANGUP, null);
 	}
 }

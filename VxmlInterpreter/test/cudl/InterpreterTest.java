@@ -456,4 +456,32 @@ public class InterpreterTest {
 		assertEquals(expectedprompts, interpreter.getPrompts());
 	}
 
+	@Test
+	public void testHeartWelcomeMessageAndSayNoThink() throws IOException,
+			ParserConfigurationException, SAXException {
+		List<Prompt> expectedprompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		prompt.tts = "Bonjour, bienvenue chez Orange et France Télécom. "
+				+ "Le temps d'attente avant la mise en relation avec votre conseiller "
+				+ "est gratuit. Cet appel est facturé au tarif d'une communication "
+				+ "locale si vous appelez d\'une ligne fixe France Télécom ... .";
+		expectedprompts.add(prompt);
+		
+		prompt = new Prompt();
+		prompt.tts = "C'est à vous !";
+		expectedprompts.add(prompt);
+		
+		prompt = new Prompt();
+		prompt.tts = "Votre numero est le 0658585895. Merci de votre appel.";
+		expectedprompts.add(prompt);
+		
+		interpreter = new Interpreter(url +"accueil.vxml");
+		interpreter.start();
+		interpreter.submitDtmf("0658585895");
+		
+		assertEquals(expectedprompts, interpreter.getPrompts());
+	}
+	
+	
+	
 }

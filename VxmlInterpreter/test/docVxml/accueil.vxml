@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<vxml xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.w3.org/2001/vxml 
+   http://www.w3.org/TR/voicexml20/vxml.xsd"
+   version="2.0">
+  <form>
+    <block>
+           <prompt>Bonjour, bienvenue chez Orange et France Télécom. Le temps d'attente avant la mise en relation avec votre conseiller est gratuit. Cet appel est facturé au tarif d'une communication locale si vous appelez d'une ligne fixe France Télécom ... .</prompt>
+   </block>
+    
+    <field name="recuperer_numero">
+       <prompt>C'est à vous !</prompt>
+       <grammar src="numero.grxml" type="application/srgs+xml"/>
+    	<filled>
+	       <prompt>
+	          Votre numero est le <value expr="recuperer_numero"/>. Merci de votre appel.
+	       </prompt>
+     		
+	    </filled>
+    </field>
+  </form>
+</vxml>

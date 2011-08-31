@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+	<form id="myForm">
+		<catch event="error.semantic">
+			<conf:pass/>
+		</catch>
+		<catch>
+			<conf:fail expr="'catch-all caught ' + _event"/>
+		</catch>
+		<block>
+			<assign name="var1" expr="3"/>
+			<conf:fail reason=" 'should never get here' "/>
+		</block>
+	</form>
+</vxml>

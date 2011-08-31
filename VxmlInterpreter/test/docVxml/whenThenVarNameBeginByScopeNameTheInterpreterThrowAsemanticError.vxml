@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+<catch event="error.semantic">
+   <prompt>an semantic error occur</prompt>
+</catch>
+    <block>
+    <var name="dialog.x" expr="'x'"/>
+    </block>
+    
+    <catch event="toto"/>
+    </form>
+</vxml>

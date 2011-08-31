@@ -81,7 +81,6 @@ class FormTag extends VxmlTag {
 				break;
 			}
 			context.setSelectedFormItem(formItem);
-
 			activateGrammar(context);
 
 			if (formItems.contains(formItem.getNodeName())) {
@@ -172,22 +171,49 @@ class MenuTag extends VxmlTag {
 }
 
 class VarTag extends VxmlTag {
+	private String parentTag = "block catch error filled form help if nomatch vxml noinput";
+
 	public VarTag(Node node) {
 		super(node);
 	}
 
 	@Override
 	public Object interpret(InterpreterContext context) throws EventException {
-		String name = Utils.getNodeAttributeValue(node, "name");
-		String[] split = name.split("\\.");
-		if (Utils.scopeNames().contains(split[0]) && split.length > 1) {
-			throw new EventException("error.semantic");
+		if (parentTag.contains(node.getParentNode().getNodeName())) {
+			String name = Utils.getNodeAttributeValue(node, "name");
+			String[] split = name.split("\\.");
+			if (Utils.scopeNames().contains(split[0]) && split.length > 1) {
+				throw new EventException("error.semantic");
+			}
+			if (!context.getParams().contains(name)) {
+				String expr = Utils.getNodeAttributeValue(node, "expr");
+				context.getDeclaration().declareVariable(name, expr == null ? "undefined" : expr,
+						InterpreterVariableDeclaration.ANONYME_SCOPE);
+			}
 		}
-		if (!context.getParams().contains(name)) {
-			String expr = Utils.getNodeAttributeValue(node, "expr");
-			context.getDeclaration().declareVariable(name, expr == null ? "undefined" : expr,
-					InterpreterVariableDeclaration.ANONYME_SCOPE);
-			System.err.println("Declare variable " + name + " = " + expr);
+		return null;
+	}
+}
+
+class AssignTag extends VxmlTag {
+	// private String parentTag =
+	// "block catch error filled form help if nomatch noinput";
+
+	public AssignTag(Node node) {
+		super(node);
+	}
+
+	@Override
+	public Object interpret(InterpreterContext context) throws EventException {
+		String name = getNodeAttributeValue(node, "name");
+		String expr = getNodeAttributeValue(node, "expr");
+		System.err.println("ASSIGN " + name + "     " + expr);
+		try {
+			context.getDeclaration().getValue(name); // Dont'n remove this, he
+			// check variable declaration
+			context.getDeclaration().setValue(name, expr, 50);
+		} catch (EcmaError error) {
+			throw new EventException("error.semantic");
 		}
 		return null;
 	}
@@ -270,26 +296,6 @@ class ExitTag extends VxmlTag {
 	public Object interpret(InterpreterContext context) throws ExitException {
 		context.setHangup(true);
 		throw new ExitException();
-	}
-}
-
-class AssignTag extends VxmlTag {
-	public AssignTag(Node node) {
-		super(node);
-	}
-
-	@Override
-	public Object interpret(InterpreterContext context) throws EventException {
-		String name = getNodeAttributeValue(node, "name");
-		String expr = getNodeAttributeValue(node, "expr");
-		try {
-			context.getDeclaration().getValue(name); // Dont'n remove this, he
-			// check variable declaration
-			context.getDeclaration().setValue(name, expr, 50);
-		} catch (EcmaError error) {
-			throw new EventException("error.semantic");
-		}
-		return null;
 	}
 }
 

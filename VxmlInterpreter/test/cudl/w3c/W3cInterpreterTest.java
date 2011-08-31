@@ -431,7 +431,7 @@ public class W3cInterpreterTest {
 			// then its properties, for instance "obj.prop1", can be assigned
 			// without explicit declaration.
 			// FIXME: assign or script fix fix
-			// add("w3c/1179.txml");
+			//add("w3c/1179.txml");
 		}
 
 	};
@@ -453,12 +453,13 @@ public class W3cInterpreterTest {
 		for (Iterator<String> iterator = fileNames.iterator(); iterator.hasNext();) {
 			String fileName = iterator.next();
 
-			if (fileName.endsWith("612.txml")) {
+			if (fileName.endsWith("1179.txml")) {
 				System.err.println(fileName);
 			}
 			interpreter = new Interpreter(url + fileName);
 			interpreter.start();
 
+			
 			// System.out.println("tmp =" + tmp);
 			if (fileName.endsWith("289.txml") || fileName.endsWith("294.txml")
 					|| fileName.endsWith("298.txml")) {

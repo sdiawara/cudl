@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+      xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+<!--
+    163: If the last main FIA loop resulted in a goto nextitem 
+         or goto expritem then the specified form item is selected.
+-->
+
+  <catch>
+    <conf:comment>
+      Toplevel caught event <value expr="_event"/>
+    </conf:comment>
+    <conf:fail expr="_event"/>
+  </catch>
+
+
+  <form id="try_nextitem">
+
+    <catch event="org.w3c.exiting">
+      <goto nextitem="block_end"/>
+      <conf:fail reason="Hit mine number next item one."/>
+    </catch>
+
+    <block>
+      <goto nextitem="f1"/>
+      <conf:fail reason="Hit mine number next item two."/>
+    </block>
+
+    <block>
+      <conf:fail reason="Hit mine number next item three."/>
+    </block>
+
+    <block name="block_end">
+      <goto next="#try_expritem"/>
+    </block>
+
+    <field name="f1">
+      <conf:speech value="alpha"/>
+      <conf:grammar utterance="alpha"/>
+      <filled>
+      	<goto nextitem="block_next"/>
+        <conf:fail reason="Hit mine number next item four."/>
+      </filled>
+    </field>
+
+    <block>
+      <conf:fail reason="Hit mine number next item five."/>
+    </block>
+
+    <block name="block_next">
+      <throw event="org.w3c.exiting"/>
+      <conf:fail reason="Hit mine number next item six."/>
+    </block>
+
+    <block>
+      <conf:fail reason="Hit mine number next item seven."/>
+    </block>
+    
+  </form>
+
+
+  <form id="try_expritem">
+
+    <catch event="org.w3c.exiting">
+      <goto nextitem="block_end"/>
+      <conf:fail reason="Hit mine number expr item one."/>
+    </catch>
+
+    <block>
+      <goto expritem="'f1'"/>
+      <conf:fail reason="Hit mine number expr item two."/>
+    </block>
+
+    <block>
+      <conf:fail reason="Hit mine number expr item three."/>
+    </block>
+
+    <block name="block_end">
+      <conf:pass/>
+    </block>
+
+    <field name="f1">
+    <log> tototo </log>
+      <conf:speech value="alpha"/>
+      <conf:grammar utterance="alpha"/>
+      <filled>
+        <goto nextitem="block_next"/>
+        <conf:fail reason="Hit mine number expr item four."/>
+      </filled>
+    </field>
+
+    <block>
+      <conf:fail reason="Hit mine number expr item five."/>
+    </block>
+
+    <block name="block_next">
+      <throw event="org.w3c.exiting"/>
+      <conf:fail reason="Hit mine number expr item six."/>
+    </block>
+
+    <block>
+      <conf:fail reason="Hit mine number expr item seven."/>
+    </block>
+    
+  </form>
+
+</vxml>

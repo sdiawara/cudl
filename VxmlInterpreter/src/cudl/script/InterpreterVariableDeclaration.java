@@ -134,7 +134,7 @@ public class InterpreterVariableDeclaration {
 			while (start != null) {
 				if (start.has(name, start)) {
 					ctxt.evaluateString(start, split[0] + "=" + value, name + "=" + value, 1, null);
-					System.err.println(name +"is here");
+					System.err.println(name + "is here");
 					break;
 				}
 				start = (ScriptableObject) start.getPrototype();
