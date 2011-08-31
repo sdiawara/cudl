@@ -1,6 +1,7 @@
 package cudl.w3c;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -15,7 +16,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mozilla.javascript.EcmaError;
 import org.xml.sax.SAXException;
 
 import cudl.Interpreter;
@@ -431,7 +431,7 @@ public class W3cInterpreterTest {
 			// then its properties, for instance "obj.prop1", can be assigned
 			// without explicit declaration.
 			// FIXME: assign or script fix fix
-			//add("w3c/1179.txml");
+			// add("w3c/1179.txml");
 		}
 
 	};
@@ -459,7 +459,6 @@ public class W3cInterpreterTest {
 			interpreter = new Interpreter(url + fileName);
 			interpreter.start();
 
-			
 			// System.out.println("tmp =" + tmp);
 			if (fileName.endsWith("289.txml") || fileName.endsWith("294.txml")
 					|| fileName.endsWith("298.txml")) {
@@ -613,16 +612,17 @@ public class W3cInterpreterTest {
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 	}
 
-	@Test(expected = EcmaError.class)
+	@Test
 	public void WhenErrorOccureTheInterpreterThrowError() throws IOException,
 			ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "w3c/a32.txml");
 		interpreter.start();
-		interpreter.noInput();
+
+		assertFalse(interpreter.getPrompts().isEmpty());
+		assertTrue(interpreter.getPrompts().get(0).tts.equals("pass"));
 	}
 
 	@Test
-	@Ignore
 	public void w3c236Test() throws IOException, ScriptException, ParserConfigurationException,
 			SAXException {
 		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();

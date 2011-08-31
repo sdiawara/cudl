@@ -1,6 +1,7 @@
 package cudl;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -227,18 +228,24 @@ public class InterpreterTest {
 		assertEquals(traceLog, interpreter.getLogs());
 	}
 
-	@Test(expected = EcmaError.class)
+	@Test
 	public void anonymeScopeVariable() throws IOException, ParserConfigurationException,
 			SAXException {
 
 		interpreter = new Interpreter(url + "anonymeScopeVariable.vxml");
 		interpreter.start();
+		
+		assertFalse(interpreter.getPrompts().isEmpty());
+		assertTrue(interpreter.getPrompts().get(0).tts.equals("pass"));
 	}
 
-	@Test(expected = EcmaError.class)
+	@Test
 	public void dialogScopeVariable() throws IOException, ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "dialogScopeVariable.vxml");
 		interpreter.start();
+		
+		assertFalse(interpreter.getPrompts().isEmpty());
+		assertTrue(interpreter.getPrompts().get(0).tts.equals("pass"));
 	}
 
 	@Test
@@ -284,7 +291,7 @@ public class InterpreterTest {
 		assertEquals(prompts, interpreter.getPrompts());
 	}
 
-	@Test(expected = EcmaError.class)
+	@Test
 	public void WhenRootChangeLastRootVariableIsNotLongerAccessible() throws IOException,
 			ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "rootChangeVariable.vxml");

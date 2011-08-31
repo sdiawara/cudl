@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.mozilla.javascript.EcmaError;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -51,7 +52,11 @@ class InternalInterpreter {
 					((FormTag) dialog).setInitVar(false);
 				} else
 					context.getFormItemNames().clear();
-				dialog.interpret(context);
+				try {
+					dialog.interpret(context);
+				} catch (EcmaError e) {
+					throw new EventException("error.semantic");
+				}
 				break;
 			case EVENT:
 				ieh.doEvent(arg);

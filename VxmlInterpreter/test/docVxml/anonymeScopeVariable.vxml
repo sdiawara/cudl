@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vxml version="2.0">
 
+<catch event="error.semantic"><conf:pass/></catch>
 <form>
   <block> 
 		<var name="block_0_scope_var" expr="toto='variable de global'; 'variable de block'"/>
 		<assign name="block_0_scope_var" expr="'variable anonyme'"/>
-		<prompt><value expr="block_0_scope_var"/></prompt>
    </block>
    <block>
    		<log>Block 2 <value expr="block_0_scope_var"/></log> 

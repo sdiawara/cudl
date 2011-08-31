@@ -4,14 +4,16 @@
 <var name="form_0_scope_var" expr="toto='variable de global'; 'variable de formulaire'"/>
  	<block> 
 		<var name="block_0_scope_var" expr="toto='variable de global'; 'variable de block'"/>
-		<prompt><value expr="block_0_scope_var"/></prompt>
-		<prompt><value expr="form_0_scope_var"/></prompt>
+		<log><value expr="block_0_scope_var"/></log>
+		<log><value expr="form_0_scope_var"/></log>
 	</block>
    <block> 
    	<goto next="#forme2"/>
    </block>
 </form>
 <form id="forme2">
+<catch event="error.semantic"><conf:pass/></catch>
+
    <block> 
  		<prompt><value expr="form_0_scope_var"/> 2</prompt>
    </block>

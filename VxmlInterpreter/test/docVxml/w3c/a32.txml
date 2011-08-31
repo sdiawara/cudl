@@ -7,6 +7,7 @@
   <catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
   
   <form>
+    <catch event="error.semantic"><conf:pass/></catch>
     <block>
   <if cond="zero > 1">
     <conf:fail reason="Error should have occured"/>
