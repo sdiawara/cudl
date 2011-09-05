@@ -1,8 +1,12 @@
 package cudl.script;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,7 +17,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import cudl.utils.RemoteFileAccess;
 import cudl.utils.SessionFileCreator;
 import cudl.utils.Utils;
 
@@ -185,10 +188,13 @@ public class InterpreterVariableDeclaration {
 	}
 
 	public Object evaluateFileScript(String fileName, int scope) throws IOException {
-		File remoteFile = RemoteFileAccess.getRemoteFile(fileName);
-		Context ctxt = Context.enter();
-		return ctxt.evaluateReader(getScope(scope), new FileReader(remoteFile), remoteFile.getName(),
-				1, null);
+        BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileName).openStream()));
+        try {
+            Context ctxt = Context.enter();
+            return ctxt.evaluateReader(getScope(scope), in, fileName, 1, null);
+        } finally {
+            in.close();
+        }
 	}
 
 	private ScriptableObject getScope(int scope) {
