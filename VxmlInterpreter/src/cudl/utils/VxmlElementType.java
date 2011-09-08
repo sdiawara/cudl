@@ -5,19 +5,8 @@ import java.util.Set;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public class VxmlElementType {
-
-	private static final Set<String> EVENT = new HashSet<String>() {
-		{
-			add("noinput");
-			add("nomatch");
-			add("error");
-			add("catch");
-			add("help");
-		}
-	};
 
 	private static final Set<String> DIALOG = new HashSet<String>() {
 		{
@@ -79,25 +68,6 @@ public class VxmlElementType {
 		return IF_CONDITIONAL_CHILDS_TYPE.contains(node.getNodeName());
 	}
 
-	public static boolean isAnEvent(Node node) {
-		return EVENT.contains(node.getNodeName());
-	}
-
-	public static boolean isSimpleIfItem(Node item) {
-		assert (item.getNodeName().equals("if"));
-		return getIfItemConditionChildsNumber(item) == 0;
-	}
-
-	public static boolean isIfElseItem(Node item) {
-		assert (item.getNodeName().equals("if"));
-		return getIfItemConditionChildsNumber(item) == 1;
-	}
-
-	public static boolean isSimpleIfElseifElseItem(Node item) {
-		assert (item.getNodeName().equals("if"));
-		return getIfItemConditionChildsNumber(item) > 1;
-	}
-
 	public static boolean isInputItem(Node item) {
 		return FORM_INPUT_ITEM_TYPES.contains(item.getNodeName());
 	}
@@ -115,17 +85,5 @@ public class VxmlElementType {
 
 	public static boolean isAnExecutableItem(Node item) {
 		return EXECUTABLE_ITEM.contains(item.getNodeName());
-	}
-
-	private static int getIfItemConditionChildsNumber(Node node) {
-		NodeList childs = node.getChildNodes();
-
-		int count = 0;
-		for (int i = 0; i < childs.getLength(); i++) {
-			if (isConditionalItem(childs.item(i))) {
-				count++;
-			}
-		}
-		return count;
 	}
 }
