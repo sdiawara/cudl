@@ -117,9 +117,7 @@ class InterpreterContext {
 			if (child.getNodeName().equals("var")) {
 				String name = Utils.getNodeAttributeValue(child, "name");
 				String value = Utils.getNodeAttributeValue(child, "expr");
-				if (value == null)
-					value = "undefined";
-				declaration.declareVariable(name, value, scope);
+				declaration.declareVariable(name, value == null?"undefined":value, scope);
 			} else if (child.getNodeName().equals("script")) {
 				String src = Utils.getNodeAttributeValue(child, "src");
 				if (src != null) {

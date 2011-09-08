@@ -275,7 +275,7 @@ class PromptTag extends VxmlTag {
 			if (prompt.contains(child.getNodeName())) {
 				Prompt pc = (Prompt) TagInterpreterFactory.getTagInterpreter(child).interpret(context);
 				p.audio += pc.audio + " ";
-				p.tts += pc.tts + " ";
+				p.tts += pc.tts+ " ";
 			} else {
 				p.tts += TagInterpreterFactory.getTagInterpreter(child).interpret(context);
 			}

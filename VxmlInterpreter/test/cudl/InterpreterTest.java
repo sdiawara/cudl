@@ -464,7 +464,7 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testHeartWelcomeMessageAndSayNoThink() throws IOException,
+	public void testHeartWelcomeMessageAndSaySubmitDTMF() throws IOException,
 			ParserConfigurationException, SAXException {
 		List<Prompt> expectedprompts = new ArrayList<Prompt>();
 		Prompt prompt = new Prompt();
