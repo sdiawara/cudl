@@ -103,8 +103,7 @@ class InterpreterContext {
 
 	private void declareDocumentScopeVariableIfNeeded(String fileName) throws IOException {
 		if (!fileName.equals(getCurrentFileName())) {
-			NodeList childNodes = currentdDocument.getElementsByTagName("vxml").item(0)
-					.getChildNodes();
+			NodeList childNodes = currentdDocument.getElementsByTagName("vxml").item(0).getChildNodes();
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			declareVariable(childNodes, InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			setCurrentFileName(fileName);

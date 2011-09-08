@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -26,25 +25,12 @@ public class InterpreterVariableDeclaration {
 	public static final int DOCUMENT_SCOPE = 70;
 	public static final int DIALOG_SCOPE = 60;
 	public static final int ANONYME_SCOPE = 50;
-	private Stack<Integer> pushStack = new Stack<Integer>();
-
-	private Stack<Integer> popStack = new Stack<Integer>() {
-		{
-			push(ANONYME_SCOPE);
-			push(DIALOG_SCOPE);
-			push(DOCUMENT_SCOPE);
-			push(APPLICATION_SCOPE);
-			push(SESSION_SCOPE);
-		}
-	};
-
 	private ScriptableObject sharedScope;
 	private ScriptableObject anonymeScope;
 	private ScriptableObject dialogScope;
 	private ScriptableObject documentScope;
 	private ScriptableObject applicationScope;
 	private ScriptableObject sessionScope;
-
 	private List<String> normalizedApplicationVariable = new ArrayList<String>() {
 		{
 			add("lastresult$ = new Array()");
@@ -83,33 +69,6 @@ public class InterpreterVariableDeclaration {
 		declarareNormalizedApplicationVariables();
 	}
 
-	private void declareNormalizedSessionVariables() throws IOException {
-		File sessionFile = new SessionFileCreator().get3900DefaultSession();
-		if (null != sessionFile) {
-			Context ctxt = new ContextFactory().enterContext();
-			ctxt.evaluateReader(sessionScope, new FileReader(sessionFile), sessionFile.getName(), 1,
-					null);
-			sessionFile.delete();
-		}
-	}
-
-	private void declarareNormalizedApplicationVariables() {
-		for (Iterator<String> appliVar = normalizedApplicationVariable.iterator(); appliVar.hasNext();) {
-			String script = (String) appliVar.next();
-			Context.enter().evaluateString(applicationScope, script, script, 1, null);
-		}
-	}
-
-	public void pop() {
-		popStack.push(pushStack.pop());
-		System.err.println("Exit scope " + getScopeName(popStack.peek()));
-		resetScopeBinding(popStack.peek());
-	}
-
-	public void push() {
-		pushStack.push(popStack.pop());
-		System.err.println("Enter scope " + getScopeName(pushStack.peek()));
-	}
 
 	public void declareVariable(String name, String value, int scope) {
 		getScope(scope).put(name, getScope(scope), evaluateScript(value, scope));
@@ -122,10 +81,6 @@ public class InterpreterVariableDeclaration {
 
 	public void setValue(String name, String value, int scope) {
 		Context ctxt = Context.enter();
-		// ctxt.evaluateString(getScope(scope), name, sourceName, lineno,
-		// securityDomain);
-		// ctxt.evaluateString(getScope(scope), name + "=" + value, name + "=" +
-		// value, 1, null);
 
 		ctxt.compileString(name + "=" + value, name + "=" + value, 1, null);
 		String[] split = name.split("\\.");
@@ -137,7 +92,6 @@ public class InterpreterVariableDeclaration {
 			while (start != null) {
 				if (start.has(name, start)) {
 					ctxt.evaluateString(start, split[0] + "=" + value, name + "=" + value, 1, null);
-					System.err.println(name + "is here");
 					break;
 				}
 				start = (ScriptableObject) start.getPrototype();
@@ -146,16 +100,6 @@ public class InterpreterVariableDeclaration {
 
 	}
 
-	private Scriptable getScopeByName(String name) {
-		return new HashMap<String, Scriptable>() {
-			{
-				put("application", applicationScope);
-				put("anonyme", anonymeScope);
-				put("document", documentScope);
-				put("dialog", dialogScope);
-			}
-		}.get(name);
-	}
 
 	public Object getValue(String name) {
 		return Context.enter().evaluateString(anonymeScope, name, "<Eval>", 1, null);
@@ -181,7 +125,6 @@ public class InterpreterVariableDeclaration {
 			anonymeScope = (ScriptableObject) context.newObject(dialogScope);
 			anonymeScope.setPrototype(dialogScope);
 			break;
-
 		default:
 			break;
 		}
@@ -195,6 +138,33 @@ public class InterpreterVariableDeclaration {
         } finally {
             in.close();
         }
+	}
+
+	private void declareNormalizedSessionVariables() throws IOException {
+		File sessionFile = new SessionFileCreator().get3900DefaultSession();
+		if (null != sessionFile) {
+			Context ctxt = new ContextFactory().enterContext();
+			ctxt.evaluateReader(sessionScope, new FileReader(sessionFile), sessionFile.getName(), 1, null);
+			sessionFile.delete();
+		}
+	}
+
+	private void declarareNormalizedApplicationVariables() {
+		for (Iterator<String> appliVar = normalizedApplicationVariable.iterator(); appliVar.hasNext();) {
+			String script = (String) appliVar.next();
+			Context.enter().evaluateString(applicationScope, script, script, 1, null);
+		}
+	}
+
+	private Scriptable getScopeByName(String name) {
+		return new HashMap<String, Scriptable>() {
+			{
+				put("application", applicationScope);
+				put("anonyme", anonymeScope);
+				put("document", documentScope);
+				put("dialog", dialogScope);
+			}
+		}.get(name);
 	}
 
 	private ScriptableObject getScope(int scope) {
@@ -214,26 +184,4 @@ public class InterpreterVariableDeclaration {
 		}
 	}
 
-	private String getScopeName(int scope) {
-		String scopeName;
-		switch (scope) {
-		case APPLICATION_SCOPE:
-			scopeName = "application";
-			break;
-		case DOCUMENT_SCOPE:
-			scopeName = "document";
-			break;
-		case DIALOG_SCOPE:
-			scopeName = "dialog";
-			break;
-		case SESSION_SCOPE:
-			scopeName = "session";
-			System.err.println("session");
-			break;
-		default:
-			scopeName = "anonyme";
-		}
-
-		return scopeName;
-	}
 }
