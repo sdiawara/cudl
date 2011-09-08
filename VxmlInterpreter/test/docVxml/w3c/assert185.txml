@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+      xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+<!--
+    If an event handler, executed after an event is thrown while processing
+    a form item, transfers control with a <goto> or <submit>, the FIA resumes
+    in the new form at the initialisation phase.
+-->
+
+  <catch>
+    <conf:comment>
+      Toplevel caught event <value expr="_event"/>
+    </conf:comment>
+    <conf:fail expr="_event"/>
+  </catch>
+
+
+  <form id="form1">
+    <property name="timeout" value="0s"/>
+    <noinput>
+      <goto next="#form2"/>
+    </noinput>
+    <field name="a">
+      <conf:grammar utterance="alpha"/>
+    </field>
+    <block>
+      <conf:fail reason="Should not get here."/>
+    </block>
+  </form>
+
+
+  <form id="form2">
+    <property name="timeout" value="0s"/>
+    <noinput>
+      <submit next="assert185-b.vxml#form3"/>
+    </noinput>
+    <field name="a">
+      <conf:grammar utterance="alpha"/>
+    <filled></filled>
+    </field>
+    <block>
+      <conf:fail reason="Should not get here."/>
+    </block>
+  </form>
+
+</vxml>

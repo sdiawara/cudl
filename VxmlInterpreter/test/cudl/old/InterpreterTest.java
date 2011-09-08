@@ -79,7 +79,7 @@ public class InterpreterTest extends TestCase {
 			ScriptException, ParserConfigurationException, SAXException {
 		List<String> expectedLogs = new ArrayList<String>();
 		expectedLogs.add("LOG PHASE init");
-		expectedLogs.add("new call");
+		expectedLogs.add("new call");	
 		expectedLogs.add("LOG PHASE relai");
 		expectedLogs.add("info:+@_relai.enter");
 		expectedLogs.add("LOG PHASE interaction");
@@ -93,8 +93,6 @@ public class InterpreterTest extends TestCase {
 		interpreter.noInput();
 		interpreter.noMatch();
 
-		System.err.println(expectedLogs);
-		System.err.println(interpreter.getLogs());
 		assertEquals(expectedLogs, interpreter.getLogs());
 	}
 
@@ -159,7 +157,6 @@ public class InterpreterTest extends TestCase {
 		interpreter.noAnswer();
 
 		assertEquals("sup:4700810C810106830783105506911808", interpreter.getTranferDestination());
-		// assertTrue(interpreter.hungup());
 		assertFalse(interpreter.getLogs().isEmpty());
 		assertEquals(expectedLogs, interpreter.getLogs());
 	}

@@ -6,9 +6,10 @@
    <catch event="event.count">
    	<conf:pass/>
    </catch>
-	<form id="test"> 
+	<form> 
       <block>
       	<throw event="event.count"/>
       </block> 
     </form>
 </vxml>
+ 

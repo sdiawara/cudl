@@ -213,6 +213,7 @@ class AssignTag extends VxmlTag {
 			// check variable declaration
 			context.getDeclaration().setValue(name, expr, 50);
 		} catch (EcmaError error) {
+			System.err.println();
 			throw new EventException("error.semantic");
 		}
 		return null;
@@ -293,7 +294,9 @@ class ExitTag extends VxmlTag {
 	}
 
 	@Override
-	public Object interpret(InterpreterContext context) throws ExitException {
+	public Object interpret(InterpreterContext context) throws ExitException, EventException {
+		if (node.getAttributes().getLength() > 1)
+			throw new EventException("error.badfetch");
 		context.setHangup(true);
 		throw new ExitException();
 	}
@@ -466,7 +469,14 @@ class ReturnTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException {
-		throw new ReturnException(getNodeAttributeValue(node, "namelist"));
+		String namelist = getNodeAttributeValue(node, "namelist");
+		String event = getNodeAttributeValue(node, "event");
+		String eventexpr = getNodeAttributeValue(node, "eventexpr");
+		if ((namelist != null && (event != null || eventexpr != null))
+				|| (event != null && eventexpr != null))
+			throw new EventException("error.badfetch");
+
+		throw new ReturnException(event, eventexpr, namelist);
 	}
 }
 
@@ -482,13 +492,21 @@ class DisconnectTag extends VxmlTag {
 }
 
 class ValueTag extends VxmlTag {
+	String prompt = "block catch";
+
 	public ValueTag(Node node) {
 		super(node);
 	}
 
 	@Override
 	public Object interpret(InterpreterContext context) {
-		return context.getDeclaration().getValue(getNodeAttributeValue(node, "expr"));
+		Object value = context.getDeclaration().getValue(getNodeAttributeValue(node, "expr"));
+		if (prompt.contains(node.getParentNode().getNodeName())) {
+			Prompt p = new Prompt();
+			p.tts = value + "";
+			context.getPrompts().add(p);
+		}
+		return value;
 	}
 }
 
@@ -552,18 +570,26 @@ class SubdialogTag extends VxmlTag {
 				context.getFormItemNames().get(node) + "=new Object();",
 				InterpreterVariableDeclaration.DIALOG_SCOPE);
 		if (internalInterpreter != null) {
-			String returnValue = internalInterpreter.getContext().getReturnValue();
-			System.err.println("return value " + returnValue);
-			StringTokenizer tokenizer = new StringTokenizer(returnValue);
-			while (tokenizer.hasMoreElements()) {
-				String variable = tokenizer.nextToken();
-				InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext()
-						.getDeclaration();
-				context.getDeclaration().evaluateScript(
-						context.getFormItemNames().get(node) + "." + variable + "='"
-								+ declaration2.getValue(variable) + "'",
-						InterpreterVariableDeclaration.ANONYME_SCOPE);
+			String[] returnValue = internalInterpreter.getContext().getReturnValue();
+
+			System.err.println("return value *" + returnValue[0] + "* *" + returnValue[1] + "*  *"
+					+ returnValue[2] + "*");
+			String namelist = returnValue[2];
+			if (namelist != null) {
+				StringTokenizer tokenizer = new StringTokenizer(namelist);
+				while (tokenizer.hasMoreElements()) {
+					String variable = tokenizer.nextToken();
+					InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext()
+							.getDeclaration();
+					context.getDeclaration().evaluateScript(
+							context.getFormItemNames().get(node) + "." + variable + "='"
+									+ declaration2.getValue(variable) + "'",
+							InterpreterVariableDeclaration.ANONYME_SCOPE);
+				}
+			} else if (returnValue[0] != null) {
+				throw new EventException(returnValue[0]);
 			}
+
 			Node filled = Utils.serachItem(node, "filled");
 			if (filled != null) {
 				FilledTag tagInterpreter = (FilledTag) TagInterpreterFactory.getTagInterpreter(filled);

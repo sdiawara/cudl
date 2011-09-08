@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <var name="count" expr="0"/>
+  <catch><conf:fail expr="'catch-all caught ' + _event"/></catch>
+  <form id="first">
+    <block>
+      <assign name="count" expr="1"/>
+      <goto next="#third"/>
+    </block>
+  </form>
+  <form id="second">
+    <block>
+      <conf:fail expr="'went to the second form'"/>
+    </block>
+  </form>
+  <form id="third">
+    <block>
+      <if cond="count==1">
+        <conf:pass/>
+      </if>
+      <conf:fail expr="'Count is wrong, should be 1 but is (' + count + ') instead"/>
+    </block>
+  </form>
+</vxml>

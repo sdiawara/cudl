@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <catch>
+    <conf:fail expr="'document caught event ' + _event"/>
+  </catch>
+  <form>
+    <block>
+      <submit expr="'535URIFragment.txml'"/>
+    </block>
+  </form>
+</vxml>

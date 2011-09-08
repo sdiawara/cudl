@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+  <var name="varCount1"/>
+  <var name="varCount2" expr="0"/>
+  <var name="varCount3"/>
+  <var name="varCount4" expr="0"/>
+  <var name="var1" expr="1"/>
+  
+  <form>
+    <catch event="noinput">
+      <prompt count="1" cond="var1 == 1"> Counter equal to <value expr="varCount1 = 1"/> </prompt>
+      <prompt count="2" cond="var1 == 2"> Counter equal to <value expr="varCount2 = 2"/>  </prompt>
+      <prompt count="3" cond="var1 == 1"> Counter equal to <value expr="varCount3 = 3"/> </prompt>
+      <prompt count="4" cond="var1 == 2"> Counter equal to <value expr="varCount4 = 4"/> </prompt>
+      
+      <if cond="var1==1 &amp;&amp; varCount1==1 &amp;&amp; varCount3 == 3 &amp;&amp; varCount2==0 &amp;&amp; varCount4 ==0">
+        <assign name="var1" expr="2"/>
+        <reprompt/>
+      <elseif cond=" var1==2  &amp;&amp; varCount2==2 &amp;&amp; varCount4==4"/>
+        <assign name="var1" expr="0"/>
+        <reprompt/>
+      <else/>
+        <conf:comment>
+          Test failed,  varCount1 is <value expr="varCount1"/>, 
+                varCount2 is <value expr="varCount2"/>,
+                varCount3 is <value expr="varCount3"/>,
+                varCount4 is <value expr="varCount4"/>
+        </conf:comment>   
+        <conf:fail reason=" prompt in noinput catched not correctly played"/>   
+      </if>
+      
+      
+    </catch>
+        
+    <field name="first">
+      <conf:grammar utterance="delta"/>
+      <prompt count="1">
+          Say nothing.
+      </prompt>
+      <prompt count="2">
+          Say nothing again.
+      </prompt>
+      
+      <prompt count="3">
+          Say London.
+      </prompt>
+      <filled>
+        <if cond="varCount1==1 &amp;&amp; varCount2==2 &amp;&amp; varCount3==3 &amp;&amp; varCount4==4">
+          <conf:pass/>
+          <else/>  
+             <conf:comment>
+              Test failed,  varCount1 is <value expr="varCount1"/>, 
+                varCount2 is <value expr="varCount2"/>,
+                varCount3 is <value expr="varCount3"/>,
+                varCount4 is <value expr="varCount4"/>
+            </conf:comment>   
+            <conf:fail reason=" prompt in noinput catched not correctly played"/>   
+      </if>
+      </filled> 
+    </field>
+    
+  </form>
+</vxml>

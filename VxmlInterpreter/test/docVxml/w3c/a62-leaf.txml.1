@@ -1,0 +1,21 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" application="a62-root.vxml"
+   xmlns="http://www.w3.org/2001/vxml"
+   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 62: 
+  Application root catch handlers are default handlers for leaf documents. -->
+
+  <form>
+    <block>
+      <!-- expect this event to be caught by handler in root -->
+      <throw event="org.w3.event.test" />
+    </block>
+
+    <block>
+      <conf:fail reason="org.w3.event.test not caught" />
+    </block>
+  </form>
+</vxml>
+

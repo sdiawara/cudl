@@ -15,6 +15,8 @@ import org.xml.sax.SAXException;
 
 import cudl.script.InterpreterVariableDeclaration;
 
+
+
 class InternalInterpreter {
 	public static final int START = 1;
 	public static final int EVENT = 2;
@@ -28,7 +30,6 @@ class InternalInterpreter {
 	public static final int DESTINATION_HANGUP = 11;
 	public static final int TALK = 12;
 	public static final int DTMF = 13;
-
 	private final InterpreterContext context;
 	private InterpreterEventHandler ieh;
 	private Properties properties = new Properties();
@@ -42,6 +43,7 @@ class InternalInterpreter {
 	public void interpret(int action, String arg) throws IOException, SAXException,
 			ParserConfigurationException {
 		Node node = context.getCurrentDialog();
+
 		try {
 			VxmlTag dialog;
 			switch (action) {
@@ -73,7 +75,6 @@ class InternalInterpreter {
 						InterpreterVariableDeclaration.SESSION_SCOPE);
 				setTransferResultAndExecute("'noanswer'");
 				break;
-
 			case CALLER_HUNGUP_DURING_TRANSFER:
 				setTransferResultAndExecute("'near_end_disconnect'");
 				break;
@@ -117,6 +118,7 @@ class InternalInterpreter {
 			ieh.resetEventCounter();
 			context.buildDocument(e.next);
 			node = context.getCurrentDialog();
+			System.err.println("Submit " + context.getCurrentFileName()+" current dialog+"+node);
 			interpret(1, null);
 		} catch (FilledException e) {
 		} catch (EventException e) {
@@ -124,7 +126,7 @@ class InternalInterpreter {
 		} catch (TransferException e) {
 			ieh.resetEventCounter();
 		} catch (ReturnException e) {
-			context.setReturnValue(e.namelist);
+			context.setReturnValue(e.event, e.eventexpr, e.namelist);
 		} catch (InterpreterException e) {
 			System.err.println(e);
 		}
@@ -173,7 +175,6 @@ class InternalInterpreter {
 			filled.setExecute(true);
 			filled.interpret(context);
 		} else {
-
 			// TODO: Refactor to add choice bailise
 			NodeList childNodes = currentDialog.getChildNodes();
 			int choiceCount = 0;
@@ -212,5 +213,4 @@ class InternalInterpreter {
 	public InterpreterContext getContext() {
 		return context;
 	}
-
 }

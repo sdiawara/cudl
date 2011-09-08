@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+
+ <catch event="error.badfetch">
+  <conf:comment>
+   Main: Caught <value expr="_event"/> which is to be expected, more or less
+  </conf:comment>
+  <conf:pass/>
+ </catch>
+
+
+ <catch>
+  <conf:fail expr="'document caught event ' + _event"/>
+ </catch>
+
+
+ <form id="stepOne">
+
+  <block>
+
+   <conf:comment>
+    Off to the bad document..
+   </conf:comment>
+
+   <goto next="545.txml#stepTwo"/>
+
+   <conf:comment>
+    Executing the comment past the goto - that should never ever ever happen..
+   </conf:comment>
+
+   <conf:fail reason="Never executed the goto"/>
+  </block>
+
+ </form>
+
+</vxml>
+

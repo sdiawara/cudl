@@ -3,7 +3,6 @@ package cudl.script;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -57,7 +57,7 @@ public class InterpreterVariableDeclaration {
 	};
 
 	public InterpreterVariableDeclaration(String scriptLocation) throws IOException {
-		Context context = Context.enter();
+		Context context =  new ContextFactory().enterContext();
 
 		sharedScope = context.initStandardObjects();
 		sessionScope = (ScriptableObject) context.newObject(sharedScope);
@@ -86,7 +86,7 @@ public class InterpreterVariableDeclaration {
 	private void declareNormalizedSessionVariables() throws IOException {
 		File sessionFile = new SessionFileCreator().get3900DefaultSession();
 		if (null != sessionFile) {
-			Context ctxt = Context.enter();
+			Context ctxt = new ContextFactory().enterContext();
 			ctxt.evaluateReader(sessionScope, new FileReader(sessionFile), sessionFile.getName(), 1,
 					null);
 			sessionFile.delete();

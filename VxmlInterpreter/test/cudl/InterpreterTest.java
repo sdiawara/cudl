@@ -8,13 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mozilla.javascript.EcmaError;
 import org.xml.sax.SAXException;
 
 public class InterpreterTest {
@@ -234,7 +234,7 @@ public class InterpreterTest {
 
 		interpreter = new Interpreter(url + "anonymeScopeVariable.vxml");
 		interpreter.start();
-		
+
 		assertFalse(interpreter.getPrompts().isEmpty());
 		assertTrue(interpreter.getPrompts().get(0).tts.equals("pass"));
 	}
@@ -243,7 +243,7 @@ public class InterpreterTest {
 	public void dialogScopeVariable() throws IOException, ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "dialogScopeVariable.vxml");
 		interpreter.start();
-		
+
 		assertFalse(interpreter.getPrompts().isEmpty());
 		assertTrue(interpreter.getPrompts().get(0).tts.equals("pass"));
 	}
@@ -473,22 +473,27 @@ public class InterpreterTest {
 				+ "est gratuit. Cet appel est facturé au tarif d'une communication "
 				+ "locale si vous appelez d\'une ligne fixe France Télécom ... .";
 		expectedprompts.add(prompt);
-		
+
 		prompt = new Prompt();
 		prompt.tts = "C'est à vous !";
 		expectedprompts.add(prompt);
-		
+
 		prompt = new Prompt();
 		prompt.tts = "Votre numero est le 0658585895. Merci de votre appel.";
 		expectedprompts.add(prompt);
-		
-		interpreter = new Interpreter(url +"accueil.vxml");
+
+		interpreter = new Interpreter(url + "accueil.vxml");
 		interpreter.start();
 		interpreter.submitDtmf("0658585895");
-		
+
 		assertEquals(expectedprompts, interpreter.getPrompts());
 	}
-	
-	
-	
+
+	private void printTTS(Interpreter interpreter) {
+		for (Iterator<Prompt> iterator = interpreter.getPrompts().iterator(); iterator.hasNext();) {
+			Prompt prompt = (Prompt) iterator.next();
+			System.err.println(prompt);
+		}
+	}
+
 }

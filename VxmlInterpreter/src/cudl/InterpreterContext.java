@@ -38,15 +38,15 @@ class InterpreterContext {
 	private String transferDestination;
 	private boolean hangup = false;
 	private List<Node> grammarActive = new ArrayList<Node>();
-	private String returnValue = "";
+	private String [] returnValue = new String[3];
 	private List<String> params = new ArrayList<String>();
 	private List<Log> logs = new ArrayList<Log>();
 	private String nextItemToVisit;
 	private Map<Node, String> formItemNames = new LinkedHashMap<Node, String>();
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 
-	InterpreterContext(String location)
-			throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException,
+			IOException, SAXException {
 		this.location = location;
 		this.declaration = new InterpreterVariableDeclaration(location);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -65,7 +65,7 @@ class InterpreterContext {
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
 
-		Node vxmlTag = currentdDocument.getDocumentElement();
+		Node vxmlTag = currentdDocument.getDocumentElement(); 
 		NodeList dialogs = vxmlTag.getChildNodes();
 		int lastIndexOf = url.lastIndexOf("#");
 		if (lastIndexOf > 0) {
@@ -192,11 +192,11 @@ class InterpreterContext {
 		return currentFileName;
 	}
 
-	public void setReturnValue(String returnValue) {
+	public void setReturnValue(String ... returnValue) {
 		this.returnValue = returnValue;
 	}
 
-	public String getReturnValue() {
+	public String[] getReturnValue() {
 		return returnValue;
 	}
 

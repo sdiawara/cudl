@@ -150,7 +150,7 @@ public class W3cInterpreterTest {
 			// as the scope that refers to the scope itself.
 			add("w3c/405.txml");
 
-			// FIXME: ADD normalization to script
+			//
 			add("w3c/399main.txml");
 
 			// A VoiceXML document can initiate a transfer to another entity
@@ -328,7 +328,7 @@ public class W3cInterpreterTest {
 			// The use of the log element has no side-effects on interpretation.
 			add("w3c/562.txml");
 
-			// FIXME: FIX fied and filled
+			// FIXME: FIX field and filled
 			// When the namelist attribute of the clear element specifies a
 			// specific set of one or more form item variables, only those form
 			// items are cleared.
@@ -344,10 +344,6 @@ public class W3cInterpreterTest {
 
 			// The interpreter throws the named event.
 			add("w3c/431.txml");
-
-			// The interpreter observes event counting when an
-			// application-defined event is thrown.
-			// add("w3c/432.txml");
 
 			// An implementation platform must support text-to-speech
 			add("w3c/a626.txml");
@@ -427,11 +423,67 @@ public class W3cInterpreterTest {
 			// first dialog in the document.
 			add("w3c/subdialog1158main.txml");
 
-			// When an ECMAScript object, e.g. "obj", has been properly initialized
-			// then its properties, for instance "obj.prop1", can be assigned
-			// without explicit declaration.
-			// FIXME: assign or script fix fix
-			// add("w3c/1179.txml");
+			// Setting next to a relative URL (excluding fragment identifier) that
+			// points to an existing VoiceXML document causes the INTERPRETER to
+			// transition to that document and begin execution of the first form.
+			add("w3c/527a1.txml");
+
+			// Setting next to a fully-qualified URL including fragment identifier
+			// that points to an existing VoiceXML document and form causes the
+			// INTERPRETER to transition to the document and begin execution of the
+			// specified form.
+			add("w3c/528a1.txml");
+
+			// Setting next to a fully-qualified URL (excluding fragment
+			// identifier) that points to an existing VoiceXML document causes the
+			// INTERPRETER to transition to that document and begin execution of
+			// the first form.
+			add("w3c/526.txml");
+
+			// Setting next to a relative URL including fragment identifier that
+			// points to an existing VoiceXML document and form causes the
+			// INTERPRETER to transition to that document and begin execution of
+			// the specified form.
+			add("w3c/529a1.txml");
+
+			// Setting expr to an ECMAScript expression that evaluates to a
+			// fully-qualified URL (excluding fragment identifier) that points to
+			// an existing VoiceXML document causes the INTERPRETER to transition
+			// to that document and begin execution of the first form.
+			add("w3c/530a1.txml");
+
+			// Setting next to a URL that points to a non-existent VoiceXML
+			// document causes the interpreter to throw a catchable error.badfetch
+			// event.
+			// FIXME: catch FileNotFoundException raise
+			// EventException("error.badfetch.http.404");
+			// TODO: after fix add 532.txml file
+			// add("w3c/531a1.txml");
+
+			// FIXME: Variable initialization
+			// add("w3c/534.txml");
+
+			// Setting next to a fragment identifier that identifies an existing
+			// form in the current document causes the INTERPRETER to transition to
+			// that form with the state of the current document and application in
+			// tact.
+			add("w3c/533.txml");
+
+			// Exactly one of "next" or "expr" must be specified; otherwise, an
+			// error.badfetch event is thrown.
+			add("w3c/543.txml");
+
+			// The element does not throw an "exit" event.
+			add("w3c/1162.txml");
+
+			// EXIT : If both "expr" and "namelist" attributes of are specified, an
+			// error.badfetch event is thrown.
+			add("w3c/545m.txml");
+
+			// A VoiceXML interpreter must execute the content within the selected
+			// event handler.
+			add("w3c/436.txml");
+
 		}
 
 	};
@@ -453,7 +505,7 @@ public class W3cInterpreterTest {
 		for (Iterator<String> iterator = fileNames.iterator(); iterator.hasNext();) {
 			String fileName = iterator.next();
 
-			if (fileName.endsWith("1179.txml")) {
+			if (fileName.endsWith("432.txml")) {
 				System.err.println(fileName);
 			}
 			interpreter = new Interpreter(url + fileName);
@@ -636,4 +688,59 @@ public class W3cInterpreterTest {
 		assertEquals(exceptedPrompts, interpreter.getPrompts());
 	}
 
+	@Test
+	@Ignore
+	// ADD reprompt implementation
+	public void w3c523Test() throws IOException, ParserConfigurationException, SAXException {
+		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
+
+		interpreter = new Interpreter(url + "w3c/523.txml");
+		interpreter.start();
+
+		System.err.println(expectedPrompts);
+		System.err.println(interpreter.getPrompts());
+		assertEquals(expectedPrompts, interpreter.getPrompts());
+	}
+
+	@Test
+	public void w3c524Test() throws IOException, ParserConfigurationException, SAXException {
+		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
+
+		Prompt prompt = new Prompt();
+		prompt.tts = "First prompt implicitly declared execution.";
+		expectedPrompts.add(prompt);
+
+		prompt = new Prompt();
+		prompt.tts = "1.0";
+		expectedPrompts.add(prompt);
+
+		prompt = new Prompt();
+		prompt.tts = ".";
+		expectedPrompts.add(prompt);
+
+		prompt = new Prompt();
+		prompt.tts = "First prompt expressly declared execution. 2.";
+		expectedPrompts.add(prompt);
+
+		prompt = new Prompt();
+		prompt.tts = "Second prompt implicitly declared execution.";
+		expectedPrompts.add(prompt);
+
+		prompt = new Prompt();
+		prompt.tts = "3";
+		expectedPrompts.add(prompt);
+
+		prompt = new Prompt();
+		prompt.tts = ".";
+		expectedPrompts.add(prompt);
+
+		prompt = new Prompt();
+		prompt.tts = "pass";
+		expectedPrompts.add(prompt);
+
+		interpreter = new Interpreter(url + "w3c/524.txml");
+		interpreter.start();
+
+		assertEquals(expectedPrompts, interpreter.getPrompts());
+	}
 }

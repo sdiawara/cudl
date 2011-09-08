@@ -60,6 +60,7 @@ class InterpreterEventHandler {
 	private Node searchEventHandlers(String eventType, int eventCounter, Node parent) {
 		while (parent != null) {
 			NodeList nodeList = parent.getChildNodes();
+			System.err.println(parent+" parent");
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
 				if (isHandlerForEventType(eventType, node)) {

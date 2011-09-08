@@ -3,13 +3,14 @@ package cudl;
 import static cudl.InternalInterpreter.BLIND_TRANSFER_SUCCESSSS;
 import static cudl.InternalInterpreter.CALLER_HUNGUP_DURING_TRANSFER;
 import static cudl.InternalInterpreter.DESTINATION_BUSY;
+import static cudl.InternalInterpreter.DESTINATION_HANGUP;
 import static cudl.InternalInterpreter.DTMF;
 import static cudl.InternalInterpreter.EVENT;
 import static cudl.InternalInterpreter.MAX_TIME_DISCONNECT;
 import static cudl.InternalInterpreter.NETWORK_BUSY;
 import static cudl.InternalInterpreter.NOANSWER;
 import static cudl.InternalInterpreter.START;
-import static cudl.InternalInterpreter.*;
+import static cudl.InternalInterpreter.TALK;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -30,9 +31,10 @@ public class Interpreter {
 	private InterpreterContext context;
 
 	public Interpreter(String url) throws IOException, ParserConfigurationException, SAXException {
+		System.err.println("debut de la creation de l'interpreteur");
 		context = new InterpreterContext(url);
 		internalInterpreter = new InternalInterpreter(context);
-
+		System.err.println("FIn de la creation de l'interpreteur");
 	}
 
 	public void start() throws IOException, SAXException, ParserConfigurationException {

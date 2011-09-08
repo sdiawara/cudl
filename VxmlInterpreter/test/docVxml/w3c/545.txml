@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+
+ <catch event="error.badfetch">
+  <conf:comment>
+   Non-main: Caught <value expr="_event"/> which is to be expected, sort of anyway
+  </conf:comment>
+  <conf:pass/>
+ </catch>
+
+
+ <catch>
+  <conf:fail expr="'document caught event ' + _event"/>
+ </catch>
+
+
+ <var name="monica" expr="'1'"/>
+
+ 
+ <form id="stepTwo">
+
+  <block>
+
+   <conf:comment>
+    About to exit, drumroll please..
+   </conf:comment>
+
+   <exit expr="'0'" namelist="monica"/>
+
+  </block>
+
+ </form>
+
+</vxml>

@@ -44,8 +44,12 @@ class SubmitException extends InterpreterException {
 
 class ReturnException extends InterpreterException {
 	final String namelist;
+	final String eventexpr;
+	final String event;
 
-	ReturnException(String namelist) {
-		this.namelist = namelist == null ? "" : namelist;
+	ReturnException(String event, String eventexpr, String namelist) {
+		this.event = event;
+		this.eventexpr = eventexpr;
+		this.namelist = namelist == null ? null : namelist;
 	}
 }

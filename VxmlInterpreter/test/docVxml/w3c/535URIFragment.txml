@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <catch>
+    <conf:fail expr="'document caught event ' + _event"/>
+  </catch>
+
+  <var name="form1entered" expr="false"/>
+  <var name="form2entered" expr="false"/>
+  <var name="form3entered" expr="false"/>
+
+  <form id="form1">
+    <var name="form1entered" expr="true"/>
+    <block>
+      <if cond="form2entered || form3entered">
+        <conf:fail expr="'must not enter other forms than form 1.'"/>
+      <else/>
+        <submit next="#form2"/>
+      </if>
+    </block>
+  </form>
+  <form id="form2">
+    <var name="form2entered" expr="true"/>
+    <block>
+      <if cond="form1entered || form3entered">
+        <conf:fail expr="'must not enter other forms than form 2.'"/>
+      <else/>
+        <submit expr="'#form3'"/>
+      </if>
+    </block>
+  </form>
+  <form id="form3">
+    <var name="form3entered" expr="true"/>
+    <block>
+      <if cond="form1entered || form2entered">
+        <conf:fail expr="'must not enter other forms than form 3.'"/>
+      <else/>
+        <conf:pass/>
+      </if>
+    </block>
+  </form>
+</vxml>

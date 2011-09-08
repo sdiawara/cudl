@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+  <var name="firstVar"/>
+  <var name="secondVar"/>
+  <var name="thirdVar"/>
+  <form>
+    <block>
+      First prompt implicitly declared execution. <value expr="firstVar = 1"/>.
+      <prompt>First prompt expressly declared execution. <value expr="secondVar = 2"/>.</prompt>
+      Second prompt implicitly declared execution. <value expr="thirdVar = 3"/>.
+      <if cond="firstVar ==1 &amp;&amp; secondVar ==2 &amp;&amp; thirdVar ==3">
+        <conf:pass/>
+        <else/>
+        <conf:comment> prompt have not been correctly played:
+                firstVar is equal to  <value expr="firstVar "/>, 
+                secondVar is equal to  <value expr="secondVar "/>,                           thirdVar is equal to  <value expr="thirdVar "/>, 
+        </conf:comment>
+        <conf:fail reason="prompt have not been correctly played."/>
+      </if>
+    </block>
+  </form>
+</vxml>

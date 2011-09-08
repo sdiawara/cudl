@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance" application="534App.txml">
+  <catch><conf:fail expr="'Second document failed with ' + _event"/></catch>
+  <var name="count" expr="1"/>
+  <form id="first">
+    <block>
+      <log><value expr="visit"/></log>
+      <log><value expr="count"/></log>
+
+      <if cond="(count==1.0)&amp;&amp;(visit==1)">
+        <conf:pass/>
+      </if>
+      <conf:fail expr="'Did not get the right count value (' + count + ') or maybe not the right visit value (' + visit + ')"/>
+    </block>
+  </form>
+  <form id="second">
+    <block>
+      <assign name="visit" expr="1"/>
+      <assign name="count" expr="2"/>
+      <goto next="534Doc.txml"/>
+    </block>
+  </form>
+</vxml>
