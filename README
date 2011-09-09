@@ -1,7 +1,6 @@
-
 cudl is a voice xml tester under development.
 
 cudl is named after the nicer combination resulted 
-from this command during the first github import... 
+from this command during the first github import...
 
 $> find src/ -name '*.java' -exec cat \{\} \; | sed -e 's:\(.\):\1\n:g'  |sort | uniq  -c | sort -n | less
