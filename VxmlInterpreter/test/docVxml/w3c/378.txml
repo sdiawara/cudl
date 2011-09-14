@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0"
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+ <var name="doingTest" expr="'0'"/>
+
+ <catch event="error.semantic">
+  <if cond="doingTest == 1">
+   <conf:pass/>
+  <else/>
+   <conf:fail expr="'Caught error.semantic outside test:' + _event"/>
+  </if>
+ </catch>
+
+
+ <catch>
+  <conf:fail expr="'document caught event ' + _event"/>
+ </catch>
+
+
+ <form id="elFormo">
+  <block>
+   <assign name="doingTest" expr="'1'"/>
+  <prompt><value expr="blahBlah"/></prompt>
+  </block>
+
+  <block>
+   <conf:fail reason="Got to the end of the test somehow!"/>
+  </block>
+ </form>
+
+</vxml>

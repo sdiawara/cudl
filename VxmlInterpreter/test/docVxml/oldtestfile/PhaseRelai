@@ -9,7 +9,7 @@
     <block>
       <!-- no grammaire -->
       <prompt timeout="300ms" bargein="false">
-        <audio>Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».</audio>
+        <audio src="">Pour avoir des informations détaillées sur ce tarif, dites : « tarif ».</audio>
       </prompt>
       <prompt timeout="100ms" bargein="false">
         <audio src="file:///usr2/sons/3900sonsappli/AT_REROUTAGE_SAUI.wav"></audio>

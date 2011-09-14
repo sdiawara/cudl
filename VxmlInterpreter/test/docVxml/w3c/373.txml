@@ -1,0 +1,29 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml"
+      xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+  <catch><conf:fail expr="_event"/></catch>
+
+  <var name="workedOK" expr="'0'"/>
+
+  <form>
+    <block>
+     <audio src="http://gaga">
+      Setting flag: <value expr="workedOK=1"/>
+     </audio>
+    </block>
+
+    <block>
+      <conf:comment>
+        Flag is set to <value expr="workedOK"/>
+      </conf:comment>
+
+      <if cond="workedOK == 1">
+        <conf:pass/>
+      <else/>
+        <conf:fail reason="Flag is not set to 1"/>
+      </if>
+    </block>
+
+  </form>
+</vxml>

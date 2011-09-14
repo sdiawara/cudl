@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+  <!-- Declaration of scriptCount variable used 
+    to determine if the test flows correctly.
+    If each script is executed in its context,
+    at the end of the test the scriptCount 
+    variable value must be 6 -->
+  <script>  var scriptCount = 1;</script>
+  <catch event="myEvent">
+    <script>  scriptCount ++;</script>
+	    <log>scriptCount now must be *<value expr="scriptCount"/>*</log>
+    <conf:comment>scriptCount now must be 6</conf:comment>
+    <if cond="scriptCount == 6">
+      <conf:pass/>
+      <else/>
+      <conf:fail expr="'The scriptCount value must be 6'"/>
+    </if>
+  </catch>
+  <catch>
+    <conf:fail expr="'document caught event ' + _event"/>
+  </catch>
+  <form>
+    <script>  scriptCount ++;</script>
+    <!-- scriptCount now must be 2 -->
+    <block>
+      <script>  scriptCount ++;</script>
+      <conf:comment>scriptCount now must be 3</conf:comment>
+    </block>
+    <field>
+      <conf:speech value="alpha"/>
+      <conf:grammar utterance="alpha"/>
+      <filled>
+        <script>  scriptCount ++;</script>
+        
+        <conf:comment>scriptCount now must be 4</conf:comment>
+        <if cond="scriptCount == 4">
+          <script>  scriptCount ++;</script>
+          <conf:comment>scriptCount now must be 5</conf:comment>
+          <throw event="myEvent"/>
+          <else/>
+          <conf:fail expr="'The scriptCount value must be 4'"/>
+        </if>
+      </filled>
+    </field>
+  </form>
+</vxml>

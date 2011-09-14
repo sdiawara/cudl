@@ -56,6 +56,7 @@ public class VxmlElementType {
 			add("log");
 			add("conf:pass");
 			add("conf:fail");
+			add("throw");
 		}
 	};
 

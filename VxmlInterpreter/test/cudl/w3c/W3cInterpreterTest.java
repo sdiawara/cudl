@@ -160,6 +160,27 @@ public class W3cInterpreterTest {
 			// the transfer.
 			add("w3c/288.txml");
 
+			// A element is executed in the scope of its containing element.
+			add("w3c/556.txml");
+
+			// A variable declared using the var element is accessible to a script
+			// declared at equal more local scope.
+			add("w3c/558.txml");
+
+			// A variable declared within an inline or externally referenced script
+			// block is accessible from a var or assign element declared at equal
+			// or more local scope.
+			add("w3c/559.txml");
+
+			// When the script element specifies a src attribute that references a
+			// URL that references a non-existent resource, the interpreter throws
+			// error.badfetch.
+			add("w3c/560.txml");
+
+			// Either an "src" attribute or an inline script (but not both) must be
+			// specified; otherwise, an error.badfetch event is thrown.
+			add("w3c/assertion-561a.txml");
+
 			// A VoiceXML document can initiate a transfer to another entity
 			// using the tag, such that the Interpreter disconnects from the
 			// caller immediately upon attempting the transfer and continues
@@ -325,11 +346,19 @@ public class W3cInterpreterTest {
 			// the call.
 			add("w3c/552.txml");
 
+			// When the interpreter executes a disconnect element, it must throw a
+			// catchable connection.disconnect.hangup event.
+			add("w3c/553a.txml");
+
+			// ECMAScript expressions within the PCDATA in must be evaluated in
+			// document order.
+			add("w3c/555.txml");
+
 			// The use of the log element has no side-effects on interpretation.
 			add("w3c/562.txml");
 
 			// FIXME: FIX field and filled
-			// When the namelist attribute of the clear element specifies a
+			// When the namelist attribute of the clear element specifies a5
 			// specific set of one or more form item variables, only those form
 			// items are cleared.
 			// add("w3c/518.txml");
@@ -476,6 +505,10 @@ public class W3cInterpreterTest {
 			// The element does not throw an "exit" event.
 			add("w3c/1162.txml");
 
+			// The label attribute may be used, for example, to indicate the
+			// purpose of the log.
+			add("w3c/1161.txml");
+
 			// EXIT : If both "expr" and "namelist" attributes of are specified, an
 			// error.badfetch event is thrown.
 			add("w3c/545m.txml");
@@ -484,8 +517,27 @@ public class W3cInterpreterTest {
 			// event handler.
 			add("w3c/436.txml");
 
-		}
+			// When the prompt element's attribute evaluates to false, the
+			// interpreter does not execute the element or its contents.
+			add("w3c/623.txml");
 
+			// If neither 'src' nor 'expr' are specified on an audio element, an
+			// error.badfetch event is thrown.
+			add("w3c/1135.txml");
+
+			// The interpreter fetches and plays the URI associated with the src
+			// attribute of the audio element.
+			// ===> audio is not player
+			add("w3c/369.txml");
+
+			// If src and expr are specified on an audio element, error.badfetch is
+			// thrown.
+			add("w3c/370.txml");
+
+			// If the expr attribute specifies an invalid ECMAScript expression,
+			// error.semantic is thrown.
+			add("w3c/378.txml");
+		}
 	};
 	private String url;
 	private Prompt prompt;
@@ -535,6 +587,8 @@ public class W3cInterpreterTest {
 				interpreter.noInput();
 			} else if (fileName.endsWith("assert163.txml")) {
 				interpreter.talk("alpha");
+				interpreter.talk("alpha");
+			} else if (fileName.endsWith("556.txml")) {
 				interpreter.talk("alpha");
 			}
 
@@ -742,5 +796,23 @@ public class W3cInterpreterTest {
 		interpreter.start();
 
 		assertEquals(expectedPrompts, interpreter.getPrompts());
+	}
+
+	@Test
+	public void shouldPlayAudioExprSpecified() throws IOException, ParserConfigurationException,
+			SAXException {
+		// The interpreter evaluates, fetches, and plays the URI associated with
+		// the expr attribute of the audio element.
+		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
+
+		Prompt prompt = new Prompt();
+		prompt.audio = "371.wav";
+		expectedPrompts.add(prompt);
+
+		interpreter = new Interpreter(url + "w3c/371.txml");
+		interpreter.start();
+
+		assertEquals(expectedPrompts, interpreter.getPrompts());
+
 	}
 }

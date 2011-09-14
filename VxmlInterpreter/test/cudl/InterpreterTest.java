@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -343,7 +342,6 @@ public class InterpreterTest {
 		interpreter.noInput();
 		assertTrue(interpreter.getPrompts().size() == 1);
 		assertEquals(expectedPrompt, interpreter.getPrompts());
-
 	}
 
 	@Test
@@ -471,7 +469,7 @@ public class InterpreterTest {
 		prompt.tts = "Bonjour, bienvenue chez Orange et France Télécom. "
 				+ "Le temps d'attente avant la mise en relation avec votre conseiller "
 				+ "est gratuit. Cet appel est facturé au tarif d'une communication "
-				+ "locale si vous appelez d\'une ligne fixe France Télécom ... .";
+				+ "locale si vous appelez d'une ligne fixe France Télécom ... .";
 		expectedprompts.add(prompt);
 
 		prompt = new Prompt();
@@ -489,11 +487,57 @@ public class InterpreterTest {
 		assertEquals(expectedprompts, interpreter.getPrompts());
 	}
 
-	private void printTTS(Interpreter interpreter) {
-		for (Iterator<Prompt> iterator = interpreter.getPrompts().iterator(); iterator.hasNext();) {
-			Prompt prompt = (Prompt) iterator.next();
-			System.err.println(prompt);
-		}
+	@Test
+	public void testIfExprIsIndicateToLogItIsExecuted() throws IOException,
+			ParserConfigurationException, SAXException {
+		List<String> expectedLogs = new ArrayList<String>();
+
+		expectedLogs.add("labelThatMustBePresentInLogMessage This is a log message.");
+
+		interpreter = new Interpreter(url + "1163.txml");
+		interpreter.start();
+
+		System.err.println(interpreter.getLogs());
+		System.err.println(expectedLogs);
+		assertEquals(expectedLogs, interpreter.getLogs());
 	}
 
+	@Test
+	public void logTagSouldCombinatePCDATAAndValueElement() throws IOException,
+			ParserConfigurationException, SAXException {
+		// The <log> element may contain any combination of text (CDATA) and
+		// <value> elements.
+		List<String> expectedLogs = new ArrayList<String>();
+
+		expectedLogs.add("This is a log message. "
+				+ "firstVariable value must be 2: firstVariable = 2.0 "
+				+ "secondVariable incremented by firstVariable must be 1002: "
+				+ "secondVariable + firstVariable = 1002.0");
+
+		interpreter = new Interpreter(url + "1152.txml");
+		interpreter.start();
+
+		System.err.println(interpreter.getLogs());
+		System.err.println(expectedLogs);
+		assertEquals(expectedLogs, interpreter.getLogs());
+	}
+
+	@Test
+	public void testTalk() throws IOException, ParserConfigurationException, SAXException{
+		List<Prompt> expectedprompts = new ArrayList<Prompt>();
+		Prompt prompt = new Prompt();
+		
+		prompt.tts = "Bonjour, merci de prononcer une phrase.";
+		expectedprompts.add(prompt);
+		
+		prompt = new Prompt();
+		prompt.tts =		 "Vous avez salut. Merci de votre appel.";
+		expectedprompts.add(prompt);
+
+		interpreter = new Interpreter(url + "talk.vxml");
+		interpreter.start();
+		interpreter.talk("salut");
+		
+		assertEquals(expectedprompts, interpreter.getPrompts());
+	}
 }

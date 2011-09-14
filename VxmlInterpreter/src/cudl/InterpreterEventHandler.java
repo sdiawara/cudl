@@ -13,6 +13,9 @@ import org.xml.sax.SAXException;
 
 import cudl.utils.Utils;
 
+//http://www.yoyodesign.org/doc/w3c/voicexml20/#dml5.2.2 french
+// or http://www.w3.org/TR/voicexml20/#dml5.2.2 English
+//http://www.yoyodesign.org/doc/w3c/voicexml20/#dml5.2.4
 //TODO inline this code inside InternalInterpreter ???
 
 //FIXME:
@@ -60,7 +63,7 @@ class InterpreterEventHandler {
 	private Node searchEventHandlers(String eventType, int eventCounter, Node parent) {
 		while (parent != null) {
 			NodeList nodeList = parent.getChildNodes();
-			System.err.println(parent+" parent");
+			System.err.println(parent + " parent");
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
 				if (isHandlerForEventType(eventType, node)) {

@@ -3,6 +3,7 @@ package cudl;
 import static cudl.utils.Utils.getNodeAttributeValue;
 import static cudl.utils.VxmlElementType.isFormItem;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,8 +33,18 @@ abstract class VxmlTag {
 		this.node = node;
 	}
 
+	protected boolean checkCond(Node node, InterpreterContext context) throws IOException {
+		String cond = getNodeAttributeValue(node, "cond");
+
+		return cond == null
+				|| Boolean.valueOf(context.getDeclaration().evaluateScript(cond,
+						InterpreterVariableDeclaration.ANONYME_SCOPE)
+						+ "");
+	}
+
 	public abstract Object interpret(InterpreterContext context) throws InterpreterException,
 			IOException, SAXException, ParserConfigurationException;
+
 }
 
 class FormTag extends VxmlTag {
@@ -93,7 +104,6 @@ class FormTag extends VxmlTag {
 					return null;
 				} catch (GotoException e) {
 					context.setNextItemToVisit(e.nextItem);
-					System.err.println(e.next + "   " + e.nextItem);
 					if (e.next != null) {
 						context.getDeclaration().resetScopeBinding(
 								InterpreterVariableDeclaration.DIALOG_SCOPE);
@@ -231,18 +241,22 @@ class LogTag extends VxmlTag {
 		Log log = new Log();
 
 		String label = getNodeAttributeValue(node, "label");
+		String expr = getNodeAttributeValue(node, "expr");
 		System.err.print("LOG:");
 		if (label != null) {
 			log.label = label;
 			System.err.print(" " + label + " ");
 		}
 
+		log.value += expr == null ? "" : context.getDeclaration().evaluateScript(expr, 50) + " ";
+
 		NodeList childs = node.getChildNodes();
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
 			log.value += TagInterpreterFactory.getTagInterpreter(child).interpret(context);
-			System.err.println(log.value);
 		}
+		log.value = log.value.trim();
+		System.err.println(log.value);
 
 		context.getLogs().add(log);
 		return null;
@@ -259,6 +273,11 @@ class PromptTag extends VxmlTag {
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException,
 			SAXException, ParserConfigurationException {
+
+		if (!checkCond(node, context)) {
+			return null;
+		}
+
 		Prompt p = new Prompt();
 		String timeout = getNodeAttributeValue(node, "timeout");
 		p.timeout = timeout != null ? timeout : "";
@@ -275,7 +294,7 @@ class PromptTag extends VxmlTag {
 			if (prompt.contains(child.getNodeName())) {
 				Prompt pc = (Prompt) TagInterpreterFactory.getTagInterpreter(child).interpret(context);
 				p.audio += pc.audio + " ";
-				p.tts += pc.tts+ " ";
+				p.tts += pc.tts + " ";
 			} else {
 				p.tts += TagInterpreterFactory.getTagInterpreter(child).interpret(context);
 			}
@@ -343,7 +362,6 @@ class IfTag extends VxmlTag {
 			SAXException, ParserConfigurationException {
 		boolean conditionChecked = checkCond(node, context);
 		NodeList childs = node.getChildNodes();
-		System.err.println("cond evaluation " + conditionChecked);
 		for (int i = 0; i < childs.getLength(); i++) {
 			Node child = childs.item(i);
 			if (VxmlElementType.isAnExecutableItem(child)) {
@@ -360,14 +378,6 @@ class IfTag extends VxmlTag {
 		}
 		return null;
 	}
-
-	private boolean checkCond(Node node, InterpreterContext context) throws IOException {
-		String cond = getNodeAttributeValue(node, "cond");
-
-		return cond == null
-				|| ((Boolean) context.getDeclaration().evaluateScript(cond,
-						InterpreterVariableDeclaration.ANONYME_SCOPE));
-	}
 }
 
 class TextTag extends VxmlTag {
@@ -377,7 +387,7 @@ class TextTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) {
-		String textContent = node.getTextContent();
+		String textContent = node.getTextContent().replaceAll("[\\s][\\s]+", " ");
 		if (VxmlElementType.isFormItem(node.getParentNode()) && !textContent.trim().equals("")) {
 			Prompt p = new Prompt();
 			p.tts += textContent.trim();
@@ -475,7 +485,7 @@ class ReturnTag extends VxmlTag {
 		if ((namelist != null && (event != null || eventexpr != null))
 				|| (event != null && eventexpr != null))
 			throw new EventException("error.badfetch");
-
+		// TODO: check parent is an subdialog ==> throw semantic error
 		throw new ReturnException(event, eventexpr, namelist);
 	}
 }
@@ -531,14 +541,24 @@ class ScriptTag extends VxmlTag {
 	}
 
 	@Override
-	public Object interpret(InterpreterContext context) throws IOException {
+	public Object interpret(InterpreterContext context) throws IOException, InterpreterException {
 		String src = getNodeAttributeValue(node, "src");
+		if (src != null && node.hasChildNodes())
+			throw new EventException("error.badfetch");
+
 		if (src == null) {
-			context.getDeclaration().evaluateScript(node.getTextContent(),
-					InterpreterVariableDeclaration.DIALOG_SCOPE);
+			System.err.println("script src =" + node.getTextContent());
+			System.err.println(context.getDeclaration().evaluateScript(node.getTextContent(),
+					InterpreterVariableDeclaration.DIALOG_SCOPE)
+					+ "  " + node.getParentNode().getNodeName());
 		} else {
-			context.getDeclaration().evaluateFileScript(src,
-					InterpreterVariableDeclaration.DIALOG_SCOPE);
+			try {
+				context.getDeclaration().evaluateFileScript(src,
+						InterpreterVariableDeclaration.DIALOG_SCOPE);
+			} catch (FileNotFoundException e) {
+				throw new EventException("error.badfetch");
+			}
+
 		}
 		return null;
 	}
@@ -662,8 +682,18 @@ class AudioTag extends VxmlTag {
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException {
 		Prompt p = new Prompt();
 		String src = getNodeAttributeValue(node, "src");
-		p.audio = src == null ? "" : src;
+		String expr = getNodeAttributeValue(node, "expr");
+
+		if ((src == null && expr == null) || (src != null && expr != null)) {
+			throw new EventException("error.badfetch");
+		}
+
+		p.audio = src == null ? context.getDeclaration().evaluateScript(expr, 50) + "" : src;
 		p.tts = node.getTextContent();
+				
+		if (node.getParentNode().getNodeName().equals("block")) {
+			context.addPrompt(p);
+		}
 		return p;
 	}
 }

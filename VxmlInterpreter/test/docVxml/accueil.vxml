@@ -15,8 +15,7 @@
     	<filled>
 	       <prompt>
 	          Votre numero est le <value expr="recuperer_numero"/>. Merci de votre appel.
-	       </prompt>
-     		
+	       </prompt>     		
 	    </filled>
     </field>
   </form>

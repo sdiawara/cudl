@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+
+  <script><![CDATA[ 
+    var var1=1;
+        ]]></script>
+
+  <var name="vardoc1" expr="var1+10"/>
+
+  <form id="myForm">
+
+    <var name="vardial1" expr="var1+100"/>
+
+
+    <block>
+      <var name="varanon1" expr="var1+1000"/>
+      <var name="varanon2"/>
+      <assign name="varanon2" expr="var1+2000"/>
+
+      <if cond="var1 != 1">
+        <conf:fail reason="Wrong value of script variable: var1!"/>
+      </if>
+
+      <if cond="vardoc1 != 11">
+        <conf:fail reason="Wrong assignment to document variable 1: vardoc1!"/>
+      </if>
+
+      <if cond="vardial1 != 101">
+        <conf:fail reason="Wrong assignment to dialog variable 1: vardial1!"/>
+      </if>
+
+      <if cond="varanon1 != 1001">
+        <conf:fail reason="Wrong assignment to anonymous variable 1: varanon1!"/>
+      </if>
+
+      <if cond="varanon2 != 2001">
+        <conf:fail reason="Wrong assignment to anonymous variable 2: varanon2!"/>
+      </if>
+
+      <goto next="559bis.txml"/>
+    </block>
+
+  </form>
+
+</vxml>

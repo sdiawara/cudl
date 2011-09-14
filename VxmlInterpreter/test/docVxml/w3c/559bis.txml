@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+
+  <script src="599scr.js"/>
+
+  <var name="var2doc1" expr="var2+10"/>  <form id="myForm">
+
+    <var name="var2dial1" expr="var2+100"/>
+
+    <block>
+      <var name="var2anon1" expr="var2+1000"/>
+      <var name="var2anon2"/>
+      <assign name="var2anon2" expr="var2+2000"/>
+
+      <if cond="var2 != 2">
+        <conf:fail reason="Wrong value of script variable: var2!"/>
+      </if>
+
+      <if cond="var2doc1 != 12">
+        <conf:fail reason="Wrong assignment to document variable 1: var2doc1!"/>
+      </if>
+
+      <if cond="var2dial1 != 102">
+        <conf:fail reason="Wrong assignment to dialog variable 1: var2dial1!"/>
+      </if>
+
+      <if cond="var2anon1 != 1002">
+        <conf:fail reason="Wrong assignment to anonymous variable 1: var2anon1!"/>
+      </if>
+
+      <if cond="var2anon2 != 2002">
+        <conf:fail reason="Wrong assignment to anonymous variable 2: var2anon2!"/>
+      </if>
+
+      <conf:pass/>
+    </block>
+
+  </form>
+
+</vxml>

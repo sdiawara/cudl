@@ -1,0 +1,35 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+
+  <form id="phorm">
+
+    <var name="phlag" expr="0"/>
+
+    <block>
+
+     <prompt cond="0 == 1">
+      <value expr="phlag = 1"/>
+     </prompt>
+
+     <if cond="phlag != 0">
+      <conf:comment>
+       Failed: phlag is now set to <value expr="phlag"/>
+      </conf:comment>
+      <conf:fail expr="'phlag set to ' + phlag"/>
+     <else/>
+      <conf:comment>
+       Passed: phlag is still set to <value expr="phlag"/>
+      </conf:comment>
+      <conf:pass/>
+     </if>
+     
+    </block>
+
+  </form>
+</vxml>

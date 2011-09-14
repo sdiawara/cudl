@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+
+  <var name="var1" expr="10"/>
+
+  <script><![CDATA[ 
+    var scrvardoc=var1+1;
+        ]]></script>
+
+  <form id="myForm">
+
+    <script><![CDATA[ 
+      var scrvardial=var1+2;
+           ]]></script>
+
+
+    <block>
+      <script><![CDATA[ 
+        var scrvaranon=var1+3;
+           ]]></script>
+
+      <if cond="scrvardoc != 11">
+        <conf:fail reason="Wrong assignment to scrvardoc variable!"/>
+      </if>
+      <if cond="scrvardial != 12">
+        <conf:fail reason="Wrong assignment to scrvardial variable!"/>
+      </if>
+      <if cond="scrvaranon != 13">
+        <conf:fail reason="Wrong assignment to scrvaranon variable!"/>
+      <else/>
+        <conf:pass/>
+      </if>
+    </block>
+
+  </form>
+
+</vxml>
