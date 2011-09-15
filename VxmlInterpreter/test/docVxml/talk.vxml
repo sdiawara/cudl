@@ -13,7 +13,7 @@
        	<grammar src="sentence.grxml" type="application/srgs+xml"/>
     	<filled>
 	       <prompt>
-	     Vous avez <value expr="phrase"/>. Merci de votre appel.
+	     Vous avez dit <value expr="phrase"/>. Merci de votre appel.
 	       </prompt>     		
 	    </filled>
     </field>

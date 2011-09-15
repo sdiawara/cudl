@@ -531,7 +531,7 @@ public class InterpreterTest {
 		expectedprompts.add(prompt);
 		
 		prompt = new Prompt();
-		prompt.tts =		 "Vous avez salut. Merci de votre appel.";
+		prompt.tts =		 "Vous avez dit salut. Merci de votre appel.";
 		expectedprompts.add(prompt);
 
 		interpreter = new Interpreter(url + "talk.vxml");

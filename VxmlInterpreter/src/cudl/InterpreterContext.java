@@ -48,7 +48,7 @@ class InterpreterContext {
 	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException,
 			IOException, SAXException {
 		this.location = location;
-		this.declaration = new InterpreterVariableDeclaration(location);
+		this.declaration = new InterpreterVariableDeclaration();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		documentBuilder = dbf.newDocumentBuilder();
 		connection = new URL(location).openConnection();
@@ -63,8 +63,11 @@ class InterpreterContext {
 		if (cookies != null)
 			connection.setRequestProperty("Cookie", cookies);
 
-		currentdDocument = documentBuilder.parse(connection.getInputStream());
-
+		try {			
+			currentdDocument = documentBuilder.parse(connection.getInputStream());
+		} catch (Exception e) {
+		}
+		
 		Node vxmlTag = currentdDocument.getDocumentElement(); 
 		NodeList dialogs = vxmlTag.getChildNodes();
 		int lastIndexOf = url.lastIndexOf("#");

@@ -93,7 +93,7 @@ class InternalInterpreter {
 			case DESTINATION_HANGUP:
 				context.getDeclaration().setValue(
 						context.getFormItemNames().get(context.getSelectedFormItem()),
-						"'far_end_disconnect'", InterpreterVariableDeclaration.DIALOG_SCOPE);
+						"'far_end_disconnect'");
 				test = true;
 				interpret(1, null);
 				break;
@@ -135,8 +135,7 @@ class InternalInterpreter {
 	private void setTransferResultAndExecute(String transferResult) throws InterpreterException,
 			IOException, SAXException, ParserConfigurationException {
 		context.getDeclaration().setValue(
-				context.getFormItemNames().get(context.getSelectedFormItem()), transferResult,
-				InterpreterVariableDeclaration.DIALOG_SCOPE);
+				context.getFormItemNames().get(context.getSelectedFormItem()), transferResult);
 		FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context
 				.getSelectedFormItem(), "filled"));
 		filled.setExecute(true);
@@ -169,7 +168,7 @@ class InternalInterpreter {
 					"application.lastresult$[0].inputmode =" + utteranceType,
 					InterpreterVariableDeclaration.APPLICATION_SCOPE);
 			context.getDeclaration().setValue(
-					context.getFormItemNames().get(context.getSelectedFormItem()), utterance, 60);
+					context.getFormItemNames().get(context.getSelectedFormItem()), utterance);
 			FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context
 					.getSelectedFormItem(), "filled"));
 			filled.setExecute(true);

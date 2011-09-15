@@ -6,20 +6,22 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import cudl.utils.SessionFileCreator;
+import cudl.utils.CudlSession;
 import cudl.utils.Utils;
 
 public class InterpreterVariableDeclaration {
+	private static final String APPLICATION_VARIABLES = "lastresult$ = new Array(); "
+			+ "lastresult$[0] = new Object(); " + "lastresult$[0].confidence = 1; "
+			+ "lastresult$[0].utterance = undefined;" + "lastresult$[0].inputmode = undefined;"
+			+ "lastresult$[0].interpretation = undefined;";
+
 	public static final int SESSION_SCOPE = 90;
 	public static final int APPLICATION_SCOPE = 80;
 	public static final int DOCUMENT_SCOPE = 70;
@@ -31,19 +33,9 @@ public class InterpreterVariableDeclaration {
 	private ScriptableObject documentScope;
 	private ScriptableObject applicationScope;
 	private ScriptableObject sessionScope;
-	private List<String> normalizedApplicationVariable = new ArrayList<String>() {
-		{
-			add("lastresult$ = new Array()");
-			add("lastresult$[0] = new Object()");
-			add("lastresult$[0].confidence = 1");
-			add("lastresult$[0].utterance = undefined");
-			add("lastresult$[0].inputmode = undefined");
-			add("lastresult$[0].interpretation = undefined");
-		}
-	};
 
-	public InterpreterVariableDeclaration(String scriptLocation) throws IOException {
-		Context context =  new ContextFactory().enterContext();
+	public InterpreterVariableDeclaration() throws IOException {
+		Context context = new ContextFactory().enterContext();
 
 		sharedScope = context.initStandardObjects();
 		sessionScope = (ScriptableObject) context.newObject(sharedScope);
@@ -69,9 +61,9 @@ public class InterpreterVariableDeclaration {
 		declarareNormalizedApplicationVariables();
 	}
 
-
 	public void declareVariable(String name, String value, int scope) {
-		getScope(scope).put(name, getScope(scope), evaluateScript(value, scope));
+		ScriptableObject scope2 = getScope(scope);
+		scope2.put(name, scope2, evaluateScript(value, scope));
 	}
 
 	public Object evaluateScript(String script, int scope) {
@@ -79,16 +71,16 @@ public class InterpreterVariableDeclaration {
 		return ctxt.evaluateString(getScope(scope), script, script + " " + scope, 1, null);
 	}
 
-	public void setValue(String name, String value, int scope) {
+	public void setValue(String name, String value) {
 		Context ctxt = Context.enter();
 
-		ctxt.compileString(name + "=" + value, name + "=" + value, 1, null);
+		System.err.println(name + "     =      " + value);
 		String[] split = name.split("\\.");
 		if (Utils.scopeNames().contains(split[0])) {
 			ctxt.evaluateString(getScopeByName(split[0]), split[1] + "=" + value, name + "=" + value,
 					1, null);
 		} else {
-			ScriptableObject start = getScope(scope);
+			ScriptableObject start = getScope(ANONYME_SCOPE);
 			while (start != null) {
 				if (start.has(name, start)) {
 					ctxt.evaluateString(start, split[0] + "=" + value, name + "=" + value, 1, null);
@@ -100,9 +92,8 @@ public class InterpreterVariableDeclaration {
 
 	}
 
-
 	public Object getValue(String name) {
-		return Context.enter().evaluateString(anonymeScope, name, "<Eval>", 1, null);
+		return Context.enter().evaluateString(anonymeScope, name, name, 1, null);
 	}
 
 	public void resetScopeBinding(int scope) {
@@ -131,36 +122,38 @@ public class InterpreterVariableDeclaration {
 	}
 
 	public Object evaluateFileScript(String fileName, int scope) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileName).openStream()));
-        try {
-            Context ctxt = Context.enter();
-            return ctxt.evaluateReader(getScope(scope), in, fileName, 1, null);
-        } finally {
-            in.close();
-        }
+		BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileName).openStream()));
+		try {
+			Context ctxt = Context.enter();
+			return ctxt.evaluateReader(getScope(scope), in, fileName, 1, null);
+		} finally {
+			in.close();
+		}
 	}
 
 	private void declareNormalizedSessionVariables() throws IOException {
-		File sessionFile = new SessionFileCreator().get3900DefaultSession();
-		if (null != sessionFile) {
-			Context ctxt = new ContextFactory().enterContext();
-			ctxt.evaluateReader(sessionScope, new FileReader(sessionFile), sessionFile.getName(), 1, null);
-			sessionFile.delete();
+		Context ctxt = new ContextFactory().enterContext();
+		try {
+			Class<?> cudlSessionFile = Class.forName("test.Session");
+			CudlSession cudlSession = (CudlSession) cudlSessionFile.newInstance();
+			String sessionScript = cudlSession.getSessionScript();
+			ctxt.evaluateString(sessionScope	, sessionScript, sessionScript, 1, null);			
+		} catch (InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		} catch (ClassNotFoundException e) {
+			System.out.println("WARNING: You do not define session file. It name will be Session and placed in package test");
 		}
 	}
 
 	private void declarareNormalizedApplicationVariables() {
-		for (Iterator<String> appliVar = normalizedApplicationVariable.iterator(); appliVar.hasNext();) {
-			String script = (String) appliVar.next();
-			Context.enter().evaluateString(applicationScope, script, script, 1, null);
-		}
+		Context.enter().evaluateString(applicationScope, APPLICATION_VARIABLES,
+				APPLICATION_VARIABLES, 1, null);
 	}
 
 	private Scriptable getScopeByName(String name) {
 		return new HashMap<String, Scriptable>() {
 			{
 				put("application", applicationScope);
-				put("anonyme", anonymeScope);
 				put("document", documentScope);
 				put("dialog", dialogScope);
 			}
@@ -183,5 +176,4 @@ public class InterpreterVariableDeclaration {
 			throw new IllegalArgumentException("Scope " + scope + " Undefined");
 		}
 	}
-
 }

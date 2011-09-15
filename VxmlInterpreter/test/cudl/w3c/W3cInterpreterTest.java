@@ -418,8 +418,6 @@ public class W3cInterpreterTest {
 			// by the subdialog is executed upon return from the subdialog.
 			add("w3c/subdialog271.txml");
 
-			// ====== > add OTHER Sidialog test
-
 			// When is contained in a element, the values specified by it are
 			// used to initialize dialog elements in the subdialog that is
 			// invoked.
@@ -614,7 +612,7 @@ public class W3cInterpreterTest {
 
 		String[] list = file.list();
 		for (int i = 0; i < list.length; i++) {
-			String url2 = "file:///" + url + list[i];
+			String url2 = "file:" + url + list[i];
 			System.err.println(url2);
 			interpreter = new Interpreter(url2);
 			interpreter.start();
