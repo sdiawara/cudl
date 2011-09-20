@@ -35,14 +35,10 @@ abstract class VxmlTag {
 
 	protected boolean checkCond(Node node, InterpreterContext context) throws IOException {
 		String cond = getNodeAttributeValue(node, "cond");
-		
-		System.err.println("" + cond);
-		
 		return cond == null || Boolean.valueOf(context.getDeclaration().evaluateScript(cond, InterpreterVariableDeclaration.ANONYME_SCOPE)+ "");
 	}
 
 	public abstract Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException;
-
 }
 
 class FormTag extends VxmlTag {
@@ -139,7 +135,7 @@ class FormTag extends VxmlTag {
 					.iterator(); iterator.hasNext();) {
 				Entry<Node, String> next = iterator.next();
 				Node nextToVisit = next.getKey();
-				String name = next.getValue();
+				String name = next.getValue(); 
 				String cond = Utils.getNodeAttributeValue(nextToVisit, "cond");
 				if (cond == null || (Boolean) context.getDeclaration().evaluateScript(cond, 50))
 					if (context.getDeclaration().getValue(name).equals(Undefined.instance)) {
@@ -189,7 +185,7 @@ class VarTag extends VxmlTag {
 			String name = Utils.getNodeAttributeValue(node, "name");
 			String[] split = name.split("\\.");
 			if (Utils.scopeNames().contains(split[0]) && split.length > 1) {
-				throw new EventException("error.semantic");
+					throw new EventException("error.semantic");
 			}
 			if (!context.getParams().contains(name)) {
 				String expr = Utils.getNodeAttributeValue(node, "expr");
@@ -211,14 +207,12 @@ class AssignTag extends VxmlTag {
 	@Override
 	public Object interpret(InterpreterContext context) throws EventException {
 		String name = getNodeAttributeValue(node, "name");
-		String expr = getNodeAttributeValue(node, "expr");
-		System.err.println("ASSIGN " + name + "     " + expr);
+		Object value = context.getDeclaration().getValue(getNodeAttributeValue(node, "expr"));
 		try {
 			context.getDeclaration().getValue(name); // Dont'n remove this, he
 			// check variable declaration
-			context.getDeclaration().setValue(name, expr);
+			context.getDeclaration().setValue(name, "'"+value+"'");
 		} catch (EcmaError error) {
-			System.err.println();
 			throw new EventException("error.semantic");
 		}
 		return null;
@@ -413,12 +407,14 @@ class GotoTag extends VxmlTag {
 
 		String nextItem;
 		if (nextItemTmp != null && exprItemTmp != null) {
+			System.err.println("BADFETCH ERROR DURING GOTO : goto must define once of nextitem or expritem");
 			throw new EventException("error.badfetch");
 		} else {
 			nextItem = nextItemTmp != null ? nextItemTmp : exprItemTmp != null ? context
 					.getDeclaration().getValue(exprItemTmp)
 					+ "" : null;
 		}
+		System.err.println("goto \t="+nextItem);
 		if (nextItem != null)
 			throw new GotoException(null, nextItem);
 
@@ -427,6 +423,7 @@ class GotoTag extends VxmlTag {
 
 		String next;
 		if (nextTmp != null && exprTmp != null) {
+			System.err.println("BADFETCH ERROR DURING GOTO : goto must define once of next or expr");
 			throw new EventException("error.badfetch");
 		} else {
 			next = nextTmp != null ? nextTmp : context.getDeclaration().getValue(exprTmp) + "";
@@ -445,6 +442,7 @@ class SubmitTag extends VxmlTag {
 		String next = getNodeAttributeValue(node, "next");
 		String expr = getNodeAttributeValue(node, "expr");
 		if (next != null && expr != null) {
+			System.err.println("Badfecth during submit");
 			throw new EventException("error.badfetch");
 		}
 
@@ -592,9 +590,7 @@ class SubdialogTag extends VxmlTag {
 					String variable = tokenizer.nextToken();
 					InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext()
 							.getDeclaration();
-					context.getDeclaration().evaluateScript(
-							context.getFormItemNames().get(node) + "." + variable + "='"
-									+ declaration2.getValue(variable) + "'",
+					context.getDeclaration().evaluateScript(context.getFormItemNames().get(node) + "." + variable + "='"+ declaration2.getValue(variable) + "'",
 							InterpreterVariableDeclaration.ANONYME_SCOPE);
 				}
 			} else if (returnValue[0] != null) {
@@ -659,7 +655,6 @@ class FieldTag extends VxmlTag {
 			if (tags.contains((child.getNodeName())))
 				TagInterpreterFactory.getTagInterpreter(child).interpret(context);
 		}
-
 		return null;
 	}
 }

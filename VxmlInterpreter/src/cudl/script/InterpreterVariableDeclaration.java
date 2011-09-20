@@ -1,8 +1,6 @@
 package cudl.script;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -21,7 +19,6 @@ public class InterpreterVariableDeclaration {
 			+ "lastresult$[0] = new Object(); " + "lastresult$[0].confidence = 1; "
 			+ "lastresult$[0].utterance = undefined;" + "lastresult$[0].inputmode = undefined;"
 			+ "lastresult$[0].interpretation = undefined;";
-
 	public static final int SESSION_SCOPE = 90;
 	public static final int APPLICATION_SCOPE = 80;
 	public static final int DOCUMENT_SCOPE = 70;
@@ -72,13 +69,11 @@ public class InterpreterVariableDeclaration {
 	}
 
 	public void setValue(String name, String value) {
+		
 		Context ctxt = Context.enter();
-
-		System.err.println(name + "     =      " + value);
 		String[] split = name.split("\\.");
 		if (Utils.scopeNames().contains(split[0])) {
-			ctxt.evaluateString(getScopeByName(split[0]), split[1] + "=" + value, name + "=" + value,
-					1, null);
+			ctxt.evaluateString(getScopeByName(split[0]), split[1] + "=" + value, name + "=" + value,	1, null);
 		} else {
 			ScriptableObject start = getScope(ANONYME_SCOPE);
 			while (start != null) {
@@ -116,8 +111,6 @@ public class InterpreterVariableDeclaration {
 			anonymeScope = (ScriptableObject) context.newObject(dialogScope);
 			anonymeScope.setPrototype(dialogScope);
 			break;
-		default:
-			break;
 		}
 	}
 
@@ -135,19 +128,18 @@ public class InterpreterVariableDeclaration {
 		Context ctxt = new ContextFactory().enterContext();
 		try {
 			Class<?> cudlSessionFile = Class.forName("test.Session");
-			CudlSession cudlSession = (CudlSession) cudlSessionFile.newInstance();
-			String sessionScript = cudlSession.getSessionScript();
-			ctxt.evaluateString(sessionScope	, sessionScript, sessionScript, 1, null);			
+			String sessionScript = ((CudlSession) cudlSessionFile.newInstance()).getSessionScript();
+			ctxt.evaluateString(sessionScope, sessionScript, sessionScript, 1, null);
 		} catch (InstantiationException e) {
 		} catch (IllegalAccessException e) {
 		} catch (ClassNotFoundException e) {
-			System.out.println("WARNING: You do not define session file. It name will be Session and placed in package test");
+			System.err
+					.println("WARNING: You do not define session file. It name will be Session and placed in package test");
 		}
 	}
 
 	private void declarareNormalizedApplicationVariables() {
-		Context.enter().evaluateString(applicationScope, APPLICATION_VARIABLES,
-				APPLICATION_VARIABLES, 1, null);
+		Context.enter().evaluateString(applicationScope, APPLICATION_VARIABLES, APPLICATION_VARIABLES, 1, null);
 	}
 
 	private Scriptable getScopeByName(String name) {

@@ -31,10 +31,8 @@ public class Interpreter {
 	private InterpreterContext context;
 
 	public Interpreter(String url) throws IOException, ParserConfigurationException, SAXException {
-		System.err.println("debut de la creation de l'interpreteur");
 		context = new InterpreterContext(url);
 		internalInterpreter = new InternalInterpreter(context);
-		System.err.println("FIn de la creation de l'interpreteur");
 	}
 
 	public void start() throws IOException, SAXException, ParserConfigurationException {
@@ -126,7 +124,6 @@ public class Interpreter {
 	}
 
 	public String getActiveGrammar() {
-		// FIXME: Return all grammar active
 		return Utils.getNodeAttributeValue(context.getGrammarActive().get(0), "src").trim();
 	}
 

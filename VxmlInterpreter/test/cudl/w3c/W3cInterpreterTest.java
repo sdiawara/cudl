@@ -535,6 +535,18 @@ public class W3cInterpreterTest {
 			// If the expr attribute specifies an invalid ECMAScript expression,
 			// error.semantic is thrown.
 			add("w3c/378.txml");
+
+			// The form item has a result variable, specified by the attribute.
+			// This variable may be given an initial value with the attribute.
+			add("w3c/1026.txml");
+
+			// When the element's attribute evaluates to false, the interpreter
+			// does not execute the element or its contents.
+			add("w3c/subdialog621.txml");
+
+			// The variable associated with the attribute of the holds the
+			// recognition result.
+			// add("w3c/232.txml");
 		}
 	};
 	private String url;
@@ -555,9 +567,6 @@ public class W3cInterpreterTest {
 		for (Iterator<String> iterator = fileNames.iterator(); iterator.hasNext();) {
 			String fileName = iterator.next();
 
-			if (fileName.endsWith("432.txml")) {
-				System.err.println(fileName);
-			}
 			interpreter = new Interpreter(url + fileName);
 			interpreter.start();
 

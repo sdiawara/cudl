@@ -90,28 +90,27 @@ public class TestVariableDeclaration {
 	public void testVariableCanDeclareInAInlineScript() {
 		String script = "var d = 'date'";
 		declaration.evaluateScript(script, InterpreterVariableDeclaration.ANONYME_SCOPE);
-		
+
 		assertEquals("date", declaration.getValue("d"));
 	}
-	
+
 	@Test
 	public void testVariableCanDeclareInAInlineScriptAsANamedScopeCanModify() {
 		String script = "var d = 'date'";
 		declaration.evaluateScript(script, InterpreterVariableDeclaration.ANONYME_SCOPE);
-		
+
 		declaration.setValue("d", "'date1'");
-		
+
 		assertEquals("date1", declaration.getValue("d"));
 	}
-	
+
 	@Test
 	public void testVariableCanDeclareInAInlineScriptAsANamedScopeCanModifyUsingAscopeName() {
 		String script = "var d = 'date'";
 		declaration.evaluateScript(script, InterpreterVariableDeclaration.DIALOG_SCOPE);
-		
+
 		declaration.setValue("dialog.d", "'date1'");
-		
+
 		assertEquals("date1", declaration.getValue("d"));
 	}
-
 }

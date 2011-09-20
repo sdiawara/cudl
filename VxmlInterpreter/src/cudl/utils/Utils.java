@@ -1,8 +1,5 @@
 package cudl.utils;
 
-import static cudl.utils.VxmlElementType.isAnExecutableItem;
-import static cudl.utils.VxmlElementType.isFormItem;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -71,12 +68,5 @@ public class Utils {
 				add("session");
 			}
 		};
-	}
-
-	public static int getScope(Node node, String rootFileUri) {
-		Node parentNode = node.getParentNode();
-		return isAnExecutableItem(node.getParentNode()) || isFormItem(node.getParentNode()) ? 50
-				: VxmlElementType.isADialog(parentNode) ? 60 : parentNode.getNodeName().equals("vxml")
-						&& parentNode.getOwnerDocument().getDocumentURI().equals(rootFileUri) ? 70 : 80;
 	}
 }

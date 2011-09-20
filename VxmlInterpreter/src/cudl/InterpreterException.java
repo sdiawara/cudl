@@ -50,6 +50,6 @@ class ReturnException extends InterpreterException {
 	ReturnException(String event, String eventexpr, String namelist) {
 		this.event = event;
 		this.eventexpr = eventexpr;
-		this.namelist = namelist == null ? null : namelist;
+		this.namelist = namelist;
 	}
 }
