@@ -56,12 +56,9 @@ public class TestVariableDeclaration {
 
 	@Test
 	public void testWhenVariableIsDeclaredInscopeNamedIsItAccesSiblePrefixedWithScopeName() {
-		declaration.declareVariable("variable", "'document'",
-				InterpreterVariableDeclaration.DOCUMENT_SCOPE);
-		declaration.declareVariable("variable", "'dialog'",
-				InterpreterVariableDeclaration.DIALOG_SCOPE);
-		declaration.declareVariable("variable", "'anonyme'",
-				InterpreterVariableDeclaration.ANONYME_SCOPE);
+		declaration.declareVariable("variable", "'document'", InterpreterVariableDeclaration.DOCUMENT_SCOPE);
+		declaration.declareVariable("variable", "'dialog'", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.declareVariable("variable", "'anonyme'", InterpreterVariableDeclaration.ANONYME_SCOPE);
 
 		assertEquals("document", declaration.getValue("document.variable"));
 		assertEquals("dialog", declaration.getValue("dialog.variable"));
@@ -86,6 +83,18 @@ public class TestVariableDeclaration {
 		assertEquals("anonyme1", declaration.getValue("variable"));
 	}
 
+	
+	@Test
+	public void testWhenWeDeclareVariableInScopeDialogItValueCanUseWithAnotherVariableInencompassingScope() {
+		declaration.declareVariable("heure_ouverture", "undefined", InterpreterVariableDeclaration.APPLICATION_SCOPE);
+		declaration.declareVariable("recupHeureOuverture", "new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.setValue("recupHeureOuverture.hOuverture", "'non'");
+		
+		declaration.setValue("heure_ouverture","recupHeureOuverture.hOuverture");
+		
+		assertEquals("non", declaration.getValue("heure_ouverture"));
+	}
+	
 	@Test
 	public void testVariableCanDeclareInAInlineScript() {
 		String script = "var d = 'date'";

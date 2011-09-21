@@ -207,11 +207,11 @@ class AssignTag extends VxmlTag {
 	@Override
 	public Object interpret(InterpreterContext context) throws EventException {
 		String name = getNodeAttributeValue(node, "name");
-		Object value = context.getDeclaration().getValue(getNodeAttributeValue(node, "expr"));
+		String expr = getNodeAttributeValue(node, "expr");
 		try {
 			context.getDeclaration().getValue(name); // Dont'n remove this, he
 			// check variable declaration
-			context.getDeclaration().setValue(name, "'"+value+"'");
+			context.getDeclaration().setValue(name, expr);
 		} catch (EcmaError error) {
 			throw new EventException("error.semantic");
 		}
@@ -501,6 +501,7 @@ class ValueTag extends VxmlTag {
 	@Override
 	public Object interpret(InterpreterContext context) {
 		Object value = context.getDeclaration().getValue(getNodeAttributeValue(node, "expr"));
+		System.err.println(getNodeAttributeValue(node, "expr")+"lol");
 		if (prompt.contains(node.getParentNode().getNodeName())) {
 			Prompt p = new Prompt();
 			p.tts = value + "";

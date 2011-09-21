@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 import cudl.utils.CudlSession;
@@ -33,8 +32,8 @@ public class InterpreterVariableDeclaration {
 
 	public InterpreterVariableDeclaration() throws IOException {
 		Context context = new ContextFactory().enterContext();
-
 		sharedScope = context.initStandardObjects();
+
 		sessionScope = (ScriptableObject) context.newObject(sharedScope);
 		sessionScope.put("session", sessionScope, sessionScope);
 		sessionScope.setPrototype(sharedScope);
@@ -58,33 +57,55 @@ public class InterpreterVariableDeclaration {
 		declarareNormalizedApplicationVariables();
 	}
 
-	public void declareVariable(String name, String value, int scope) {
-		ScriptableObject scope2 = getScope(scope);
-		scope2.put(name, scope2, evaluateScript(value, scope));
+	public void declareVariable(String name, Object value, int scope) {
+		ScriptableObject scopeObject = getScope(scope);
+		scopeObject.put(name, scopeObject, evaluateScript(value + "", scope));
 	}
 
 	public Object evaluateScript(String script, int scope) {
-		Context ctxt = Context.enter();
-		return ctxt.evaluateString(getScope(scope), script, script + " " + scope, 1, null);
+		Context context = Context.enter();
+		return context.evaluateString(getScope(scope), script, script + " " + scope, 1, null);
 	}
 
-	public void setValue(String name, String value) {
-		
-		Context ctxt = Context.enter();
-		String[] split = name.split("\\.");
-		if (Utils.scopeNames().contains(split[0])) {
-			ctxt.evaluateString(getScopeByName(split[0]), split[1] + "=" + value, name + "=" + value,	1, null);
-		} else {
-			ScriptableObject start = getScope(ANONYME_SCOPE);
-			while (start != null) {
-				if (start.has(name, start)) {
-					ctxt.evaluateString(start, split[0] + "=" + value, name + "=" + value, 1, null);
-					break;
-				}
-				start = (ScriptableObject) start.getPrototype();
-			}
+	public Object evaluateFileScript(String fileName, int scope) throws IOException {
+		BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileName).openStream()));
+		try {
+			return Context.enter().evaluateReader(getScope(scope), in, fileName, 1, null);
+		} finally {
+			in.close();
 		}
+	}
 
+	public void setValue(String name, Object value) {
+		Context ctxt = Context.enter();
+
+		String[] split = name.split("\\.");
+		ScriptableObject nameDeclarationScope;
+		if (Utils.scopeNames().contains(split[0])) {
+			nameDeclarationScope = searchDeclarationScope(name);
+			ctxt.evaluateString(nameDeclarationScope, name + "=" + value, name + "=" + value, 1, null);
+		} else {
+			nameDeclarationScope = searchDeclarationScope(name);
+			ScriptableObject valueDeclarationScope = searchDeclarationScope(value + "");
+			if (valueDeclarationScope != null) {
+				nameDeclarationScope.put(name, nameDeclarationScope, valueDeclarationScope.get(value));
+			} else
+				nameDeclarationScope.put(name, nameDeclarationScope, evaluateScript(value + "",	ANONYME_SCOPE));
+		}
+	}
+
+	private ScriptableObject searchDeclarationScope(String name) {
+		ScriptableObject start = anonymeScope;
+
+		String search = name.split("\\.")[0];
+
+		while (start != sharedScope) {
+			if (start.has(search, start)) {
+				return start;
+			}
+			start = (ScriptableObject) start.getPrototype();
+		}
+		return null;
 	}
 
 	public Object getValue(String name) {
@@ -114,16 +135,6 @@ public class InterpreterVariableDeclaration {
 		}
 	}
 
-	public Object evaluateFileScript(String fileName, int scope) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileName).openStream()));
-		try {
-			Context ctxt = Context.enter();
-			return ctxt.evaluateReader(getScope(scope), in, fileName, 1, null);
-		} finally {
-			in.close();
-		}
-	}
-
 	private void declareNormalizedSessionVariables() throws IOException {
 		Context ctxt = new ContextFactory().enterContext();
 		try {
@@ -133,17 +144,17 @@ public class InterpreterVariableDeclaration {
 		} catch (InstantiationException e) {
 		} catch (IllegalAccessException e) {
 		} catch (ClassNotFoundException e) {
-			System.err
-					.println("WARNING: You do not define session file. It name will be Session and placed in package test");
+			System.err.println("WARNING: You do not define session file. It name will be Session and placed in package test");
 		}
 	}
 
 	private void declarareNormalizedApplicationVariables() {
-		Context.enter().evaluateString(applicationScope, APPLICATION_VARIABLES, APPLICATION_VARIABLES, 1, null);
+		Context.enter().evaluateString(applicationScope, APPLICATION_VARIABLES,
+				APPLICATION_VARIABLES, 1, null);
 	}
 
-	private Scriptable getScopeByName(String name) {
-		return new HashMap<String, Scriptable>() {
+	private ScriptableObject getScopeByName(String name) {
+		return new HashMap<String, ScriptableObject>() {
 			{
 				put("application", applicationScope);
 				put("document", documentScope);
