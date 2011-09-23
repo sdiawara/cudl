@@ -459,13 +459,14 @@ public class W3cInterpreterTest {
 			// that points to an existing VoiceXML document and form causes the
 			// INTERPRETER to transition to the document and begin execution of the
 			// specified form.
-			add("w3c/528a1.txml");
+			//TODO: ADD FILE
+			//add("w3c/528a1.txml");
 
 			// Setting next to a fully-qualified URL (excluding fragment
 			// identifier) that points to an existing VoiceXML document causes the
 			// INTERPRETER to transition to that document and begin execution of
 			// the first form.
-			add("w3c/526.txml");
+			//add("w3c/526.txml");
 
 			// Setting next to a relative URL including fragment identifier that
 			// points to an existing VoiceXML document and form causes the
@@ -477,7 +478,7 @@ public class W3cInterpreterTest {
 			// fully-qualified URL (excluding fragment identifier) that points to
 			// an existing VoiceXML document causes the INTERPRETER to transition
 			// to that document and begin execution of the first form.
-			add("w3c/530a1.txml");
+			//add("w3c/530a1.txml");
 
 			// Setting next to a URL that points to a non-existent VoiceXML
 			// document causes the interpreter to throw a catchable error.badfetch

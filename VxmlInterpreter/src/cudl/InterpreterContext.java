@@ -24,7 +24,7 @@ import cudl.script.InterpreterVariableDeclaration;
 import cudl.utils.Utils;
 
 class InterpreterContext {
-	private final String location;
+	private String location;
 	private final InterpreterVariableDeclaration declaration;
 	private DocumentBuilder documentBuilder;
 	private Document currentdDocument;
@@ -110,6 +110,7 @@ class InterpreterContext {
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			declareVariable(childNodes, InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			setCurrentFileName(fileName);
+			location = currentFileName;
 		}
 	}
 

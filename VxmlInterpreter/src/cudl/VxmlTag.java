@@ -428,6 +428,7 @@ class GotoTag extends VxmlTag {
 		} else {
 			next = nextTmp != null ? nextTmp : context.getDeclaration().getValue(exprTmp) + "";
 		}
+		System.err.println(next);
 		throw new GotoException(next, null);
 	}
 }
@@ -544,8 +545,7 @@ class ScriptTag extends VxmlTag {
 					+ "  " + node.getParentNode().getNodeName());
 		} else {
 			try {
-				context.getDeclaration().evaluateFileScript(src,
-						InterpreterVariableDeclaration.DIALOG_SCOPE);
+				context.getDeclaration().evaluateFileScript(src, InterpreterVariableDeclaration.DIALOG_SCOPE);
 			} catch (FileNotFoundException e) {
 				throw new EventException("error.badfetch");
 			}
@@ -576,14 +576,11 @@ class SubdialogTag extends VxmlTag {
 			context.getLogs().addAll(internalInterpreter.getContext().getLogs());
 			context.getPrompts().addAll(internalInterpreter.getContext().getPrompts());
 		}
-		context.getDeclaration().evaluateScript(
-				context.getFormItemNames().get(node) + "=new Object();",
-				InterpreterVariableDeclaration.DIALOG_SCOPE);
+		context.getDeclaration().evaluateScript(context.getFormItemNames().get(node) + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
 		if (internalInterpreter != null) {
 			String[] returnValue = internalInterpreter.getContext().getReturnValue();
 
-			System.err.println("return value *" + returnValue[0] + "* *" + returnValue[1] + "*  *"
-					+ returnValue[2] + "*");
+			System.err.println("return value *" + returnValue[0] + "* *" + returnValue[1] + "*  *" + returnValue[2] + "*");
 			String namelist = returnValue[2];
 			if (namelist != null) {
 				StringTokenizer tokenizer = new StringTokenizer(namelist);
@@ -617,8 +614,8 @@ class SubdialogTag extends VxmlTag {
 				String name = getNodeAttributeValue(item, "name");
 				String value = getNodeAttributeValue(item, "expr");
 				internalInterpreter.getContext().addParam(name);
-				internalInterpreter.getContext().getDeclaration().declareVariable(name,
-						"'" + context.getDeclaration().evaluateScript(value, 50) + "'", 50);
+				Object evaluateScript = context.getDeclaration().evaluateScript(value, 50);
+				internalInterpreter.getContext().getDeclaration().declareVariable(name, "'" + evaluateScript + "'", 50);
 			}
 		}
 	}
@@ -633,9 +630,7 @@ class TransferTag extends VxmlTag {
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException {
 		String dest = getNodeAttributeValue(node, "dest");
 		String destExpr = getNodeAttributeValue(node, "destexpr");
-		context.setTransfertDestination((dest != null) ? dest : context.getDeclaration()
-				.evaluateScript(destExpr, 50)
-				+ "");
+		context.setTransfertDestination((dest != null) ? dest : context.getDeclaration().evaluateScript(destExpr, 50) + "");
 		throw new TransferException();
 	}
 }

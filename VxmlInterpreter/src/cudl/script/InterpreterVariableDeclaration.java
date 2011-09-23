@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -149,18 +148,7 @@ public class InterpreterVariableDeclaration {
 	}
 
 	private void declarareNormalizedApplicationVariables() {
-		Context.enter().evaluateString(applicationScope, APPLICATION_VARIABLES,
-				APPLICATION_VARIABLES, 1, null);
-	}
-
-	private ScriptableObject getScopeByName(String name) {
-		return new HashMap<String, ScriptableObject>() {
-			{
-				put("application", applicationScope);
-				put("document", documentScope);
-				put("dialog", dialogScope);
-			}
-		}.get(name);
+		Context.enter().evaluateString(applicationScope, APPLICATION_VARIABLES, APPLICATION_VARIABLES, 1, null);
 	}
 
 	private ScriptableObject getScope(int scope) {

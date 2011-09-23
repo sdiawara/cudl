@@ -7,9 +7,9 @@
   </catch>
     
   <form>
-
+<var name="date" expr="'2002-11-15'"/>
      <subdialog name="subtest" src="#subtarget">
-       <param name="vxml2irdate" expr="'2002-11-15'"/> 
+       <param name="vxml2irdate" expr="date"/>
      </subdialog>                                    
   </form>
   

@@ -34,7 +34,7 @@
     <assign name="a656" expr="target"/>
   </block>
   <subdialog name="sb1" src="a656a.txml">
-    <param name="a656" expr ="a656"/>
+       <param name="a656" expr ="a656"/>
   </subdialog>
   <block>
     <if cond="a656 != target">

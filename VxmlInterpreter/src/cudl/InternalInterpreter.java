@@ -32,12 +32,13 @@ class InternalInterpreter {
 	private InterpreterEventHandler ieh;
 	private Properties properties = new Properties();
 	private boolean test;
+	
 	InternalInterpreter(InterpreterContext context) throws IOException, SAXException {
 		this.context = context;
 		ieh = new InterpreterEventHandler(context);
 	}
 
-	public void interpret(int action, String arg) throws IOException, SAXException,
+	 void interpret(int action, String arg) throws IOException, SAXException,
 			ParserConfigurationException {
 		Node node = context.getCurrentDialog();
 
@@ -54,6 +55,7 @@ class InternalInterpreter {
 				try {
 					dialog.interpret(context);
 				} catch (EcmaError e) {
+					e.printStackTrace();
 					throw new EventException("error.semantic");
 				}
 				break;

@@ -122,4 +122,21 @@ public class TestVariableDeclaration {
 
 		assertEquals("date1", declaration.getValue("d"));
 	}
+	
+	@Test
+	public void blabla() throws IOException {
+		declaration.declareVariable("a656", "undefined", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.declareVariable("block1", "undefined", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.declareVariable("block2", "undefined", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.declareVariable("target", "'a656b.txml'", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		
+		declaration.setValue("a656", "target");
+		declaration.resetScopeBinding(50);
+		
+		InterpreterVariableDeclaration subDeclaration = new InterpreterVariableDeclaration();
+		
+		subDeclaration.declareVariable("a656", "'"+declaration.evaluateScript("a656", 50)+"'", 50);
+		
+		assertEquals("a656b.txml", subDeclaration.getValue("a656"));
+	}
 }
