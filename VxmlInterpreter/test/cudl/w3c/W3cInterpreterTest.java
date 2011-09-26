@@ -820,9 +820,24 @@ public class W3cInterpreterTest {
 		interpreter.start();
 
 		assertEquals(expectedPrompts, interpreter.getPrompts());
-
 	}
 
+	
+	@Test
+	@Ignore
+	public void testPromptCounterInInputTagTakeEffect() throws Exception {
+		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
+		
+		Prompt p = new Prompt();
+		p.tts = "Say nothing. 1.0";
+		expectedPrompts.add(p);
+		
+		Interpreter interpreter = new Interpreter(url + "firstFileName.vxml");
+		interpreter.start();
+
+		assertEquals(expectedPrompts, interpreter.getPrompts());
+	}
+	
 	@Test
 	@Ignore
 	public void testReprompt() throws Exception {
@@ -847,13 +862,11 @@ public class W3cInterpreterTest {
 		p.tts = "pass";
 		expectedPrompts.add(p);
 
-		List<String> expectedLogs = new ArrayList<String>();
-
 		Interpreter interpreter = new Interpreter(url + "w3c/525.txml");
 		interpreter.start();
 		interpreter.noInput();
+		interpreter.talk("New York");
 
-		assertEquals(expectedLogs, interpreter.getLogs());
 		assertEquals(expectedPrompts, interpreter.getPrompts());
 	}
 }

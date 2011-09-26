@@ -111,7 +111,7 @@ public class InterpreterVariableDeclaration {
 	}
 
 	public void resetScopeBinding(int scope) {
-		System.err.println("reset scope"+scope);
+		System.err.println("reset scope" + scope);
 		Context context = Context.enter();
 		switch (scope) {
 		case APPLICATION_SCOPE:
@@ -119,7 +119,7 @@ public class InterpreterVariableDeclaration {
 			applicationScope.put("application", applicationScope, applicationScope);
 			applicationScope.setPrototype(sessionScope);
 			declarareNormalizedApplicationVariables();
-			break;
+			// break;
 		case DOCUMENT_SCOPE:
 			documentScope = (ScriptableObject) context.newObject(applicationScope);
 			documentScope.put("document", documentScope, documentScope);

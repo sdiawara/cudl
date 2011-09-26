@@ -82,7 +82,8 @@ class InterpreterEventHandler {
 			}
 			parent = parent.getParentNode();
 		}
-		return availableHandler.get(0);
+
+		return availableHandler.size() == 0 ? null : availableHandler.get(0);
 	}
 
 	private boolean isHandlerForEventType(String eventType, Node node) {
