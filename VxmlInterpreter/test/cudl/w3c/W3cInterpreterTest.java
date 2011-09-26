@@ -561,8 +561,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test()
-	public void w3cIRTest() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void w3cIRTest() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 
 		int count = 0;
 		for (Iterator<String> iterator = fileNames.iterator(); iterator.hasNext();) {
@@ -572,8 +571,7 @@ public class W3cInterpreterTest {
 			interpreter.start();
 
 			// System.out.println("tmp =" + tmp);
-			if (fileName.endsWith("289.txml") || fileName.endsWith("294.txml")
-					|| fileName.endsWith("298.txml")) {
+			if (fileName.endsWith("289.txml") || fileName.endsWith("294.txml") || fileName.endsWith("298.txml")) {
 				interpreter.blindTransferSuccess();
 			} else if (fileName.endsWith("288.txml")) {
 				interpreter.destinationHangup();
@@ -633,8 +631,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3cManual1() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void w3cManual1() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 		// If the last main FIA loop did not result in a goto nextitem
 		// and there is no form item which is eligible to be visited
 		// then an implicit exit is generated.
@@ -647,8 +644,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3c218Test() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void w3c218Test() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 		// Assertion:
 		// "An enumerate element can be used inside prompts associated with a menu element."
 		// Pass if user hears utterances that alpha, bravo, charlie and delta
@@ -668,8 +664,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3c219Test() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void w3c219Test() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 		// An enumerate element can be used inside catch element elements
 		// associated with a menu element.
 
@@ -688,8 +683,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3c216Test() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void w3c216Test() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 		// The enumerate element without content inside a prompt lists all the
 		// choices, following the order in which they appear in the menu.
 
@@ -708,8 +702,7 @@ public class W3cInterpreterTest {
 
 	@Test
 	@Ignore
-	public void w3c217Test() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void w3c217Test() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 		// The enumerate element with content defines a template specifier that
 		// will list all the choices. Two special variables are defined
 
@@ -727,8 +720,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void WhenErrorOccureTheInterpreterThrowError() throws IOException,
-			ParserConfigurationException, SAXException {
+	public void WhenErrorOccureTheInterpreterThrowError() throws IOException, ParserConfigurationException, SAXException {
 		interpreter = new Interpreter(url + "w3c/a32.txml");
 		interpreter.start();
 
@@ -737,8 +729,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void w3c236Test() throws IOException, ScriptException, ParserConfigurationException,
-			SAXException {
+	public void w3c236Test() throws IOException, ScriptException, ParserConfigurationException, SAXException {
 		List<Prompt> exceptedPrompts = new ArrayList<Prompt>();
 		prompt = new Prompt();
 		prompt.tts = "pass";
@@ -822,22 +813,20 @@ public class W3cInterpreterTest {
 		assertEquals(expectedPrompts, interpreter.getPrompts());
 	}
 
-	
 	@Test
-	@Ignore
 	public void testPromptCounterInInputTagTakeEffect() throws Exception {
 		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
-		
+
 		Prompt p = new Prompt();
 		p.tts = "Say nothing. 1.0";
 		expectedPrompts.add(p);
-		
-		Interpreter interpreter = new Interpreter(url + "firstFileName.vxml");
+
+		Interpreter interpreter = new Interpreter(url + "w3c/525.txml");
 		interpreter.start();
 
 		assertEquals(expectedPrompts, interpreter.getPrompts());
 	}
-	
+
 	@Test
 	@Ignore
 	public void testReprompt() throws Exception {

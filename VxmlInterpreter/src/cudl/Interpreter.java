@@ -32,7 +32,6 @@ public class Interpreter {
 
 	public Interpreter(String url) throws IOException, ParserConfigurationException, SAXException {
 		context = new InterpreterContext(url);
-		NewInterpreterContext newContext = new NewInterpreterContext(url);
 		internalInterpreter = new InternalInterpreter(context);
 	}
 
