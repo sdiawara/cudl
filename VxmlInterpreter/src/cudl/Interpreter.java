@@ -32,6 +32,7 @@ public class Interpreter {
 
 	public Interpreter(String url) throws IOException, ParserConfigurationException, SAXException {
 		context = new InterpreterContext(url);
+		NewInterpreterContext newContext = new NewInterpreterContext(url);
 		internalInterpreter = new InternalInterpreter(context);
 	}
 
@@ -51,8 +52,7 @@ public class Interpreter {
 		internalInterpreter.interpret(EVENT, "connection.disconnect.hangup");
 	}
 
-	public void blindTransferSuccess() throws IOException, SAXException,
-			ParserConfigurationException {
+	public void blindTransferSuccess() throws IOException, SAXException, ParserConfigurationException {
 		internalInterpreter.interpret(BLIND_TRANSFER_SUCCESSSS, null);
 	}
 
@@ -60,8 +60,7 @@ public class Interpreter {
 		internalInterpreter.interpret(NOANSWER, null);
 	}
 
-	public void callerHangupDuringTransfer() throws IOException, SAXException,
-			ParserConfigurationException {
+	public void callerHangupDuringTransfer() throws IOException, SAXException, ParserConfigurationException {
 		internalInterpreter.interpret(CALLER_HUNGUP_DURING_TRANSFER, null);
 	}
 
@@ -77,14 +76,12 @@ public class Interpreter {
 		internalInterpreter.interpret(MAX_TIME_DISCONNECT, null);
 	}
 
-	public void talk(String sentence) throws UnsupportedEncodingException, IOException,
-			SAXException, ParserConfigurationException {
+	public void talk(String sentence) throws UnsupportedEncodingException, IOException, SAXException, ParserConfigurationException {
 		String utterance = "'" + URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "") + "'";
 		internalInterpreter.interpret(TALK, utterance);
 	}
 
-	public void submitDtmf(String dtmf) throws IOException, SAXException,
-			ParserConfigurationException {
+	public void submitDtmf(String dtmf) throws IOException, SAXException, ParserConfigurationException {
 		String utterance = "'" + dtmf.replaceAll(" ", "") + "'";
 		internalInterpreter.interpret(DTMF, utterance);
 	}

@@ -32,14 +32,13 @@ class InternalInterpreter {
 	private InterpreterEventHandler ieh;
 	private Properties properties = new Properties();
 	private boolean test;
-	
+
 	InternalInterpreter(InterpreterContext context) throws IOException, SAXException {
 		this.context = context;
 		ieh = new InterpreterEventHandler(context);
 	}
 
-	 void interpret(int action, String arg) throws IOException, SAXException,
-			ParserConfigurationException {
+	void interpret(int action, String arg) throws IOException, SAXException, ParserConfigurationException {
 		Node node = context.getCurrentDialog();
 
 		try {
@@ -63,18 +62,18 @@ class InternalInterpreter {
 				ieh.doEvent(arg);
 				break;
 			case BLIND_TRANSFER_SUCCESSSS:
-				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '0'",InterpreterVariableDeclaration.SESSION_SCOPE);
+				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '0'", InterpreterVariableDeclaration.SESSION_SCOPE);
 				ieh.doEvent("connection.disconnect.transfer");
 				break;
 			case NOANSWER:
-				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '2'",InterpreterVariableDeclaration.SESSION_SCOPE);
+				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '2'", InterpreterVariableDeclaration.SESSION_SCOPE);
 				setTransferResultAndExecute("'noanswer'");
 				break;
 			case CALLER_HUNGUP_DURING_TRANSFER:
 				setTransferResultAndExecute("'near_end_disconnect'");
 				break;
 			case NETWORK_BUSY:
-				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '5'",InterpreterVariableDeclaration.SESSION_SCOPE);
+				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '5'", InterpreterVariableDeclaration.SESSION_SCOPE);
 				setTransferResultAndExecute("'network_busy'");
 				break;
 			case DESTINATION_BUSY:
@@ -84,7 +83,7 @@ class InternalInterpreter {
 				setTransferResultAndExecute("'maxtime_disconnect'");
 				break;
 			case DESTINATION_HANGUP:
-				context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()),"'far_end_disconnect'");
+				context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()), "'far_end_disconnect'");
 				test = true;
 				interpret(1, null);
 				break;
@@ -122,12 +121,10 @@ class InternalInterpreter {
 		}
 	}
 
-	private void setTransferResultAndExecute(String transferResult) throws InterpreterException,
-			IOException, SAXException, ParserConfigurationException {
-		context.getDeclaration().setValue(
-				context.getFormItemNames().get(context.getSelectedFormItem()), transferResult);
-		FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context
-				.getSelectedFormItem(), "filled"));
+	private void setTransferResultAndExecute(String transferResult) throws InterpreterException, IOException, SAXException,
+			ParserConfigurationException {
+		context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()), transferResult);
+		FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context.getSelectedFormItem(), "filled"));
 		filled.setExecute(true);
 		filled.interpret(context); // FIXME raise disconnect event instead to be
 		// closer to OMS buggy interpretation.
@@ -147,20 +144,15 @@ class InternalInterpreter {
 		properties.put(getNodeAttributeValue(node, "name"), getNodeAttributeValue(node, "value"));
 	}
 
-	void utterance(String utterance, String utteranceType) throws IOException, SAXException,
-			ParserConfigurationException, InterpreterException {
+	void utterance(String utterance, String utteranceType) throws IOException, SAXException, ParserConfigurationException, InterpreterException {
 		Node currentDialog = context.getCurrentDialog();
 		if (currentDialog.getNodeName().equals("form")) {
-			context.getDeclaration().evaluateScript(
-					"application.lastresult$[0].utterance =" + utterance,
+			context.getDeclaration().evaluateScript("application.lastresult$[0].utterance =" + utterance,
 					InterpreterVariableDeclaration.APPLICATION_SCOPE);
-			context.getDeclaration().evaluateScript(
-					"application.lastresult$[0].inputmode =" + utteranceType,
+			context.getDeclaration().evaluateScript("application.lastresult$[0].inputmode =" + utteranceType,
 					InterpreterVariableDeclaration.APPLICATION_SCOPE);
-			context.getDeclaration().setValue(
-					context.getFormItemNames().get(context.getSelectedFormItem()), utterance);
-			FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context
-					.getSelectedFormItem(), "filled"));
+			context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()), utterance);
+			FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context.getSelectedFormItem(), "filled"));
 			filled.setExecute(true);
 			filled.interpret(context);
 		} else {

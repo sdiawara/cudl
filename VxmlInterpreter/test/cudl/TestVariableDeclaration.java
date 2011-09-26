@@ -124,7 +124,7 @@ public class TestVariableDeclaration {
 	}
 	
 	@Test
-	public void blabla() throws IOException {
+	public void testVariableParamsInSubdialog() throws IOException {
 		declaration.declareVariable("a656", "undefined", InterpreterVariableDeclaration.DIALOG_SCOPE);
 		declaration.declareVariable("block1", "undefined", InterpreterVariableDeclaration.DIALOG_SCOPE);
 		declaration.declareVariable("block2", "undefined", InterpreterVariableDeclaration.DIALOG_SCOPE);
@@ -138,5 +138,12 @@ public class TestVariableDeclaration {
 		subDeclaration.declareVariable("a656", "'"+declaration.evaluateScript("a656", 50)+"'", 50);
 		
 		assertEquals("a656b.txml", subDeclaration.getValue("a656"));
+	}
+	
+	@Test
+	public void variableDeclaredWithVarTagIsAccessibleInLowestScopeScriptTag() {
+		declaration.declareVariable("nbErreur", "0", InterpreterVariableDeclaration.DOCUMENT_SCOPE);
+
+		assertEquals(1.0, declaration.evaluateScript("nbErreur += 1;", 50));
 	}
 }

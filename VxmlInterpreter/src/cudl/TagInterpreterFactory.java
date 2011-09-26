@@ -9,15 +9,14 @@ class TagInterpreterFactory {
 		String nodeName = node.getNodeName().replaceAll("#|:", "");
 		String className = getClassName(nodeName);
 		try {
-			Constructor<?> constructor = Class.forName(className).getConstructor(
-					new Class[] { Node.class });
+			Constructor<?> constructor = Class.forName(className).getConstructor(new Class[] { Node.class });
 			return (VxmlTag) constructor.newInstance(node);
 		} catch (ClassNotFoundException e) {
 			// FIXME check expected vxml behavior if unknown tag in page
 			throw new UnsupportedOperationException("Not supported tag " + nodeName);
 		} catch (Exception e) {
-			throw new RuntimeException("Error while trying to instanciate " + nodeName
-					+ " tag handler (" + className + "): " + e, e);
+			throw new RuntimeException("Error while trying to instanciate " + nodeName + " tag handler (" + className
+					+ "): " + e, e);
 		}
 	}
 

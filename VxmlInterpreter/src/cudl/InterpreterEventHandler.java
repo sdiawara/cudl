@@ -1,7 +1,9 @@
 package cudl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,15 +45,13 @@ class InterpreterEventHandler {
 		// reset to 0 ?
 	}
 
-	public void doEvent(String eventType) throws IOException, SAXException, InterpreterException,
-			ParserConfigurationException {
+	public void doEvent(String eventType) throws IOException, SAXException, InterpreterException, ParserConfigurationException {
 		int counter = (eventCounter.get(eventType) == null) ? 1 : eventCounter.get(eventType) + 1;
-
+		System.err.println(context.getSelectedFormItem() + "********************");
 		eventCounter.put(eventType, counter);
 		Node node = searchEventHandlers(eventType, counter, context.getSelectedFormItem());
-		Document rootDocument = context.getRootDocument();
-		node = node == null && rootDocument != null ? searchEventHandlers(eventType, counter,
-				rootDocument.getElementsByTagName("vxml").item(0)) : node;
+		Document rootDoc = context.getRootDocument();
+		node = (node == null && rootDoc != null) ? searchEventHandlers(eventType, counter, rootDoc.getElementsByTagName("vxml").item(0)) : node;
 
 		if (node == null) {
 			// FIXME what are we supposed to do here ? Check the spec...
@@ -61,9 +61,11 @@ class InterpreterEventHandler {
 	}
 
 	private Node searchEventHandlers(String eventType, int eventCounter, Node parent) {
+		List<Node> availableHandler = new ArrayList<Node>();
+
 		while (parent != null) {
 			NodeList nodeList = parent.getChildNodes();
-			System.err.println(parent + " parent");
+			// System.err.println(parent + " parent");
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
 				if (isHandlerForEventType(eventType, node)) {
@@ -75,11 +77,12 @@ class InterpreterEventHandler {
 						// here we check only equality
 						return node;
 					}
+					availableHandler.add(node);
 				}
 			}
 			parent = parent.getParentNode();
 		}
-		return null;
+		return availableHandler.get(0);
 	}
 
 	private boolean isHandlerForEventType(String eventType, Node node) {
@@ -88,8 +91,7 @@ class InterpreterEventHandler {
 
 	private boolean isCatchItemAndContainsEvent(Node node, String eventName) {
 		String eventAttribute = Utils.getNodeAttributeValue(node, "event");
-		return node.getNodeName().equals("catch") && eventAttribute != null
-				&& eventAttribute.contains(eventName);
+		return node.getNodeName().equals("catch") && eventAttribute != null && eventAttribute.contains(eventName);
 	}
 
 	public void resetEventCounter() {

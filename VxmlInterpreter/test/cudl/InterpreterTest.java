@@ -523,21 +523,33 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void testTalk() throws IOException, ParserConfigurationException, SAXException{
+	public void testTalk() throws IOException, ParserConfigurationException, SAXException {
 		List<Prompt> expectedprompts = new ArrayList<Prompt>();
 		Prompt prompt = new Prompt();
-		
+
 		prompt.tts = "Bonjour, merci de prononcer une phrase.";
 		expectedprompts.add(prompt);
-		
+
 		prompt = new Prompt();
-		prompt.tts =		 "Vous avez dit salut. Merci de votre appel.";
+		prompt.tts = "Vous avez dit salut. Merci de votre appel.";
 		expectedprompts.add(prompt);
 
 		interpreter = new Interpreter(url + "talk.vxml");
 		interpreter.start();
 		interpreter.talk("salut");
-		
+
 		assertEquals(expectedprompts, interpreter.getPrompts());
+	}
+
+	@Test
+	public void testPromptIsWhenItHasGoodcount() throws Exception {
+		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
+		List<String> expectedLogs = new ArrayList<String>();
+
+		Interpreter interpreter = new Interpreter(url + "promptCounter.vxml");
+		interpreter.start();
+
+		assertEquals(expectedPrompts, interpreter.getPrompts());
+		assertEquals(expectedLogs, interpreter.getLogs());
 	}
 }

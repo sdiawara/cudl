@@ -61,8 +61,7 @@ public class VxmlElementType {
 	};
 
 	public static boolean isFormItem(Node node) {
-		return isInputItem(node)
-				|| FORM_ITEM_TYPES.contains(node.getNodeName());
+		return isInputItem(node) || FORM_ITEM_TYPES.contains(node.getNodeName());
 	}
 
 	public static boolean isConditionalItem(Node node) {
@@ -80,8 +79,7 @@ public class VxmlElementType {
 	public static boolean isAModalItem(Node item) {
 		NamedNodeMap attributes = item.getAttributes();
 		Node namedItem = attributes.getNamedItem("modal");
-		return attributes != null && namedItem != null
-				&& namedItem.getNodeValue().equals("true");
+		return attributes != null && namedItem != null && namedItem.getNodeValue().equals("true");
 	}
 
 	public static boolean isAnExecutableItem(Node item) {

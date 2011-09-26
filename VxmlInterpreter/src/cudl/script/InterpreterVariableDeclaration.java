@@ -13,9 +13,8 @@ import cudl.utils.CudlSession;
 import cudl.utils.Utils;
 
 public class InterpreterVariableDeclaration {
-	private static final String APPLICATION_VARIABLES = "lastresult$ = new Array(); "
-			+ "lastresult$[0] = new Object(); " + "lastresult$[0].confidence = 1; "
-			+ "lastresult$[0].utterance = undefined;" + "lastresult$[0].inputmode = undefined;"
+	private static final String APPLICATION_VARIABLES = "lastresult$ = new Array(); " + "lastresult$[0] = new Object(); "
+			+ "lastresult$[0].confidence = 1; " + "lastresult$[0].utterance = undefined;" + "lastresult$[0].inputmode = undefined;"
 			+ "lastresult$[0].interpretation = undefined;";
 	public static final int SESSION_SCOPE = 90;
 	public static final int APPLICATION_SCOPE = 80;
@@ -89,7 +88,7 @@ public class InterpreterVariableDeclaration {
 			if (valueDeclarationScope != null) {
 				nameDeclarationScope.put(name, nameDeclarationScope, valueDeclarationScope.get(value));
 			} else
-				nameDeclarationScope.put(name, nameDeclarationScope, evaluateScript(value + "",	ANONYME_SCOPE));
+				nameDeclarationScope.put(name, nameDeclarationScope, evaluateScript(value + "", ANONYME_SCOPE));
 		}
 	}
 
@@ -112,6 +111,7 @@ public class InterpreterVariableDeclaration {
 	}
 
 	public void resetScopeBinding(int scope) {
+		System.err.println("reset scope"+scope);
 		Context context = Context.enter();
 		switch (scope) {
 		case APPLICATION_SCOPE:
@@ -119,6 +119,7 @@ public class InterpreterVariableDeclaration {
 			applicationScope.put("application", applicationScope, applicationScope);
 			applicationScope.setPrototype(sessionScope);
 			declarareNormalizedApplicationVariables();
+			break;
 		case DOCUMENT_SCOPE:
 			documentScope = (ScriptableObject) context.newObject(applicationScope);
 			documentScope.put("document", documentScope, documentScope);

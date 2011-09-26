@@ -459,14 +459,14 @@ public class W3cInterpreterTest {
 			// that points to an existing VoiceXML document and form causes the
 			// INTERPRETER to transition to the document and begin execution of the
 			// specified form.
-			//TODO: ADD FILE
-			//add("w3c/528a1.txml");
+			// TODO: ADD FILE
+			// add("w3c/528a1.txml");
 
 			// Setting next to a fully-qualified URL (excluding fragment
 			// identifier) that points to an existing VoiceXML document causes the
 			// INTERPRETER to transition to that document and begin execution of
 			// the first form.
-			//add("w3c/526.txml");
+			// add("w3c/526.txml");
 
 			// Setting next to a relative URL including fragment identifier that
 			// points to an existing VoiceXML document and form causes the
@@ -478,7 +478,7 @@ public class W3cInterpreterTest {
 			// fully-qualified URL (excluding fragment identifier) that points to
 			// an existing VoiceXML document causes the INTERPRETER to transition
 			// to that document and begin execution of the first form.
-			//add("w3c/530a1.txml");
+			// add("w3c/530a1.txml");
 
 			// Setting next to a URL that points to a non-existent VoiceXML
 			// document causes the interpreter to throw a catchable error.badfetch
@@ -807,8 +807,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	public void shouldPlayAudioExprSpecified() throws IOException, ParserConfigurationException,
-			SAXException {
+	public void shouldPlayAudioExprSpecified() throws IOException, ParserConfigurationException, SAXException {
 		// The interpreter evaluates, fetches, and plays the URI associated with
 		// the expr attribute of the audio element.
 		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
@@ -822,5 +821,39 @@ public class W3cInterpreterTest {
 
 		assertEquals(expectedPrompts, interpreter.getPrompts());
 
+	}
+
+	@Test
+	@Ignore
+	public void testReprompt() throws Exception {
+		// NOTE: This test uses expr side-effects.
+		// The user interaction follows:
+		// computer: Say nothing 1.
+		// user : (silence)
+		// computer: caught no input. Say New York 2.
+		// user : New York.
+		// computer: pass!
+		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
+
+		Prompt p = new Prompt();
+		p.tts = "Say nothing. 1.0";
+		expectedPrompts.add(p);
+
+		p = new Prompt();
+		p.tts = "Say New York. 2";
+		expectedPrompts.add(p);
+
+		p = new Prompt();
+		p.tts = "pass";
+		expectedPrompts.add(p);
+
+		List<String> expectedLogs = new ArrayList<String>();
+
+		Interpreter interpreter = new Interpreter(url + "w3c/525.txml");
+		interpreter.start();
+		interpreter.noInput();
+
+		assertEquals(expectedLogs, interpreter.getLogs());
+		assertEquals(expectedPrompts, interpreter.getPrompts());
 	}
 }
