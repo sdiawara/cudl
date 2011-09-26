@@ -592,7 +592,7 @@ public class W3cInterpreterTest {
 			} else if (fileName.endsWith("235.txml")) {
 				interpreter.noInput();
 			} else if (fileName.endsWith("assert163.txml")) {
-				interpreter.talk("alpha");
+				interpreter.talk("alpha");	
 				interpreter.talk("alpha");
 			} else if (fileName.endsWith("556.txml")) {
 				interpreter.talk("alpha");

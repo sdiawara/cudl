@@ -45,6 +45,13 @@ abstract class NonTerminalTag extends VxmlTag {
 
 	private NonTerminalTag(Node node) {
 		super(node);
+		createChilds(node.getChildNodes());
+	}
+
+	private void createChilds(NodeList childs) {
+		for (int i = 0; i < childs.getLength(); i++) {
+			this.childs.add(TagInterpreterFactory.getTagInterpreter(childs.item(i)));
+		}
 	}
 }
 
