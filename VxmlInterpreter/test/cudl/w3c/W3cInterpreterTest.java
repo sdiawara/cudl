@@ -814,6 +814,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
+	@Ignore
 	public void testPromptCounterInInputTagTakeEffect() throws Exception {
 		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xmlns:conf="http://www.w3.org/2002/vxml-conformance">
+
+<!-- 
+  NOTE: This test uses expr side-effects.
+        The user interaction follows:
+         computer: Say nothing 1.
+         user    : (silence)
+         computer: caught no input. Say New York 2.
+         user    : New York.
+         computer: pass!
+-->
+
+  <catch>
+    <conf:fail expr="'catch-all caught ' + _event"/>
+  </catch>
+
+  <form>
+    <var name="formVar" expr="0"/>
+
+    <field name="first">
+      <noinput>
+        caught no input
+        <reprompt/>
+      </noinput>
+
+      <conf:grammar utterance="charlie"/>
+
+      <prompt count="1">
+          Say nothing. <value expr="formVar = 1"/>
+      </prompt>
+
+      <prompt count="2">
+          Say New York. <value expr="formVar = 2"/>
+      </prompt>
+
+      <filled>
+        <if cond="formVar == 2">
+          <conf:pass/>
+          <else/>
+          <conf:fail expr="'expected form var 2; got ' + formVar"/>
+        </if>
+      </filled>
+    </field>
+  </form>
+</vxml>

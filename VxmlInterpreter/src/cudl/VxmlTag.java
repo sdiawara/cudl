@@ -43,16 +43,18 @@ abstract class VxmlTag {
 abstract class NonTerminalTag extends VxmlTag {
 	protected List<VxmlTag> childs;
 
-	private NonTerminalTag(Node node) {
+	NonTerminalTag(Node node) {
 		super(node);
 		createChilds(node.getChildNodes());
 	}
 
-	private void createChilds(NodeList childs) {
-		for (int i = 0; i < childs.getLength(); i++) {
-			this.childs.add(TagInterpreterFactory.getTagInterpreter(childs.item(i)));
+	private void createChilds(NodeList nodelist) {
+		childs = new ArrayList<VxmlTag>();
+		for (int i = 0; i < nodelist.getLength(); i++) {
+			childs.add(TagInterpreterFactory.getTagInterpreter(nodelist.item(i)));
 		}
 	}
+
 }
 
 class FormTag extends VxmlTag {
@@ -697,7 +699,19 @@ class EnumerateTag extends VxmlTag {
 
 }
 
-class ProceduralsTag extends VxmlTag {
+class RepromptTag extends VxmlTag {
+
+	public RepromptTag(Node node) {
+		super(node);
+	}
+
+	@Override
+	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException {
+		return null;
+	}
+}
+
+class ProceduralsTag extends NonTerminalTag {
 
 	ProceduralsTag(Node node) {
 		super(node);
@@ -705,9 +719,8 @@ class ProceduralsTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException {
-		NodeList childs = node.getChildNodes();
-		for (int i = 0; i < childs.getLength(); i++) {
-			TagInterpreterFactory.getTagInterpreter(childs.item(i)).interpret(context);
+		for (VxmlTag tag : childs) {
+			tag.interpret(context);
 		}
 		return null;
 	}
@@ -759,17 +772,5 @@ class CatchTag extends ProceduralsTag {
 class NomatchTag extends ProceduralsTag {
 	public NomatchTag(Node node) {
 		super(node);
-	}
-}
-
-class RepromptTag extends VxmlTag {
-
-	public RepromptTag(Node node) {
-		super(node);
-	}
-
-	@Override
-	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException {
-		return null;
 	}
 }
