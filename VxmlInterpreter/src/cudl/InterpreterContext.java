@@ -63,10 +63,7 @@ class InterpreterContext {
 		if (cookies != null)
 			connection.setRequestProperty("Cookie", cookies);
 
-		try {
-			currentdDocument = documentBuilder.parse(connection.getInputStream());
-		} catch (Exception e) {
-		}
+		currentdDocument = documentBuilder.parse(connection.getInputStream());
 
 		Node vxmlTag = currentdDocument.getDocumentElement();
 		NodeList dialogs = vxmlTag.getChildNodes();
