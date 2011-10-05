@@ -564,11 +564,30 @@ class SubdialogTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException {
-		context.getDeclaration().setValue(context.getFormItemNames().get(node), "true");
+		InterpreterVariableDeclaration declaration = context.getDeclaration();
+        String formItemName = context.getFormItemNames().get(node);
+        declaration.setValue(formItemName, "true");
 		String src = getNodeAttributeValue(node, "src");
 		InternalInterpreter internalInterpreter = null;
 		if (src != null) {
 			String url = Utils.tackWeelFormedUrl(context.getCurrentFileName(), src);
+			
+            //if remote url, put namelist values in GET parameters
+			if (! url.startsWith("#")) {
+			    String nameList = getNodeAttributeValue(node, "namelist");
+			    if (nameList != null) {
+			        StringTokenizer tokenizer = new StringTokenizer(nameList);
+			        String urlSuite = "?";
+			        while (tokenizer.hasMoreElements()) {
+			            String data = tokenizer.nextToken();
+			            urlSuite += data + "=" + context.getDeclaration().getValue(data) + "&";
+			        }
+			        url += urlSuite;
+			    }
+			}
+
+			
+            //TODO put namelist values in child context
 
 			internalInterpreter = new InternalInterpreter(new InterpreterContext(url));
 
@@ -577,7 +596,8 @@ class SubdialogTag extends VxmlTag {
 			context.getLogs().addAll(internalInterpreter.getContext().getLogs());
 			context.getPrompts().addAll(internalInterpreter.getContext().getPrompts());
 		}
-		context.getDeclaration().evaluateScript(context.getFormItemNames().get(node) + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		context.getDeclaration().evaluateScript(formItemName + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		
 		if (internalInterpreter != null) {
 			String[] returnValue = internalInterpreter.getContext().getReturnValue();
 
@@ -589,7 +609,7 @@ class SubdialogTag extends VxmlTag {
 					String variable = tokenizer.nextToken();
 					InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext().getDeclaration();
 					context.getDeclaration().evaluateScript(
-							context.getFormItemNames().get(node) + "." + variable + "='" + declaration2.getValue(variable) + "'",
+							formItemName + "." + variable + "='" + declaration2.getValue(variable) + "'",
 							InterpreterVariableDeclaration.ANONYME_SCOPE);
 				}
 			} else if (returnValue[0] != null) {
