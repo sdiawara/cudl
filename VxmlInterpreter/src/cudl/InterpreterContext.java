@@ -31,8 +31,7 @@ class InterpreterContext {
 	private DocumentBuilder documentBuilder;
 	private Document currentdDocument;
 	private Document rootDocument;
-	private URLConnection connection;
-	private String cookies;
+	String cookies;
 	private String currentRootFileName;
 	private String currentFileName;
 	private Node currentDialog;
@@ -47,21 +46,25 @@ class InterpreterContext {
 	private Map<Node, String> formItemNames = new LinkedHashMap<Node, String>();
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 
-	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
-		this.location = location;
-		this.declaration = new InterpreterVariableDeclaration();
-		documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		connection = new URL(location).openConnection();
-		cookies = connection.getHeaderField("Set-Cookie");
-		buildDocument(location);
-	}
+    InterpreterContext(String location, String cookies) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+        this.cookies = cookies;
+        this.location = location;
+        this.declaration = new InterpreterVariableDeclaration();
+        documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        buildDocument(location);
+    }
+
+    InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+        this(location, null);
+    }
 
 	void buildDocument(String fileName) throws IOException, SAXException {
 		String url = Utils.tackWeelFormedUrl(location, fileName);
 		System.err.println("build " + location + " + " + fileName + " url" + url);
-		connection = new URL(url).openConnection();
+		URLConnection connection = new URL(url).openConnection();
 		if (cookies != null)
 			connection.setRequestProperty("Cookie", cookies);
+		cookies = connection.getHeaderField("Set-Cookie");
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
 

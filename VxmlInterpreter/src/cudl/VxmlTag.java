@@ -589,7 +589,7 @@ class SubdialogTag extends VxmlTag {
 			
             //TODO put namelist values in child context
 
-			internalInterpreter = new InternalInterpreter(new InterpreterContext(url));
+			internalInterpreter = new InternalInterpreter(new InterpreterContext(url, context.cookies));
 
 			declareParams(internalInterpreter, node.getChildNodes(), context);
 			internalInterpreter.interpret(1, null);
