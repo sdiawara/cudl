@@ -64,7 +64,12 @@ class InterpreterContext {
 		URLConnection connection = new URL(url).openConnection();
 		if (cookies != null)
 			connection.setRequestProperty("Cookie", cookies);
-		cookies = connection.getHeaderField("Set-Cookie");
+		{
+		    String tmpCookies = connection.getHeaderField("Set-Cookie"); 
+		    if (tmpCookies != null) {
+		        cookies = tmpCookies.replaceAll(";.*", "");
+		    }
+		}
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
 
