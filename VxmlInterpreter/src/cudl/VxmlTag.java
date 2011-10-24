@@ -211,21 +211,11 @@ class VarTag extends VxmlTag {
 	}
 }
 
-//FIXME this is a dirty hack to work around an issue with assign tag
-//      (see AssignTagOld). When a variable is declared in a root
-//      page and one assigns a new value to it in block, then the
-//      assignment has no effect :(
-class AssignTag extends VarTag {
-    public AssignTag(Node node) {
-        super(node);
-    }
-}
-
-class AssignTagOld extends VxmlTag {
+class AssignTag extends VxmlTag {
 	// private String parentTag =
 	// "block catch error filled form help if nomatch noinput";
 
-	public AssignTagOld(Node node) {
+	public AssignTag(Node node) {
 		super(node);
 	}
 

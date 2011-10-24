@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mozilla.javascript.EcmaError;
+import org.mozilla.javascript.ScriptableObject;
 
 import cudl.script.InterpreterVariableDeclaration;
 
@@ -88,11 +89,12 @@ public class TestVariableDeclaration {
 	public void testWhenWeDeclareVariableInScopeDialogItValueCanUseWithAnotherVariableInencompassingScope() {
 		declaration.declareVariable("heure_ouverture", "undefined", InterpreterVariableDeclaration.APPLICATION_SCOPE);
 		declaration.declareVariable("recupHeureOuverture", "new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
-		declaration.setValue("recupHeureOuverture.hOuverture", "'non'");
 		
+		declaration.setValue("recupHeureOuverture.hOuverture", "'non'");
 		declaration.setValue("heure_ouverture","recupHeureOuverture.hOuverture");
 		
-		assertEquals("non", declaration.getValue("heure_ouverture"));
+//        assertEquals("non", ((ScriptableObject) declaration.getValue("recupHeureOuverture")).get("hOuverture"));
+        assertEquals("non", declaration.getValue("heure_ouverture"));
 	}
 	
 	@Test

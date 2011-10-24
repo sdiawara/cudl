@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -22,7 +21,7 @@ public class InterpreterTest {
 	
 	@Before
 	public void setUp() throws IOException {
-		url = "file://" + new File(".").getCanonicalPath() + "/test/docVxml/";
+		url = "file:test/docVxml/";
 	}
 
 	@Test
@@ -541,15 +540,39 @@ public class InterpreterTest {
 		assertEquals(expectedprompts, interpreter.getPrompts());
 	}
 
-	@Test
-	public void testPromptIsWhenItHasGoodcount() throws Exception {
-		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
-		List<String> expectedLogs = new ArrayList<String>();
+    @Test
+    public void testPromptIsWhenItHasGoodcount() throws Exception {
+        List<Prompt> expectedPrompts = new ArrayList<Prompt>();
+        List<String> expectedLogs = new ArrayList<String>();
 
-		Interpreter interpreter = new Interpreter(url + "promptCounter.vxml");
-		interpreter.start();
+        Interpreter interpreter = new Interpreter(url + "promptCounter.vxml");
+        interpreter.start();
 
-		assertEquals(expectedPrompts, interpreter.getPrompts());
-		assertEquals(expectedLogs, interpreter.getLogs());
-	}
+        assertEquals(expectedPrompts, interpreter.getPrompts());
+        assertEquals(expectedLogs, interpreter.getLogs());
+    }
+
+    @Test
+    public void testApplicationScopeVariable() throws Exception {
+        List<String> expectedLogs = new ArrayList<String>();
+        expectedLogs.add("second_value");
+        expectedLogs.add("second_value");
+
+        Interpreter interpreter = new Interpreter(url + "application_scope_variable_page_1.vxml");
+        interpreter.start();
+
+        assertEquals(expectedLogs, interpreter.getLogs());
+    }
+    
+    @Test
+    public void testAssignObjectFieldValue() throws Exception {
+        List<String> expectedLogs = new ArrayList<String>();
+        expectedLogs.add("value");
+
+        Interpreter interpreter = new Interpreter(url + "assign_object_field_value.vxml");
+        interpreter.start();
+
+        assertEquals(expectedLogs, interpreter.getLogs());
+    }
+
 }

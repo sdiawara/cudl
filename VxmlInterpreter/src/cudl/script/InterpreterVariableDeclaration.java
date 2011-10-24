@@ -86,9 +86,11 @@ public class InterpreterVariableDeclaration {
 			nameDeclarationScope = searchDeclarationScope(name);
 			ScriptableObject valueDeclarationScope = searchDeclarationScope(value + "");
 			if (valueDeclarationScope != null) {
-				nameDeclarationScope.put(name, nameDeclarationScope, valueDeclarationScope.get(value));
+//                nameDeclarationScope.put(name, nameDeclarationScope, valueDeclarationScope.get(value));
+	             nameDeclarationScope.put(name, nameDeclarationScope, evaluateScript(value + "", ANONYME_SCOPE));
 			} else
-				nameDeclarationScope.put(name, nameDeclarationScope, evaluateScript(value + "", ANONYME_SCOPE));
+                nameDeclarationScope.put(name, nameDeclarationScope, evaluateScript(value + "", ANONYME_SCOPE));
+//			    evaluateScript(name+"="+value, ANONYME_SCOPE);
 		}
 	}
 
@@ -107,7 +109,7 @@ public class InterpreterVariableDeclaration {
 	}
 
 	public Object getValue(String name) {
-		return Context.enter().evaluateString(anonymeScope, name, name, 1, null);
+	    return Context.enter().evaluateString(anonymeScope, name, name, 1, null);
 	}
 
 	public void resetScopeBinding(int scope) {
