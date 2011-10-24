@@ -37,7 +37,7 @@ abstract class VxmlTag {
 		return cond == null || Boolean.valueOf(context.getDeclaration().evaluateScript(cond, InterpreterVariableDeclaration.ANONYME_SCOPE) + "");
 	}
 
-	public abstract Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException;
+	abstract Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException;
 }
 
 abstract class NonTerminalTag extends VxmlTag {
@@ -51,10 +51,13 @@ abstract class NonTerminalTag extends VxmlTag {
 	private void createChilds(NodeList nodelist) {
 		childs = new ArrayList<VxmlTag>();
 		for (int i = 0; i < nodelist.getLength(); i++) {
-			childs.add(TagInterpreterFactory.getTagInterpreter(nodelist.item(i)));
+			Node childNode = nodelist.item(i);
+			if (canContainsChild(childNode.getNodeName()))
+				childs.add(TagInterpreterFactory.getTagInterpreter(childNode));
 		}
 	}
 
+	abstract boolean canContainsChild(String childName);
 }
 
 class FormTag extends VxmlTag {
@@ -84,9 +87,9 @@ class FormTag extends VxmlTag {
 						name = "form_item_generated_name_by_cudl_" + form_item_generated++;
 					}
 					context.getDeclaration().declareVariable(name, expr == null ? "undefined" : expr, 60);
-					// if (isInputItem(child) || "initial".equals(getName(child))) {
-					// promptCounter.put(name, 1);
-					// }
+					if ("field".equals(child.getNodeName()) || "initial".equals(child.getNodeName())) {
+						context.setPromptCounter(child, 1);
+					}
 					context.addFormItemName(child, name);
 				}
 			}
@@ -277,6 +280,7 @@ class PromptTag extends VxmlTag {
 		}
 
 		Prompt p = new Prompt();
+
 		String timeout = getNodeAttributeValue(node, "timeout");
 		p.timeout = timeout != null ? timeout : "";
 
@@ -301,6 +305,7 @@ class PromptTag extends VxmlTag {
 		p.tts = p.tts.trim();
 		p.audio = p.audio.trim();
 		context.addPrompt(p);
+
 		return null;
 	}
 }
@@ -635,8 +640,9 @@ class TransferTag extends VxmlTag {
 	}
 }
 
-class FieldTag extends VxmlTag {
-	private String tags = "prompt var assign if goto submit filled";
+class FieldTag extends NonTerminalTag implements PromptCounter {
+	private final String tags = "prompt var assign if goto submit filled";
+	private int promptCount = 1;
 
 	public FieldTag(Node node) {
 		super(node);
@@ -644,13 +650,31 @@ class FieldTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException {
-		NodeList childs = node.getChildNodes();
-		for (int i = 0; i < childs.getLength(); i++) {
-			Node child = childs.item(i);
-			if (tags.contains((child.getNodeName())))
-				TagInterpreterFactory.getTagInterpreter(child).interpret(context);
+		for (VxmlTag tag : childs) {
+			if (tag instanceof PromptTag) {
+				String count = getNodeAttributeValue(tag.node, "count");
+				if (!(count == null || Integer.valueOf(count) == context.getPromptCounter(context.getSelectedFormItem()))) {
+					continue;
+				}
+			}
+			tag.interpret(context);
 		}
 		return null;
+	}
+	
+	@Override
+	public int getcount() {
+		return promptCount;
+	}
+
+	@Override
+	public void increment() {
+		promptCount++;
+	}
+
+	@Override
+	boolean canContainsChild(String childName) {
+		return tags.contains(childName);
 	}
 }
 
@@ -669,7 +693,7 @@ class AudioTag extends VxmlTag {
 			throw new EventException("error.badfetch");
 		}
 
-		p.audio = src == null ? context.getDeclaration().evaluateScript(expr, 50) + "" : src;
+		p.audio = (src == null) ? context.getDeclaration().evaluateScript(expr, 50) + "" : src;
 		p.tts = node.getTextContent();
 
 		if (node.getParentNode().getNodeName().equals("block")) {
@@ -707,6 +731,8 @@ class RepromptTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException {
+		System.err.println("REPROMPTS ");
+		context.incrementPromptCounter(context.getSelectedFormItem());
 		return null;
 	}
 }
@@ -723,6 +749,11 @@ class ProceduralsTag extends NonTerminalTag {
 			tag.interpret(context);
 		}
 		return null;
+	}
+
+	@Override
+	boolean canContainsChild(String childName) {
+		return true;
 	}
 }
 

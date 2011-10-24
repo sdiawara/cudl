@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="fr/mbs/vxml/script/InterpreterScriptEngine.java|cudl/script/copy/|cudl/vxml/Application.java|cudl/vxml/Document.java" kind="src" path="src"/>
+	<classpathentry excluding="fr/mbs/vxml/script/InterpreterScriptEngine.java|cudl/script/copy/|cudl/vxml/" kind="src" path="src"/>
 	<classpathentry excluding="cudl/script/" kind="src" path="test"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>

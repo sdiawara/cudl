@@ -3,12 +3,11 @@ package cudl;
 import static cudl.utils.Utils.tackWeelFormedUrl;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,7 @@ class InterpreterContext {
 	private String nextItemToVisit;
 	private Map<Node, String> formItemNames = new LinkedHashMap<Node, String>();
 	private List<Prompt> prompts = new ArrayList<Prompt>();
+	private Map<Node, Integer> promptCounter = new Hashtable<Node, Integer>();
 
 	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
 		this.location = location;
@@ -236,5 +236,20 @@ class InterpreterContext {
 
 	public List<Prompt> getPrompts() {
 		return prompts;
+	}
+
+	public void setPromptCounter(Node node, int i) {
+		promptCounter.put(node, i);
+	}
+
+	public void incrementPromptCounter(Node node) {
+		Integer integer = promptCounter.get(node);
+		promptCounter.put(node, integer + 1);
+		System.err.println(" ================ "+node +"          "+ promptCounter);
+	}
+
+	public int getPromptCounter(Node node) {
+		System.err.println(" ================ "+node +"          "+ promptCounter);
+		return promptCounter.get(node);
 	}
 }

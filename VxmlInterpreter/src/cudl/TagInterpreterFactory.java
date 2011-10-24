@@ -15,8 +15,7 @@ class TagInterpreterFactory {
 			// FIXME check expected vxml behavior if unknown tag in page
 			throw new UnsupportedOperationException("Not supported tag " + nodeName);
 		} catch (Exception e) {
-			throw new RuntimeException("Error while trying to instanciate " + nodeName + " tag handler (" + className
-					+ "): " + e, e);
+			throw new RuntimeException("Error while trying to instanciate " + nodeName + " tag handler (" + className + "): " + e, e);
 		}
 	}
 

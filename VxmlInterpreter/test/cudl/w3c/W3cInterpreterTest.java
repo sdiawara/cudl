@@ -592,7 +592,7 @@ public class W3cInterpreterTest {
 			} else if (fileName.endsWith("235.txml")) {
 				interpreter.noInput();
 			} else if (fileName.endsWith("assert163.txml")) {
-				interpreter.talk("alpha");	
+				interpreter.talk("alpha");
 				interpreter.talk("alpha");
 			} else if (fileName.endsWith("556.txml")) {
 				interpreter.talk("alpha");
@@ -814,7 +814,6 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
-	@Ignore
 	public void testPromptCounterInInputTagTakeEffect() throws Exception {
 		List<Prompt> expectedPrompts = new ArrayList<Prompt>();
 
@@ -825,11 +824,12 @@ public class W3cInterpreterTest {
 		Interpreter interpreter = new Interpreter(url + "w3c/525.txml");
 		interpreter.start();
 
+		System.err.println(expectedPrompts);
+		System.err.println(interpreter.getPrompts());
 		assertEquals(expectedPrompts, interpreter.getPrompts());
 	}
 
 	@Test
-	@Ignore
 	public void testReprompt() throws Exception {
 		// NOTE: This test uses expr side-effects.
 		// The user interaction follows:
@@ -857,6 +857,8 @@ public class W3cInterpreterTest {
 		interpreter.noInput();
 		interpreter.talk("New York");
 
+		System.err.println(expectedPrompts);
+		System.err.println(interpreter.getPrompts());
 		assertEquals(expectedPrompts, interpreter.getPrompts());
 	}
 }
