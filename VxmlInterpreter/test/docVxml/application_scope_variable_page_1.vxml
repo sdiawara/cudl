@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1" application="file:test/docVxml/application_scope_variable_root.vxml" 
+  xmlns="http://www.w3.org/2001/vxml"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.w3.org/2001/vxml http://www.w3.org/TR/2007/REC-voicexml21-20070619/vxml.xsd">
+  
+  <form>
+    <block>
+  	  <assign name="appliScopeVar" expr="'second_value'"/>
+      <log expr="appliScopeVar"/>
+      <goto next="application_scope_variable_page_2.vxml"/>
+    </block>
+  </form>
+  
+</vxml>
