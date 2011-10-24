@@ -144,7 +144,9 @@ public class InterpreterVariableDeclaration {
 		} catch (InstantiationException e) {
 		} catch (IllegalAccessException e) {
 		} catch (ClassNotFoundException e) {
-			System.err.println("WARNING: You do not define session file. It name will be Session and placed in package test");
+			String msg = "ERROR: You must define a Session class in the test package implementing cudl.utils.CudlSession !!! See https://github.com/multimediabs/cudl/blob/master/VxmlInterpreter/test/test/Session.java";
+            System.err.println(msg);
+            throw new RuntimeException(msg);
 		}
 	}
 

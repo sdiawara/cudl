@@ -211,11 +211,21 @@ class VarTag extends VxmlTag {
 	}
 }
 
-class AssignTag extends VxmlTag {
+//FIXME this is a dirty hack to work around an issue with assign tag
+//      (see AssignTagOld). When a variable is declared in a root
+//      page and one assigns a new value to it in block, then the
+//      assignment has no effect :(
+class AssignTag extends VarTag {
+    public AssignTag(Node node) {
+        super(node);
+    }
+}
+
+class AssignTagOld extends VxmlTag {
 	// private String parentTag =
 	// "block catch error filled form help if nomatch noinput";
 
-	public AssignTag(Node node) {
+	public AssignTagOld(Node node) {
 		super(node);
 	}
 
@@ -569,20 +579,43 @@ class SubdialogTag extends VxmlTag {
 
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException {
-		context.getDeclaration().setValue(context.getFormItemNames().get(node), "true");
+		InterpreterVariableDeclaration declaration = context.getDeclaration();
+        String formItemName = context.getFormItemNames().get(node);
+        declaration.setValue(formItemName, "true");
 		String src = getNodeAttributeValue(node, "src");
 		InternalInterpreter internalInterpreter = null;
 		if (src != null) {
 			String url = Utils.tackWeelFormedUrl(context.getCurrentFileName(), src);
+			
+            //if remote url, put namelist values in GET parameters
+			if (! url.startsWith("#")) {
+			    String nameList = getNodeAttributeValue(node, "namelist");
+			    if (nameList != null) {
+			        StringTokenizer tokenizer = new StringTokenizer(nameList);
+			        String urlSuite = "?";
+			        while (tokenizer.hasMoreElements()) {
+			            String data = tokenizer.nextToken();
+			            urlSuite += data + "=" + context.getDeclaration().getValue(data) + "&";
+			        }
+			        url += urlSuite;
+			    }
+			}
 
-			internalInterpreter = new InternalInterpreter(new InterpreterContext(url));
+			
+            //TODO put namelist values in child context
+
+			//FIXME this is not a viable way to handle subdialogs ;(
+			InterpreterContext subContext = new InterpreterContext(url, context.cookies);
+            internalInterpreter = new InternalInterpreter(subContext);
+            context.cookies = subContext.cookies;
 
 			declareParams(internalInterpreter, node.getChildNodes(), context);
 			internalInterpreter.interpret(1, null);
 			context.getLogs().addAll(internalInterpreter.getContext().getLogs());
 			context.getPrompts().addAll(internalInterpreter.getContext().getPrompts());
 		}
-		context.getDeclaration().evaluateScript(context.getFormItemNames().get(node) + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		context.getDeclaration().evaluateScript(formItemName + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		
 		if (internalInterpreter != null) {
 			String[] returnValue = internalInterpreter.getContext().getReturnValue();
 
@@ -594,7 +627,7 @@ class SubdialogTag extends VxmlTag {
 					String variable = tokenizer.nextToken();
 					InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext().getDeclaration();
 					context.getDeclaration().evaluateScript(
-							context.getFormItemNames().get(node) + "." + variable + "='" + declaration2.getValue(variable) + "'",
+							formItemName + "." + variable + "='" + declaration2.getValue(variable) + "'",
 							InterpreterVariableDeclaration.ANONYME_SCOPE);
 				}
 			} else if (returnValue[0] != null) {
