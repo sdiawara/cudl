@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Stack;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -21,12 +22,13 @@ public class InterpreterVariableDeclaration {
 	public static final int DOCUMENT_SCOPE = 70;
 	public static final int DIALOG_SCOPE = 60;
 	public static final int ANONYME_SCOPE = 50;
+
 	private ScriptableObject sharedScope;
-	private ScriptableObject anonymeScope;
-	private ScriptableObject dialogScope;
-	private ScriptableObject documentScope;
-	private ScriptableObject applicationScope;
 	private ScriptableObject sessionScope;
+	private ScriptableObject applicationScope;
+	private ScriptableObject documentScope;
+	private ScriptableObject dialogScope;
+	private ScriptableObject anonymeScope;
 
 	public InterpreterVariableDeclaration() throws IOException {
 		Context context = new ContextFactory().enterContext();
@@ -52,12 +54,12 @@ public class InterpreterVariableDeclaration {
 		anonymeScope.setPrototype(dialogScope);
 
 		declareNormalizedSessionVariables();
+
 		declarareNormalizedApplicationVariables();
 	}
 
 	public void declareVariable(String name, Object value, int scope) {
-		ScriptableObject scopeObject = getScope(scope);
-		scopeObject.put(name, scopeObject, evaluateScript(value + "", scope));
+		getScope(scope).put(name, getScope(scope), evaluateScript(value + "", scope));
 	}
 
 	public Object evaluateScript(String script, int scope) {
@@ -78,19 +80,10 @@ public class InterpreterVariableDeclaration {
 		Context ctxt = Context.enter();
 
 		String[] split = name.split("\\.");
-		ScriptableObject nameDeclarationScope;
 		if (Utils.scopeNames().contains(split[0])) {
-			nameDeclarationScope = searchDeclarationScope(name);
-			ctxt.evaluateString(nameDeclarationScope, name + "=" + value, name + "=" + value, 1, null);
+			ctxt.evaluateString(searchDeclarationScope(name), name + "=" + value, name + "=" + value, 1, null);
 		} else {
-			nameDeclarationScope = searchDeclarationScope(name);
-			ScriptableObject valueDeclarationScope = searchDeclarationScope(value + "");
-			if (valueDeclarationScope != null) {
-//                nameDeclarationScope.put(name, nameDeclarationScope, valueDeclarationScope.get(value));
-	             nameDeclarationScope.put(name, nameDeclarationScope, evaluateScript(value + "", ANONYME_SCOPE));
-			} else
-                nameDeclarationScope.put(name, nameDeclarationScope, evaluateScript(value + "", ANONYME_SCOPE));
-//			    evaluateScript(name+"="+value, ANONYME_SCOPE);
+			searchDeclarationScope(name).put(name, searchDeclarationScope(name), evaluateScript(value + "", ANONYME_SCOPE));
 		}
 	}
 
@@ -109,11 +102,11 @@ public class InterpreterVariableDeclaration {
 	}
 
 	public Object getValue(String name) {
-	    return Context.enter().evaluateString(anonymeScope, name, name, 1, null);
+		return Context.enter().evaluateString(anonymeScope, name, name, 1, null);
 	}
 
 	public void resetScopeBinding(int scope) {
-		System.err.println("reset scope"+scope);
+		System.err.println("reset scope" + scope);
 		Context context = Context.enter();
 		switch (scope) {
 		case APPLICATION_SCOPE:
@@ -146,9 +139,10 @@ public class InterpreterVariableDeclaration {
 		} catch (InstantiationException e) {
 		} catch (IllegalAccessException e) {
 		} catch (ClassNotFoundException e) {
-			String msg = "ERROR: You must define a Session class in the test package implementing cudl.utils.CudlSession !!! See https://github.com/multimediabs/cudl/blob/master/VxmlInterpreter/test/test/Session.java";
-            System.err.println(msg);
-            throw new RuntimeException(msg);
+			String msg = "ERROR: You must define a Session class in the test package implementing cudl.utils.CudlSession !!! "
+					+ "See https://github.com/multimediabs/cudl/blob/master/VxmlInterpreter/test/test/Session.java";
+			System.err.println(msg);
+			throw new RuntimeException(msg);
 		}
 	}
 

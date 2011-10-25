@@ -45,18 +45,19 @@ class InterpreterContext {
 	private Map<Node, String> formItemNames = new LinkedHashMap<Node, String>();
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 	private Map<Node, Integer> promptCounter = new Hashtable<Node, Integer>();
+	public String lastChangeEvent = "";
 
-    InterpreterContext(String location, String cookies) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
-        this.cookies = cookies;
-        this.location = location;
-        this.declaration = new InterpreterVariableDeclaration();
-        documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        buildDocument(location);
-    }
+	InterpreterContext(String location, String cookies) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+		this.cookies = cookies;
+		this.location = location;
+		this.declaration = new InterpreterVariableDeclaration();
+		documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		buildDocument(location);
+	}
 
-    InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
-        this(location, null);
-    }
+	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+		this(location, null);
+	}
 
 	void buildDocument(String fileName) throws IOException, SAXException {
 		String url = Utils.tackWeelFormedUrl(location, fileName);
@@ -65,10 +66,10 @@ class InterpreterContext {
 		if (cookies != null)
 			connection.setRequestProperty("Cookie", cookies);
 		{
-		    String tmpCookies = connection.getHeaderField("Set-Cookie"); 
-		    if (tmpCookies != null) {
-		        cookies = tmpCookies.replaceAll(";.*", "");
-		    }
+			String tmpCookies = connection.getHeaderField("Set-Cookie");
+			if (tmpCookies != null) {
+				cookies = tmpCookies.replaceAll(";.*", "");
+			}
 		}
 
 		currentdDocument = documentBuilder.parse(connection.getInputStream());
@@ -87,6 +88,9 @@ class InterpreterContext {
 				}
 			}
 		}
+
+		if (currentRootFileName != null && currentRootFileName.equals(url) && lastChangeEvent.equals("goto"))
+			return;
 
 		Node appplicationRoot = vxmlTag.getAttributes().getNamedItem("application");
 		if (null != appplicationRoot) {
@@ -250,11 +254,9 @@ class InterpreterContext {
 	public void incrementPromptCounter(Node node) {
 		Integer integer = promptCounter.get(node);
 		promptCounter.put(node, integer + 1);
-		System.err.println(" ================ "+node +"          "+ promptCounter);
 	}
 
 	public int getPromptCounter(Node node) {
-		System.err.println(" ================ "+node +"          "+ promptCounter);
 		return promptCounter.get(node);
 	}
 }

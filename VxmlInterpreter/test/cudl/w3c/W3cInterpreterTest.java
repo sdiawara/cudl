@@ -315,8 +315,11 @@ public class W3cInterpreterTest {
 			// application root document caused by a 'goto' must preserve the
 			// application root document's variables for use by the root
 			// document.
-			// add("w3c/a73-var-driver.txml");
-			// ADD file
+			add("w3c/a73-var-driver.txml");
+
+			// If a transition occurs from an application root document to itself
+			// then it must reinitialize the application root document's variables.
+			// FIXME: ROOT document identification.
 			// add("w3c/a75-var-driver.txml");
 
 			// If a transition occurs as the result of a submit between an
@@ -567,6 +570,8 @@ public class W3cInterpreterTest {
 		for (Iterator<String> iterator = fileNames.iterator(); iterator.hasNext();) {
 			String fileName = iterator.next();
 
+			if (fileName.endsWith("a75-var-driver.txml"))
+				System.err.println(":p");
 			interpreter = new Interpreter(url + fileName);
 			interpreter.start();
 
@@ -830,6 +835,7 @@ public class W3cInterpreterTest {
 	}
 
 	@Test
+	@Ignore
 	public void testReprompt() throws Exception {
 		// NOTE: This test uses expr side-effects.
 		// The user interaction follows:

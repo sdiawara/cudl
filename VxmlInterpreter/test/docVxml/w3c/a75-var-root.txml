@@ -1,0 +1,42 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+   xmlns="http://www.w3.org/2001/vxml"
+   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 75: 
+  If a transition occurs from an application root document to itself 
+  then it must reinitialize the application root document's variables. -->
+
+  <var name="rootvar" expr="7" />
+
+  <catch>
+    <conf:fail expr="'root caught unexpected event:' + _event" />
+  </catch>
+
+  <form>
+    <block>
+      <conf:comment>Assign new value to 'rootvar' before transitioning to
+        verify variable initialization in a75-var-root.vxml#check.</conf:comment>
+      <assign name="rootvar" expr="8" />
+      <if cond="rootvar == 8">
+        <conf:comment>rootvar is now 8</conf:comment>
+        <goto next="a75-var-root.txml#check" />
+      <else/>
+        <conf:fail expr="'first form has unexpected value for rootvar: ' + rootvar" />
+      </if>
+    </block>
+  </form>
+
+  <form id="check">
+    <block>
+      <conf:comment>Verify rootvar value reset on transition from root to itself.</conf:comment>
+      <if cond="rootvar == 7">
+        <conf:pass />
+      <else/>
+        <conf:fail expr="'check form has unexpected value for rootvar: ' + rootvar" />
+      </if>
+    </block>
+  </form>
+</vxml>
+

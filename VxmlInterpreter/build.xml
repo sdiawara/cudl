@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="VxmlInterpreter" default="compile">
 
+  <property file="build_info.properties"/>
+  <property name="build.number" value="${build.major.number}.${build.minor.number}.${build.revision.number}"/>
   <property name="src.dir" location="src" />
   <property name="test.src.dir" location="test" />
   <property name="target.dir" location="target" />
@@ -24,6 +26,46 @@
     <pathelement location="${build.dir}" />
     <pathelement location="${test.build.dir}" />
   </path>
+
+
+  <target name="current-number">
+       <echo>Current build number:${build.number}</echo>
+  </target>
+
+
+
+<target name="dist">
+  <antcall target="minor"></antcall>
+</target>
+
+<target name="revision" description="Incremente revision number" >
+    <propertyfile  file="build_info.properties">
+            <entry key="build.revision.number" type="int" operation="+" value="1" pattern="00"/>
+    </propertyfile>
+</target>
+
+<target name="minor" description="Incremente minor number">
+    <propertyfile  file="build_info.properties">
+            <entry key="build.minor.number" type="int" operation="+" value="1" pattern="00"/>
+            <entry key="build.revision.number" type="int" value="0" pattern="00"/>
+    </propertyfile>
+</target>
+
+<target name="major" description="Incremente major number">
+    <propertyfile  file="build_info.properties">
+            <entry key="build.major.number" type="int" operation="+" value="1" pattern="00"/>
+            <entry key="build.minor.number" type="int" value="0" pattern="00"/>
+            <entry key="build.revision.number" type="int" value="0" pattern="00"/>
+    </propertyfile>
+</target>
+
+<target name="all">
+    <propertyfile  file="build_info.properties">
+            <entry key="build.major.number" type="int" operation="+" value="1" pattern="00"/>
+            <entry key="build.minor.number" type="int" operation="+" value="1" pattern="00"/>
+            <entry key="build.revision.number" type="int" operation="+" value="1" pattern="00"/>
+    </propertyfile>
+</target>
 
   <target name="prepare">
     <mkdir dir="${target.dir}" />
@@ -63,7 +105,7 @@
 
   <target name="jar" depends="compile" description="Generate jar file" >
     <unzip src="lib/js.jar" dest="${build.dir}"/>
-    <jar jarfile="${target.dir}\cudl_v0.1.jar" 
+    <jar jarfile="${target.dir}\cudl_v${build.number}.jar" 
       basedir="${build.dir}" />
   </target>
 

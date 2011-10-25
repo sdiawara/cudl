@@ -54,7 +54,6 @@ class InternalInterpreter {
 				try {
 					dialog.interpret(context);
 				} catch (EcmaError e) {
-					e.printStackTrace();
 					throw new EventException("error.semantic");
 				}
 				break;
@@ -95,6 +94,9 @@ class InternalInterpreter {
 				break;
 			}
 		} catch (GotoException e) {
+			// FIXME: this is use to check transition between leaf document and
+			// root document
+			context.lastChangeEvent = "goto";
 			ieh.resetEventCounter();
 			if (e.next != null) {
 				context.buildDocument(e.next);
@@ -105,6 +107,7 @@ class InternalInterpreter {
 			}
 			interpret(1, null);
 		} catch (SubmitException e) {
+			context.lastChangeEvent = "submit";
 			ieh.resetEventCounter();
 			context.buildDocument(e.next);
 			node = context.getCurrentDialog();
@@ -187,7 +190,6 @@ class InternalInterpreter {
 
 	Properties getCurrentDialogProperties() {
 		collectDialogProperty(context.getSelectedFormItem().getParentNode().getChildNodes());
-		System.err.println(properties);
 		return properties;
 	}
 

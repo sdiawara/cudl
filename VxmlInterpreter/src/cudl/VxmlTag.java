@@ -663,9 +663,8 @@ class TransferTag extends VxmlTag {
 	}
 }
 
-class FieldTag extends NonTerminalTag implements PromptCounter {
+class FieldTag extends NonTerminalTag  {
 	private final String tags = "prompt var assign if goto submit filled";
-	private int promptCount = 1;
 
 	public FieldTag(Node node) {
 		super(node);
@@ -685,16 +684,6 @@ class FieldTag extends NonTerminalTag implements PromptCounter {
 		return null;
 	}
 	
-	@Override
-	public int getcount() {
-		return promptCount;
-	}
-
-	@Override
-	public void increment() {
-		promptCount++;
-	}
-
 	@Override
 	boolean canContainsChild(String childName) {
 		return tags.contains(childName);

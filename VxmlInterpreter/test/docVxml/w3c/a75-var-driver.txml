@@ -1,0 +1,21 @@
+<!-- @ Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. See http://www.w3.org/Consortium/Legal/. @ -->
+<vxml version="2.0" 
+   xmlns="http://www.w3.org/2001/vxml"
+   xmlns:conf="http://www.w3.org/2002/vxml-conformance"
+>
+
+<!-- Assertion 75: 
+  If a transition occurs from an application root document to itself 
+  then it must reinitialize the application root document's variables. -->
+
+  <catch>
+    <conf:fail expr="'a75-var-driver caught unexpected event:' + _event" />
+  </catch>
+
+  <form>
+    <block>
+      <goto next="a75-var-root.txml" />
+    </block>
+  </form>
+</vxml>
+
