@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<vxml xmlns="http://www.w3.org/2001/vxml" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.w3.org/2001/vxml 
+   http://www.w3.org/TR/voicexml20/vxml.xsd"
+   version="2.0" application="appRoot.vxml">
+  <form id="idSaisieTestTelephone">
+    <field>
+       <grammar src="numero.grxml" type="application/srgs+xml"/>
+    	<filled>
+	       <prompt>
+	          Votre numero est le <value expr="recuperer_numero"/>. Merci de votre appel.
+	       </prompt>     		
+	    </filled>
+	   <noinput>
+				<log label="stats">NO_INPUT</log>
+				<log label="nbErreurs">avant +1 : <value expr="nbErreurs"/></log>
+				<assign name="nextStat" expr="'start.vxml#testNbErreur'"/>
+				<goto next="arret_son.vxml"/>
+	   </noinput>
+    </field>
+  </form>
+  
+  <!-- test le nombre d erreur -->
+	<form id="testNbErreur">
+		<script>
+              	nbErreurs++;
+		</script>
+		<block>
+			<log label="nbErreurs">apres +1 : <value expr="nbErreurs"/></log>
+			<if cond="nbErreurs &lt; 3">
+				<!-- message de demande de saisie ASC004 -->
+				<log label="stats">TEST_ERREUR</log>
+				<assign name="nextStat" expr="'start.vxml#moins3Erreurs'"/>
+				<goto next="arret_son.vxml"/>
+			<else />
+				<!-- message d echec de compatibilite du telephone ASC005 -->
+				<goto next="#telIncompatible" />
+			</if>
+		</block>
+	</form>
+	
+	<!-- Moins de 3 erreurs -->
+	<form id="moins3Erreurs">
+		<block>
+			<prompt>
+				<audio src="/SONS/ACS004.alaw" />
+			</prompt>
+			<goto next="#idSaisieTestTelephone" />
+		</block>
+	</form>
+  
+</vxml>

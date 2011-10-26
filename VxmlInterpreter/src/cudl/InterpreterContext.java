@@ -61,7 +61,8 @@ class InterpreterContext {
 
 	void buildDocument(String fileName) throws IOException, SAXException {
 		String url = Utils.tackWeelFormedUrl(location, fileName);
-		System.err.println("build " + location + " + " + fileName + " url" + url);
+		System.err.println(url);
+		//System.err.println("build " + location + " + " + fileName + " url" + url);
 		URLConnection connection = new URL(url).openConnection();
 		if (cookies != null)
 			connection.setRequestProperty("Cookie", cookies);
@@ -106,6 +107,7 @@ class InterpreterContext {
 
 	private void declareRootScopeVariableIfNeeded(String textContent) throws IOException {
 		if (!textContent.equals(currentRootFileName)) {
+			System.err.println("ko");
 			NodeList childNodes = rootDocument.getDocumentElement().getChildNodes();
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
 			declareVariable(childNodes, InterpreterVariableDeclaration.APPLICATION_SCOPE);
@@ -115,7 +117,7 @@ class InterpreterContext {
 
 	private void declareDocumentScopeVariableIfNeeded(String fileName) throws IOException {
 		if (!fileName.equals(getCurrentFileName())) {
-			System.err.println(fileName + "   sdfsdfsd");
+//			System.err.println(fileName + "   sdfsdfsd");
 			NodeList childNodes = currentdDocument.getElementsByTagName("vxml").item(0).getChildNodes();
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			declareVariable(childNodes, InterpreterVariableDeclaration.DOCUMENT_SCOPE);
@@ -130,7 +132,7 @@ class InterpreterContext {
 			if (child.getNodeName().equals("var")) {
 				String name = Utils.getNodeAttributeValue(child, "name");
 				String value = Utils.getNodeAttributeValue(child, "expr");
-				System.err.println(name + "=" + value + "   documentscope");
+				//System.err.println(name + "=" + value + "   documentscope");
 				declaration.declareVariable(name, value == null ? "undefined" : value, scope);
 			} else if (child.getNodeName().equals("script")) {
 				String src = Utils.getNodeAttributeValue(child, "src");

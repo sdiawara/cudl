@@ -45,7 +45,7 @@ class InternalInterpreter {
 			VxmlTag dialog;
 			switch (action) {
 			case START:
-				System.err.println(node);
+				// System.err.println(node);
 				dialog = TagInterpreterFactory.getTagInterpreter(node);
 				if (test) {
 					((FormTag) dialog).setInitVar(false);
@@ -150,9 +150,9 @@ class InternalInterpreter {
 	void utterance(String utterance, String utteranceType) throws IOException, SAXException, ParserConfigurationException, InterpreterException {
 		Node currentDialog = context.getCurrentDialog();
 		if (currentDialog.getNodeName().equals("form")) {
-			context.getDeclaration().evaluateScript("application.lastresult$[0].utterance =" + utterance,
+			context.getDeclaration().evaluateScript("lastresult$[0].utterance =" + utterance,
 					InterpreterVariableDeclaration.APPLICATION_SCOPE);
-			context.getDeclaration().evaluateScript("application.lastresult$[0].inputmode =" + utteranceType,
+			context.getDeclaration().evaluateScript("lastresult$[0].inputmode =" + utteranceType,
 					InterpreterVariableDeclaration.APPLICATION_SCOPE);
 			context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()), utterance);
 			FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context.getSelectedFormItem(), "filled"));

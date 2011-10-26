@@ -47,7 +47,7 @@ class InterpreterEventHandler {
 
 	public void doEvent(String eventType) throws IOException, SAXException, InterpreterException, ParserConfigurationException {
 		int counter = (eventCounter.get(eventType) == null) ? 1 : eventCounter.get(eventType) + 1;
-		System.err.println(context.getSelectedFormItem() + "********************");
+		//System.err.println(context.getSelectedFormItem() + "********************");
 		eventCounter.put(eventType, counter);
 		Node node = searchEventHandlers(eventType, counter, context.getSelectedFormItem());
 		Document rootDoc = context.getRootDocument();

@@ -53,8 +53,6 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "shelloExit.vxml");
 		interpreter.start();
 
-		System.err.println(traceLog);
-		System.err.println(interpreter.getLogs());
 		assertEquals(traceLog, interpreter.getLogs());
 		assertEquals(traceStat, interpreter.getLogsWithLabel("stats"));
 		assertTrue(interpreter.hungup());
@@ -96,8 +94,6 @@ public class InterpreterTest {
 
 		assertTrue(interpreter.getLogsWithLabel("stats").isEmpty());
 
-		System.err.println(traceLog);
-		System.err.println(interpreter.getLogs());
 		assertEquals(traceLog, interpreter.getLogs());
 		assertTrue(interpreter.hungup());
 	}
@@ -129,9 +125,6 @@ public class InterpreterTest {
 		interpreter.start();
 
 		assertTrue(interpreter.getLogsWithLabel("stats").isEmpty());
-		System.err.println(traceLog);
-		System.err.println(interpreter.getLogs());
-
 		assertEquals(traceLog, interpreter.getLogs());
 	}
 
@@ -165,8 +158,6 @@ public class InterpreterTest {
 		interpreter = new Interpreter(url + "prompt.vxml");
 		interpreter.start();
 
-		System.err.println(prompts);
-		System.err.println(interpreter.getPrompts());
 		assertEquals(prompts, interpreter.getPrompts());
 	}
 
@@ -182,9 +173,6 @@ public class InterpreterTest {
 
 		interpreter = new Interpreter(url + "prompt1.vxml");
 		interpreter.start();
-
-		System.err.println(prompts);
-		System.err.println(interpreter.getPrompts());
 
 		assertTrue(interpreter.getPrompts().size() == 1);
 		assertEquals(prompts, interpreter.getPrompts());
@@ -282,9 +270,40 @@ public class InterpreterTest {
 	}
 
 	@Test
-	public void WhenRootChangeLastRootVariableIsNotLongerAccessible() throws IOException, ParserConfigurationException, SAXException {
-		interpreter = new Interpreter(url + "rootChangeVariable.vxml");
+	// @Ignore //see testVariable declaration ===>
+	// globalVariableCantBeAssignInscript
+	public void RootVariableIsAllWaysVisibleAnotherVersion() throws IOException, ParserConfigurationException, SAXException {
+		List<String> expectedLogs = new ArrayList<String>();
+
+		expectedLogs.add("NO_INPUT");
+		expectedLogs.add("avant +1 : 0.0");
+		expectedLogs.add("NO_INPUT2");
+		expectedLogs.add("apres +1 : 1.0");
+		expectedLogs.add("TEST_ERREUR");
+		expectedLogs.add("NO_INPUT2");
+		expectedLogs.add("NO_INPUT");
+		expectedLogs.add("avant +1 : 1.0");
+
+		expectedLogs.add("NO_INPUT2");
+		expectedLogs.add("apres +1 : 2.0");
+		expectedLogs.add("TEST_ERREUR");
+		expectedLogs.add("NO_INPUT2");
+		
+		// expectedLogs.add("avant +1 : 0.0");
+		// expectedLogs.add("apres +1 : 1.0");
+
+		interpreter = new Interpreter(url + "start.vxml");
 		interpreter.start();
+		interpreter.noInput();
+		interpreter.noInput();
+		interpreter.noInput();
+		interpreter.noInput();
+		interpreter.noInput();
+		interpreter.noInput();
+
+		System.err.println(expectedLogs);
+		System.err.println(interpreter.getLogs());
+		assertEquals(expectedLogs, interpreter.getLogs());
 	}
 
 	@Test

@@ -428,9 +428,11 @@ class GotoTag extends VxmlTag {
 			nextItem = nextItemTmp != null ? nextItemTmp : exprItemTmp != null ? context.getDeclaration().getValue(exprItemTmp) + "" : null;
 		}
 
-		if (nextItem != null)
+		if (nextItem != null) {
+			System.err.println("GOTO " + nextItem);
 			throw new GotoException(null, nextItem);
-
+		}
+		
 		String nextTmp = getNodeAttributeValue(node, "next");
 		String exprTmp = getNodeAttributeValue(node, "expr");
 
@@ -441,6 +443,7 @@ class GotoTag extends VxmlTag {
 		} else {
 			next = nextTmp != null ? nextTmp : context.getDeclaration().getValue(exprTmp) + "";
 		}
+		System.err.println("GOTO " + next);
 		throw new GotoException(next, null);
 	}
 }
@@ -552,7 +555,7 @@ class ScriptTag extends VxmlTag {
 			context.getDeclaration().evaluateScript(node.getTextContent(), InterpreterVariableDeclaration.DIALOG_SCOPE);
 		} else {
 			try {
-				context.getDeclaration().evaluateFileScript(src, InterpreterVariableDeclaration.DIALOG_SCOPE);
+				System.err.println("====>"+context.getDeclaration().evaluateFileScript(src, InterpreterVariableDeclaration.DIALOG_SCOPE));
 			} catch (FileNotFoundException e) {
 				throw new EventException("error.badfetch");
 			}
@@ -570,34 +573,33 @@ class SubdialogTag extends VxmlTag {
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException, ParserConfigurationException {
 		InterpreterVariableDeclaration declaration = context.getDeclaration();
-        String formItemName = context.getFormItemNames().get(node);
-        declaration.setValue(formItemName, "true");
+		String formItemName = context.getFormItemNames().get(node);
+		declaration.setValue(formItemName, "true");
 		String src = getNodeAttributeValue(node, "src");
 		InternalInterpreter internalInterpreter = null;
 		if (src != null) {
 			String url = Utils.tackWeelFormedUrl(context.getCurrentFileName(), src);
-			
-            //if remote url, put namelist values in GET parameters
-			if (! url.startsWith("#")) {
-			    String nameList = getNodeAttributeValue(node, "namelist");
-			    if (nameList != null) {
-			        StringTokenizer tokenizer = new StringTokenizer(nameList);
-			        String urlSuite = "?";
-			        while (tokenizer.hasMoreElements()) {
-			            String data = tokenizer.nextToken();
-			            urlSuite += data + "=" + context.getDeclaration().getValue(data) + "&";
-			        }
-			        url += urlSuite;
-			    }
+
+			// if remote url, put namelist values in GET parameters
+			if (!url.startsWith("#")) {
+				String nameList = getNodeAttributeValue(node, "namelist");
+				if (nameList != null) {
+					StringTokenizer tokenizer = new StringTokenizer(nameList);
+					String urlSuite = "?";
+					while (tokenizer.hasMoreElements()) {
+						String data = tokenizer.nextToken();
+						urlSuite += data + "=" + context.getDeclaration().getValue(data) + "&";
+					}
+					url += urlSuite;
+				}
 			}
 
-			
-            //TODO put namelist values in child context
+			// TODO put namelist values in child context
 
-			//FIXME this is not a viable way to handle subdialogs ;(
+			// FIXME this is not a viable way to handle subdialogs ;(
 			InterpreterContext subContext = new InterpreterContext(url, context.cookies);
-            internalInterpreter = new InternalInterpreter(subContext);
-            context.cookies = subContext.cookies;
+			internalInterpreter = new InternalInterpreter(subContext);
+			context.cookies = subContext.cookies;
 
 			declareParams(internalInterpreter, node.getChildNodes(), context);
 			internalInterpreter.interpret(1, null);
@@ -605,7 +607,7 @@ class SubdialogTag extends VxmlTag {
 			context.getPrompts().addAll(internalInterpreter.getContext().getPrompts());
 		}
 		context.getDeclaration().evaluateScript(formItemName + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
-		
+
 		if (internalInterpreter != null) {
 			String[] returnValue = internalInterpreter.getContext().getReturnValue();
 
@@ -616,8 +618,7 @@ class SubdialogTag extends VxmlTag {
 				while (tokenizer.hasMoreElements()) {
 					String variable = tokenizer.nextToken();
 					InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext().getDeclaration();
-					context.getDeclaration().evaluateScript(
-							formItemName + "." + variable + "='" + declaration2.getValue(variable) + "'",
+					context.getDeclaration().evaluateScript(formItemName + "." + variable + "='" + declaration2.getValue(variable) + "'",
 							InterpreterVariableDeclaration.ANONYME_SCOPE);
 				}
 			} else if (returnValue[0] != null) {
@@ -663,7 +664,7 @@ class TransferTag extends VxmlTag {
 	}
 }
 
-class FieldTag extends NonTerminalTag  {
+class FieldTag extends NonTerminalTag {
 	private final String tags = "prompt var assign if goto submit filled";
 
 	public FieldTag(Node node) {
@@ -683,7 +684,7 @@ class FieldTag extends NonTerminalTag  {
 		}
 		return null;
 	}
-	
+
 	@Override
 	boolean canContainsChild(String childName) {
 		return tags.contains(childName);

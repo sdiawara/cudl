@@ -9,11 +9,12 @@ import java.util.Stack;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 
 import cudl.utils.CudlSession;
-import cudl.utils.Utils;
 
 public class InterpreterVariableDeclaration {
+	private static final int SCOPE_STEP = 10;
 	private static final String APPLICATION_VARIABLES = "lastresult$ = new Array(); " + "lastresult$[0] = new Object(); "
 			+ "lastresult$[0].confidence = 1; " + "lastresult$[0].utterance = undefined;" + "lastresult$[0].inputmode = undefined;"
 			+ "lastresult$[0].interpretation = undefined;";
@@ -30,78 +31,104 @@ public class InterpreterVariableDeclaration {
 	private ScriptableObject dialogScope;
 	private ScriptableObject anonymeScope;
 
+	private Stack<ScriptableObject> peekStack = new Stack<ScriptableObject>();
+	private Stack<ScriptableObject> tmpStatck = new Stack<ScriptableObject>();
+	private int currentScope;
+
 	public InterpreterVariableDeclaration() throws IOException {
 		Context context = new ContextFactory().enterContext();
-		sharedScope = context.initStandardObjects();
 
-		sessionScope = (ScriptableObject) context.newObject(sharedScope);
+		sessionScope = context.initStandardObjects();
 		sessionScope.put("session", sessionScope, sessionScope);
-		sessionScope.setPrototype(sharedScope);
-
+		
 		applicationScope = (ScriptableObject) context.newObject(sessionScope);
 		applicationScope.put("application", applicationScope, applicationScope);
-		applicationScope.setPrototype(sessionScope);
+		applicationScope.setParentScope(sessionScope);
 
 		documentScope = (ScriptableObject) context.newObject(applicationScope);
 		documentScope.put("document", documentScope, documentScope);
-		documentScope.setPrototype(applicationScope);
+		documentScope.setParentScope(applicationScope);
 
 		dialogScope = (ScriptableObject) context.newObject(documentScope);
 		dialogScope.put("dialog", dialogScope, dialogScope);
-		dialogScope.setPrototype(documentScope);
+		dialogScope.setParentScope(documentScope);
 
 		anonymeScope = (ScriptableObject) context.newObject(dialogScope);
-		anonymeScope.setPrototype(dialogScope);
+		anonymeScope.setParentScope(dialogScope);
 
+		peekStack.push(sessionScope);
 		declareNormalizedSessionVariables();
-
+		peekStack.push(applicationScope);
 		declarareNormalizedApplicationVariables();
+
+		tmpStatck.push(anonymeScope);
+		tmpStatck.push(dialogScope);
+		tmpStatck.push(documentScope);
+
+		currentScope = 80;
 	}
 
 	public void declareVariable(String name, Object value, int scope) {
 		getScope(scope).put(name, getScope(scope), evaluateScript(value + "", scope));
 	}
 
+	// ***
+	public void declareVariableNew(String name, Object value) {
+		ScriptableObject currentScope = peekStack.peek();
+		currentScope.put(name, currentScope, evaluateScriptNew(value + ""));
+	}
+
 	public Object evaluateScript(String script, int scope) {
 		Context context = Context.enter();
-		return context.evaluateString(getScope(scope), script, script + " " + scope, 1, null);
+		ScriptableObject scope2 = getScope(scope);
+		return context.evaluateString(scope2, script, script + " " + scope, 1, null);
+	}
+
+	// ***
+	public Object evaluateScriptNew(String script) {
+		Context context = Context.enter();
+		return context.evaluateString(peekStack.peek(), script, script, 1, null);
 	}
 
 	public Object evaluateFileScript(String fileName, int scope) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileName).openStream()));
 		try {
+			// Context.enter().evaluateReader(peekStack.peek(), in, fileName, 1,
+			// null);
 			return Context.enter().evaluateReader(getScope(scope), in, fileName, 1, null);
 		} finally {
 			in.close();
 		}
 	}
 
-	public void setValue(String name, Object value) {
-		Context ctxt = Context.enter();
-
-		String[] split = name.split("\\.");
-		if (Utils.scopeNames().contains(split[0])) {
-			ctxt.evaluateString(searchDeclarationScope(name), name + "=" + value, name + "=" + value, 1, null);
-		} else {
-			searchDeclarationScope(name).put(name, searchDeclarationScope(name), evaluateScript(value + "", ANONYME_SCOPE));
+	public Object evaluateFileScriptNew(String fileName, int scope) throws IOException {
+		BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileName).openStream()));
+		try {
+			return Context.enter().evaluateReader(peekStack.peek(), in, fileName, 1, null);
+		} finally {
+			in.close();
 		}
 	}
 
-	private ScriptableObject searchDeclarationScope(String name) {
-		ScriptableObject start = anonymeScope;
+	// ***
+	public void setValue(String name, Object value) {
+		Context ctxt = Context.enter();
+		Object valueEvaluation = ctxt.evaluateString(anonymeScope, value.toString(), value.toString(), 1, null);
 
-		String search = name.split("\\.")[0];
+		if (valueEvaluation instanceof String)
+			valueEvaluation = "'" + valueEvaluation + "'";
 
-		while (start != sharedScope) {
-			if (start.has(search, start)) {
-				return start;
-			}
-			start = (ScriptableObject) start.getPrototype();
-		}
-		return null;
+		if (valueEvaluation instanceof Undefined)
+			valueEvaluation = "undefined";
+
+		ctxt.evaluateString(searchDeclarationScope(name), name + "=" + valueEvaluation + "", name + "=" + valueEvaluation + ";", 1, null);
 	}
 
 	public Object getValue(String name) {
+		return Context.enter().evaluateString(anonymeScope, name, name, 1, null);
+	}
+
+	public Object getValueNew(String name) {
 		return Context.enter().evaluateString(anonymeScope, name, name, 1, null);
 	}
 
@@ -110,24 +137,37 @@ public class InterpreterVariableDeclaration {
 		Context context = Context.enter();
 		switch (scope) {
 		case APPLICATION_SCOPE:
+			System.err.println("reset scope APPLICATION");
 			applicationScope = (ScriptableObject) context.newObject(sessionScope);
 			applicationScope.put("application", applicationScope, applicationScope);
-			applicationScope.setPrototype(sessionScope);
+			applicationScope.setParentScope(sessionScope);
 			declarareNormalizedApplicationVariables();
 			break;
 		case DOCUMENT_SCOPE:
 			documentScope = (ScriptableObject) context.newObject(applicationScope);
 			documentScope.put("document", documentScope, documentScope);
-			documentScope.setPrototype(applicationScope);
+			documentScope.setParentScope(applicationScope);
 		case DIALOG_SCOPE:
 			dialogScope = (ScriptableObject) context.newObject(documentScope);
 			dialogScope.put("dialog", dialogScope, dialogScope);
-			dialogScope.setPrototype(documentScope);
+			dialogScope.setParentScope(documentScope);
 		case ANONYME_SCOPE:
 			anonymeScope = (ScriptableObject) context.newObject(dialogScope);
-			anonymeScope.setPrototype(dialogScope);
+			anonymeScope.setParentScope(dialogScope);
 			break;
 		}
+	}
+
+	private ScriptableObject searchDeclarationScope(String name) {
+		ScriptableObject start = anonymeScope;
+		String search = name.split("\\.")[0];
+		while (start != sharedScope) {
+			if (start.has(search, start)) {
+				return start;
+			}
+			start = (ScriptableObject) start.getParentScope();
+		}
+		return null;
 	}
 
 	private void declareNormalizedSessionVariables() throws IOException {
@@ -164,6 +204,23 @@ public class InterpreterVariableDeclaration {
 			return sessionScope;
 		default:
 			throw new IllegalArgumentException("Scope " + scope + " Undefined");
+		}
+	}
+
+	public void enterScope() {
+		System.err.println(peekStack.size() + "size");
+		if (currentScope > 50) {
+			currentScope -= SCOPE_STEP;
+			peekStack.push(tmpStatck.pop());
+		}
+	}
+
+	public void exitScope() {
+		if (currentScope < 90) {
+			ScriptableObject pop = peekStack.pop();
+			resetScopeBinding(currentScope);
+			currentScope += SCOPE_STEP;
+			tmpStatck.push(pop);
 		}
 	}
 }
