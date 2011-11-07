@@ -23,7 +23,8 @@ public class TestVariableDeclaration {
 	}
 
 	@Test
-	public void testWeCanDeclareVariableAndRetreViewItValue() throws IOException {
+	public void testWeCanDeclareVariableAndRetreViewItValue()
+			throws IOException {
 		declaration.enterScope();
 		declaration.declareVariableNew("variableDocument", "'document'");
 		declaration.enterScope();
@@ -66,15 +67,20 @@ public class TestVariableDeclaration {
 		declaration.enterScope();
 		declaration.enterScope();
 		declaration.enterScope();
-		declaration.evaluateScript("variableAnonyme++", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.evaluateScript("variableAnonyme++",
+				InterpreterVariableDeclaration.DIALOG_SCOPE);
 	}
 
 	@Test
 	public void eachGigestScopeCanBeModifyByLOwestScope() {
-		declaration.declareVariable("variableAnonyme", "0", InterpreterVariableDeclaration.APPLICATION_SCOPE);
-		declaration.evaluateScript("variableAnonyme++", InterpreterVariableDeclaration.DOCUMENT_SCOPE);
-		declaration.evaluateScript("variableAnonyme++", InterpreterVariableDeclaration.DIALOG_SCOPE);
-		declaration.evaluateScript("variableAnonyme++", InterpreterVariableDeclaration.ANONYME_SCOPE);
+		declaration.declareVariable("variableAnonyme", "0",
+				InterpreterVariableDeclaration.APPLICATION_SCOPE);
+		declaration.evaluateScript("variableAnonyme++",
+				InterpreterVariableDeclaration.DOCUMENT_SCOPE);
+		declaration.evaluateScript("variableAnonyme++",
+				InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.evaluateScript("variableAnonyme++",
+				InterpreterVariableDeclaration.ANONYME_SCOPE);
 
 		assertEquals(3.0, declaration.getValue("application.variableAnonyme"));
 	}
@@ -125,9 +131,11 @@ public class TestVariableDeclaration {
 		declaration.enterScope();
 
 		declaration.setValue("recupHeureOuverture.hOuverture", "'non'");
-		declaration.setValue("heure_ouverture", "recupHeureOuverture.hOuverture");
+		declaration.setValue("heure_ouverture",
+				"recupHeureOuverture.hOuverture");
 
-		assertEquals("non", ((ScriptableObject) declaration.getValueNew("recupHeureOuverture")).get("hOuverture"));
+		assertEquals("non", ((ScriptableObject) declaration
+				.getValueNew("recupHeureOuverture")).get("hOuverture"));
 		assertEquals("non", declaration.getValueNew("heure_ouverture"));
 	}
 
@@ -213,7 +221,8 @@ public class TestVariableDeclaration {
 
 		InterpreterVariableDeclaration subDeclaration = new InterpreterVariableDeclaration();
 
-		subDeclaration.declareVariableNew("a656", "'" + declaration.evaluateScriptNew("a656") + "'");
+		subDeclaration.declareVariableNew("a656", "'"
+				+ declaration.evaluateScriptNew("a656") + "'");
 
 		assertEquals("a656b.txml", subDeclaration.getValueNew("a656"));
 	}
@@ -229,10 +238,13 @@ public class TestVariableDeclaration {
 	// sera en bonne uniforme
 	@Test
 	public void globalVariableCantBeAssignInscript() {
-		declaration.declareVariable("nbErreurs", "0", InterpreterVariableDeclaration.APPLICATION_SCOPE);
+		declaration.declareVariable("nbErreurs", "0",
+				InterpreterVariableDeclaration.APPLICATION_SCOPE);
 
-		declaration.evaluateScript("nbErreurs++;", InterpreterVariableDeclaration.DIALOG_SCOPE);
-		declaration.resetScopeBinding(InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.evaluateScript("nbErreurs++;",
+				InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration
+				.resetScopeBinding(InterpreterVariableDeclaration.DIALOG_SCOPE);
 
 		Object nbErreurs = declaration.getValue("nbErreurs");
 		Object appNbErreurs = declaration.getValue("application.nbErreurs");
@@ -241,7 +253,8 @@ public class TestVariableDeclaration {
 		assertEquals(1.0, appNbErreurs);
 	}
 
-	// ajouter un nouveau test qui dit : quand une variable est déclarer dans une
+	// ajouter un nouveau test qui dit : quand une variable est déclarer dans
+	// une
 	// porter plus grosse les modification sur cette variable dans une autre (
 	// plus petit, sans redeclaration) se font sur la porte la plus grande
 
@@ -250,22 +263,27 @@ public class TestVariableDeclaration {
 		Context context = new ContextFactory().enterContext();
 		ScriptableObject sessionScope = context.initStandardObjects();
 
-		ScriptableObject applicationScope = (ScriptableObject) context.newObject(sessionScope);
+		ScriptableObject applicationScope = (ScriptableObject) context
+				.newObject(sessionScope);
 		applicationScope.put("application", applicationScope, applicationScope);
 		applicationScope.setParentScope(sessionScope);
 
-		ScriptableObject documentScope = (ScriptableObject) context.newObject(applicationScope);
+		ScriptableObject documentScope = (ScriptableObject) context
+				.newObject(applicationScope);
 		documentScope.put("document", documentScope, documentScope);
 		documentScope.setParentScope(applicationScope);
 
 		context.evaluateString(applicationScope, "var v = 0", "", 1, null);
 
 		context.evaluateString(documentScope, "v++", "", 1, null);
-		assertEquals(1.0, context.evaluateString(documentScope, "v", "", 1, null));
+		assertEquals(1.0, context.evaluateString(documentScope, "v", "", 1,
+				null));
 
 		context.evaluateString(applicationScope, "v++", "", 1, null);
-		assertEquals(2.0, context.evaluateString(documentScope, "v", "", 1, null));
-		assertEquals(2.0, context.evaluateString(applicationScope, "v", "", 1, null));
+		assertEquals(2.0, context.evaluateString(documentScope, "v", "", 1,
+				null));
+		assertEquals(2.0, context.evaluateString(applicationScope, "v", "", 1,
+				null));
 
 	}
 

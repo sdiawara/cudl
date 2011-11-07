@@ -29,7 +29,7 @@ import cudl.utils.Utils;
 public class Interpreter {
 	private InternalInterpreter internalInterpreter;
 	private InterpreterContext context;
-
+	
 	public Interpreter(String url) throws IOException, ParserConfigurationException, SAXException {
 		context = new InterpreterContext(url);
 		internalInterpreter = new InternalInterpreter(context);
@@ -75,7 +75,8 @@ public class Interpreter {
 		internalInterpreter.interpret(MAX_TIME_DISCONNECT, null);
 	}
 
-	public void talk(String sentence) throws UnsupportedEncodingException, IOException, SAXException, ParserConfigurationException {
+	public void talk(String sentence) throws UnsupportedEncodingException, IOException, SAXException,
+			ParserConfigurationException {
 		String utterance = "'" + URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "") + "'";
 		internalInterpreter.interpret(TALK, utterance);
 	}

@@ -47,22 +47,27 @@ class InterpreterContext {
 	private Map<Node, Integer> promptCounter = new Hashtable<Node, Integer>();
 	public String lastChangeEvent = "";
 
-	InterpreterContext(String location, String cookies) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+	InterpreterContext(String location, String cookies)
+			throws ParserConfigurationException, MalformedURLException,
+			IOException, SAXException {
 		this.cookies = cookies;
 		this.location = location;
 		this.declaration = new InterpreterVariableDeclaration();
-		documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		documentBuilder = DocumentBuilderFactory.newInstance()
+				.newDocumentBuilder();
 		buildDocument(location);
 	}
 
-	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
+	InterpreterContext(String location) throws ParserConfigurationException,
+			MalformedURLException, IOException, SAXException {
 		this(location, null);
 	}
 
 	void buildDocument(String fileName) throws IOException, SAXException {
 		String url = Utils.tackWeelFormedUrl(location, fileName);
 		System.err.println(url);
-		//System.err.println("build " + location + " + " + fileName + " url" + url);
+		// System.err.println("build " + location + " + " + fileName + " url" +
+		// url);
 		URLConnection connection = new URL(url).openConnection();
 		if (cookies != null)
 			connection.setRequestProperty("Cookie", cookies);
@@ -79,7 +84,8 @@ class InterpreterContext {
 		NodeList dialogs = vxmlTag.getChildNodes();
 		int lastIndexOf = url.lastIndexOf("#");
 		if (lastIndexOf > 0) {
-			currentDialog = Utils.searchDialogByName(dialogs, url.substring(lastIndexOf + 1));
+			currentDialog = Utils.searchDialogByName(dialogs,
+					url.substring(lastIndexOf + 1));
 		} else {
 			for (int i = 0; i < dialogs.getLength(); i++) {
 				String nodeName = dialogs.item(i).getNodeName();
@@ -90,54 +96,70 @@ class InterpreterContext {
 			}
 		}
 
-		if (currentRootFileName != null && currentRootFileName.equals(url) && lastChangeEvent.equals("goto"))
+		if (currentRootFileName != null && currentRootFileName.equals(url)
+				&& lastChangeEvent.equals("goto"))
 			return;
 
-		Node appplicationRoot = vxmlTag.getAttributes().getNamedItem("application");
+		Node appplicationRoot = vxmlTag.getAttributes().getNamedItem(
+				"application");
 		if (null != appplicationRoot) {
-			String rootUrl = tackWeelFormedUrl(location, appplicationRoot.getTextContent());
+			String rootUrl = tackWeelFormedUrl(location,
+					appplicationRoot.getTextContent());
 			rootDocument = documentBuilder.parse(rootUrl);
 			declareRootScopeVariableIfNeeded(rootUrl);
-		} else if (!url.equals(currentRootFileName) && currentRootFileName != null) {
-			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
+		} else if (!url.equals(currentRootFileName)
+				&& currentRootFileName != null) {
+			declaration
+					.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
 		}
 
 		declareDocumentScopeVariableIfNeeded(url.split("#")[0]);
 	}
 
-	private void declareRootScopeVariableIfNeeded(String textContent) throws IOException {
+	private void declareRootScopeVariableIfNeeded(String textContent)
+			throws IOException {
 		if (!textContent.equals(currentRootFileName)) {
 			System.err.println("ko");
-			NodeList childNodes = rootDocument.getDocumentElement().getChildNodes();
-			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
-			declareVariable(childNodes, InterpreterVariableDeclaration.APPLICATION_SCOPE);
+			NodeList childNodes = rootDocument.getDocumentElement()
+					.getChildNodes();
+			declaration
+					.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
+			declareVariable(childNodes,
+					InterpreterVariableDeclaration.APPLICATION_SCOPE);
 			currentRootFileName = tackWeelFormedUrl(location, textContent);
 		}
 	}
 
-	private void declareDocumentScopeVariableIfNeeded(String fileName) throws IOException {
+	private void declareDocumentScopeVariableIfNeeded(String fileName)
+			throws IOException {
 		if (!fileName.equals(getCurrentFileName())) {
-//			System.err.println(fileName + "   sdfsdfsd");
-			NodeList childNodes = currentdDocument.getElementsByTagName("vxml").item(0).getChildNodes();
-			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
-			declareVariable(childNodes, InterpreterVariableDeclaration.DOCUMENT_SCOPE);
+			// System.err.println(fileName + "   sdfsdfsd");
+			NodeList childNodes = currentdDocument.getElementsByTagName("vxml")
+					.item(0).getChildNodes();
+			declaration
+					.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
+			declareVariable(childNodes,
+					InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			setCurrentFileName(fileName);
 			location = currentFileName;
 		}
 	}
 
-	private void declareVariable(NodeList childNodes, int scope) throws MalformedURLException, IOException {
+	private void declareVariable(NodeList childNodes, int scope)
+			throws MalformedURLException, IOException {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node child = childNodes.item(i);
 			if (child.getNodeName().equals("var")) {
 				String name = Utils.getNodeAttributeValue(child, "name");
 				String value = Utils.getNodeAttributeValue(child, "expr");
-				//System.err.println(name + "=" + value + "   documentscope");
-				declaration.declareVariable(name, value == null ? "undefined" : value, scope);
+				// System.err.println(name + "=" + value + "   documentscope");
+				declaration.declareVariable(name, value == null ? "undefined"
+						: value, scope);
 			} else if (child.getNodeName().equals("script")) {
 				String src = Utils.getNodeAttributeValue(child, "src");
 				if (src != null) {
-					declaration.evaluateFileScript(tackWeelFormedUrl(location, src), scope);
+					declaration.evaluateFileScript(
+							tackWeelFormedUrl(location, src), scope);
 				} else
 					declaration.evaluateScript(child.getTextContent(), scope);
 			}

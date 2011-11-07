@@ -42,7 +42,7 @@ class InternalInterpreter {
 		Node node = context.getCurrentDialog();
 
 		try {
-			VxmlTag dialog;
+			VoiceXmlNode dialog;
 			switch (action) {
 			case START:
 				// System.err.println(node);

@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-abstract class TxmlTag extends VxmlTag {
+abstract class TxmlTag extends VoiceXmlNode {
 	TxmlTag(Node node) {
 		super(node);
 	}
