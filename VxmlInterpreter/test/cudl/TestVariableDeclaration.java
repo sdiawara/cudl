@@ -12,31 +12,38 @@ import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.ScriptableObject;
 
 import cudl.script.InterpreterVariableDeclaration;
-
+import static cudl.script.InterpreterVariableDeclaration.*;
 public class TestVariableDeclaration {
 
 	private InterpreterVariableDeclaration declaration;
 
 	@Before
 	public void setUp() throws IOException {
-		declaration = new InterpreterVariableDeclaration();
+		declaration = new InterpreterVariableDeclaration(null);
 	}
 
 	@Test
 	public void testWeCanDeclareVariableAndRetreViewItValue()
 			throws IOException {
-		declaration.enterScope();
-		declaration.declareVariableNew("variableDocument", "'document'");
-		declaration.enterScope();
-		declaration.declareVariableNew("variableDialog", "'dialog'");
-		declaration.enterScope();
-		declaration.declareVariableNew("variableAnonyme", "'anonyme'");
+		declaration.declareVariable("variableDocument", "'document'",DOCUMENT_SCOPE);
+		declaration.declareVariable("variableDialog", "'dialog'",DIALOG_SCOPE);
+		declaration.declareVariable("variableAnonyme", "'anonyme'",ANONYME_SCOPE);
 
-		assertEquals("anonyme", declaration.getValueNew("variableAnonyme"));
-		assertEquals("dialog", declaration.getValueNew("variableDialog"));
-		assertEquals("document", declaration.getValueNew("variableDocument"));
+		assertEquals("anonyme", declaration.getValue("variableAnonyme"));
+		assertEquals("dialog", declaration.getValue("variableDialog"));
+		assertEquals("document", declaration.getValue("variableDocument"));
 	}
 
+	
+	@Test
+	public void sessionVariablesDeclaration() {
+		declaration.declareVariable("variableSession", "new Object()",SESSION_SCOPE);
+		declaration.evaluateScript("variableSession.toto ='blabla'",SESSION_SCOPE);
+		
+//		assertEquals("", declaration.evaluateScript("session.variableSession",SESSION_SCOPE));
+		assertEquals("blabla", ((ScriptableObject)declaration.evaluateScript("session.variableSession",SESSION_SCOPE)).get("toto"));
+	}
+	
 	@Test(expected = EcmaError.class)
 	public void testWhenScopeIsClearVariableDeclaredIsLose() {
 		declaration.enterScope();
@@ -219,7 +226,7 @@ public class TestVariableDeclaration {
 		declaration.setValue("a656", "target");
 		declaration.exitScope();
 
-		InterpreterVariableDeclaration subDeclaration = new InterpreterVariableDeclaration();
+		InterpreterVariableDeclaration subDeclaration = new InterpreterVariableDeclaration(null);
 
 		subDeclaration.declareVariableNew("a656", "'"
 				+ declaration.evaluateScriptNew("a656") + "'");

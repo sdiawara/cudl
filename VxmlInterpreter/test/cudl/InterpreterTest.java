@@ -7,7 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -593,5 +595,17 @@ public class InterpreterTest {
 
 		assertEquals(1, interpreter.getLogs().size());
 		assertEquals("return_value", interpreter.getLogs().get(0));
+	}
+	
+	@Test
+	public void sessionVariableInConstructor() throws IOException, SAXException, ParserConfigurationException{
+		String sessionVariables ="test = {variable: 'value'}";
+		
+		Interpreter interpreter = new Interpreter(url + "sessionVariablesLogger.vxml", sessionVariables);
+		interpreter.start();
+		
+
+		assertEquals(1, interpreter.getLogs().size());
+		assertEquals("value", interpreter.getLogs().get(0));
 	}
 }

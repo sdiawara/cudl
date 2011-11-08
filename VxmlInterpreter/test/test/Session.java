@@ -3,7 +3,7 @@ package test;
 import cudl.utils.CudlSession;
 
 public class Session  implements CudlSession{
-	private String session ="session = new Object();"+ 
+	private String session = 
 			"connection =  new Object();"+
 			"session.connection  = connection;"+
 			"connection.local  =  new Object();"+

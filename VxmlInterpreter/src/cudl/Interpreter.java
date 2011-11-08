@@ -18,6 +18,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,9 +30,15 @@ import cudl.utils.Utils;
 public class Interpreter {
 	private InternalInterpreter internalInterpreter;
 	private InterpreterContext context;
-	
+
 	public Interpreter(String url) throws IOException, ParserConfigurationException, SAXException {
 		context = new InterpreterContext(url);
+		internalInterpreter = new InternalInterpreter(context);
+	}
+
+	public Interpreter(String url, String sessionVariables) throws IOException,
+			ParserConfigurationException, SAXException {
+		context = new InterpreterContext(url, null, sessionVariables);
 		internalInterpreter = new InternalInterpreter(context);
 	}
 
@@ -88,7 +95,7 @@ public class Interpreter {
 
 	public List<String> getLogsWithLabel(String... label) {
 		List<String> logs = new ArrayList<String>();
-		for (Iterator<Log> iterator = context.getLogs().iterator(); iterator.hasNext();) {
+		for (java.util.Iterator<Log> iterator = context.getLogs().iterator(); iterator.hasNext();) {
 			Log log = (Log) iterator.next();
 			for (int i = 0; i < label.length; i++) {
 				if (log.label.equals(label[i])) {
