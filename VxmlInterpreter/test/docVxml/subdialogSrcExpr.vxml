@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+	<var name="subdialog" expr="'#sub'"/>
+      <form> 
+      <subdialog name="f1" srcexpr="subdialog">
+       		<filled>
+       			<log><value expr="f1.return_value"/></log>
+       		</filled>
+       </subdialog>
+    </form>
+    <form id="sub">
+       <var name="return_value" expr="'return_value'"/>
+       <block>
+       		<return namelist="return_value"/>
+       </block>
+    </form>
+ </vxml>
