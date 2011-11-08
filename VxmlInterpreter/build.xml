@@ -122,7 +122,7 @@
   
   <target name="build-pom">
     <exec executable="maven/build_pom.sh" />
-  <artifact:pom id="pom" file="maven/pom.xml" />
+    <artifact:pom id="pom" file="target/pom.xml" />
   </target>  
 
   <target name="maven-install" depends="jar,build-pom">

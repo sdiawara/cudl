@@ -944,6 +944,15 @@ class SubdialogTag extends VoiceXmlNode {
 		String formItemName = context.getFormItemNames().get(node);
 		declaration.setValue(formItemName, "true");
 		String src = getNodeAttributeValue(node, "src");
+		String srcexpr = getNodeAttributeValue(node, "srcexpr");
+
+		if (src != null && srcexpr != null) {
+			throw new EventException("error.badfetch");
+		}
+		if(src == null && srcexpr != null)
+		{
+			src = context.getDeclaration().evaluateScript(srcexpr, 50)+"";
+		}
 		InternalInterpreter internalInterpreter = null;
 		if (src != null) {
 			String url = Utils.tackWeelFormedUrl(context.getCurrentFileName(), src);
