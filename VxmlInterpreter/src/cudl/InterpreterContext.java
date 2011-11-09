@@ -125,7 +125,6 @@ class InterpreterContext {
 
 	private void declareDocumentScopeVariableIfNeeded(String fileName) throws IOException {
 		if (!fileName.equals(getCurrentFileName())) {
-			// System.err.println(fileName + "   sdfsdfsd");
 			NodeList childNodes = currentdDocument.getElementsByTagName("vxml").item(0).getChildNodes();
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.DOCUMENT_SCOPE);
 			declareVariable(childNodes, InterpreterVariableDeclaration.DOCUMENT_SCOPE);
@@ -140,7 +139,6 @@ class InterpreterContext {
 			if (child.getNodeName().equals("var")) {
 				String name = Utils.getNodeAttributeValue(child, "name");
 				String value = Utils.getNodeAttributeValue(child, "expr");
-				// System.err.println(name + "=" + value + "   documentscope");
 				declaration.declareVariable(name, value == null ? "undefined" : value, scope);
 			} else if (child.getNodeName().equals("script")) {
 				String src = Utils.getNodeAttributeValue(child, "src");
