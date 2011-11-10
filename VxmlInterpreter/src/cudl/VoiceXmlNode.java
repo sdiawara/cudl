@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.ast.Yield;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -949,28 +950,25 @@ class SubdialogTag extends VoiceXmlNode {
 		if (src != null && srcexpr != null) {
 			throw new EventException("error.badfetch");
 		}
-		if(src == null && srcexpr != null)
-		{
-			src = context.getDeclaration().evaluateScript(srcexpr, 50)+"";
+		if (src == null && srcexpr != null) {
+			src = context.getDeclaration().evaluateScript(srcexpr, 50) + "";
 		}
 		InternalInterpreter internalInterpreter = null;
 		if (src != null) {
 			String url = Utils.tackWeelFormedUrl(context.getCurrentFileName(), src);
 
 			// if remote url, put namelist values in GET parameters
-			if (!url.startsWith("#")) {
-				String nameList = getNodeAttributeValue(node, "namelist");
-				if (nameList != null) {
-					StringTokenizer tokenizer = new StringTokenizer(nameList);
-					String urlSuite = "?";
-					while (tokenizer.hasMoreElements()) {
-						String data = tokenizer.nextToken();
-						urlSuite += data + "=" + context.getDeclaration().getValue(data) + "&";
-					}
-					url += urlSuite;
+			String nameList = getNodeAttributeValue(node, "namelist");
+			if (nameList != null) {
+				StringTokenizer tokenizer = new StringTokenizer(nameList);
+				String urlSuite = "?";
+				while (tokenizer.hasMoreElements()) {
+					String data = tokenizer.nextToken();
+					urlSuite += data + "=" + context.getDeclaration().getValue(data) + "&";
 				}
+				url += urlSuite;
 			}
-
+			System.err.println("subdialog url" + url);
 			// TODO put namelist values in child context
 
 			// FIXME this is not a viable way to handle subdialogs ;(

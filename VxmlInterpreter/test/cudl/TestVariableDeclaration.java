@@ -13,6 +13,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 import cudl.script.InterpreterVariableDeclaration;
 import static cudl.script.InterpreterVariableDeclaration.*;
+
 public class TestVariableDeclaration {
 
 	private InterpreterVariableDeclaration declaration;
@@ -23,136 +24,106 @@ public class TestVariableDeclaration {
 	}
 
 	@Test
-	public void testWeCanDeclareVariableAndRetreViewItValue()
-			throws IOException {
-		declaration.declareVariable("variableDocument", "'document'",DOCUMENT_SCOPE);
-		declaration.declareVariable("variableDialog", "'dialog'",DIALOG_SCOPE);
-		declaration.declareVariable("variableAnonyme", "'anonyme'",ANONYME_SCOPE);
+	public void testWeCanDeclareVariableAndRetreViewItValue() throws IOException {
+		declaration.declareVariable("variableDocument", "'document'", DOCUMENT_SCOPE);
+		declaration.declareVariable("variableDialog", "'dialog'", DIALOG_SCOPE);
+		declaration.declareVariable("variableAnonyme", "'anonyme'", ANONYME_SCOPE);
 
 		assertEquals("anonyme", declaration.getValue("variableAnonyme"));
 		assertEquals("dialog", declaration.getValue("variableDialog"));
 		assertEquals("document", declaration.getValue("variableDocument"));
 	}
 
-	
 	@Test
 	public void sessionVariablesDeclaration() {
-		declaration.declareVariable("variableSession", "new Object()",SESSION_SCOPE);
-		declaration.evaluateScript("variableSession.toto ='blabla'",SESSION_SCOPE);
-		
-//		assertEquals("", declaration.evaluateScript("session.variableSession",SESSION_SCOPE));
-		assertEquals("blabla", ((ScriptableObject)declaration.evaluateScript("session.variableSession",SESSION_SCOPE)).get("toto"));
+		declaration.declareVariable("variableSession", "new Object()", SESSION_SCOPE);
+		declaration.evaluateScript("variableSession.toto ='blabla'", SESSION_SCOPE);
+
+		// assertEquals("",
+		// declaration.evaluateScript("session.variableSession",SESSION_SCOPE));
+		assertEquals("blabla", ((ScriptableObject) declaration.evaluateScript("session.variableSession",
+				SESSION_SCOPE)).get("toto"));
 	}
-	
+
 	@Test(expected = EcmaError.class)
 	public void testWhenScopeIsClearVariableDeclaredIsLose() {
-		declaration.enterScope();
-		declaration.declareVariableNew("variableDocument", "'document'");
 
-		declaration.enterScope();
-		declaration.declareVariableNew("variableDialog", "'dialog'");
+		declaration.declareVariable("variableDocument", "'document'", DOCUMENT_SCOPE);
+		declaration.declareVariable("variableDialog", "'dialog'", DIALOG_SCOPE);
 
-		declaration.enterScope();
-		declaration.declareVariableNew("variableAnonyme", "'anonyme'");
-		declaration.exitScope(); // this exit current scope et clean then
+		declaration.declareVariable("variableAnonyme", "'anonyme'", ANONYME_SCOPE);
+		declaration.resetScopeBinding(ANONYME_SCOPE);
 
-		assertEquals("document", declaration.getValueNew("variableDocument"));
-		assertEquals("dialog", declaration.getValueNew("variableDialog"));
-		assertEquals("anonyme", declaration.getValueNew("variableAnonyme"));
+		assertEquals("document", declaration.getValue("variableDocument"));
+		assertEquals("dialog", declaration.getValue("variableDialog"));
+		assertEquals("anonyme", declaration.getValue("variableAnonyme"));
 	}
 
 	@Test(expected = EcmaError.class)
 	public void testWhenVariableIsnotDeclaredItAccessMakeError() {
-		declaration.enterScope();
-		declaration.enterScope();
-		declaration.enterScope();
-		declaration.getValueNew("variableAnonyme");
+		declaration.getValue("variableAnonyme");
 	}
 
 	@Test(expected = EcmaError.class)
 	public void testWhenVariableIsnotDeclaredItAccessWithScriptMakeError() {
-		declaration.enterScope();
-		declaration.enterScope();
-		declaration.enterScope();
-		declaration.evaluateScript("variableAnonyme++",
-				InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.evaluateScript("variableAnonyme++", InterpreterVariableDeclaration.DIALOG_SCOPE);
 	}
 
 	@Test
 	public void eachGigestScopeCanBeModifyByLOwestScope() {
-		declaration.declareVariable("variableAnonyme", "0",
-				InterpreterVariableDeclaration.APPLICATION_SCOPE);
-		declaration.evaluateScript("variableAnonyme++",
-				InterpreterVariableDeclaration.DOCUMENT_SCOPE);
-		declaration.evaluateScript("variableAnonyme++",
-				InterpreterVariableDeclaration.DIALOG_SCOPE);
-		declaration.evaluateScript("variableAnonyme++",
-				InterpreterVariableDeclaration.ANONYME_SCOPE);
+		declaration.declareVariable("variableAnonyme", "0", InterpreterVariableDeclaration.APPLICATION_SCOPE);
+		declaration.evaluateScript("variableAnonyme++", InterpreterVariableDeclaration.DOCUMENT_SCOPE);
+		declaration.evaluateScript("variableAnonyme++", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.evaluateScript("variableAnonyme++", InterpreterVariableDeclaration.ANONYME_SCOPE);
 
 		assertEquals(3.0, declaration.getValue("application.variableAnonyme"));
 	}
 
 	@Test
 	public void testWhenVariableIsDeclaredInscopeNamedIsItAccesSiblePrefixedWithScopeName() {
-		declaration.enterScope();
-		declaration.declareVariableNew("variable", "'document'");
+		declaration.declareVariable("variable", "'document'", DOCUMENT_SCOPE);
+		declaration.declareVariable("variable", "'dialog'", DIALOG_SCOPE);
+		declaration.declareVariable("variable", "'anonyme'", ANONYME_SCOPE);
 
-		declaration.enterScope();
-		declaration.declareVariableNew("variable", "'dialog'");
-
-		declaration.enterScope();
-		declaration.declareVariableNew("variable", "'anonyme'");
-
-		assertEquals("document", declaration.getValueNew("document.variable"));
-		assertEquals("dialog", declaration.getValueNew("dialog.variable"));
-		assertEquals("anonyme", declaration.getValueNew("variable"));
+		assertEquals("document", declaration.getValue("document.variable"));
+		assertEquals("dialog", declaration.getValue("dialog.variable"));
+		assertEquals("anonyme", declaration.getValue("variable"));
 	}
 
 	@Test
 	public void testwhenWeAssignVariableNameItValeurChange() {
-		declaration.enterScope();
-		declaration.declareVariableNew("variable", "'document'");
+		declaration.declareVariable("variable", "'document'", DOCUMENT_SCOPE);
 
-		declaration.enterScope();
-		declaration.declareVariableNew("variable", "'dialog'");
+		declaration.declareVariable("variable", "'dialog'", DIALOG_SCOPE);
 
-		declaration.enterScope();
-		declaration.declareVariableNew("variable", "'anonyme'");
+		declaration.declareVariable("variable", "'anonyme'", ANONYME_SCOPE);
 
 		declaration.setValue("document.variable", "'document1'");
 		declaration.setValue("dialog.variable", "'dialog1'");
 		declaration.setValue("variable", "'anonyme1'");
 
-		assertEquals("document1", declaration.getValueNew("document.variable"));
-		assertEquals("dialog1", declaration.getValueNew("dialog.variable"));
-		assertEquals("anonyme1", declaration.getValueNew("variable"));
+		assertEquals("document1", declaration.getValue("document.variable"));
+		assertEquals("dialog1", declaration.getValue("dialog.variable"));
+		assertEquals("anonyme1", declaration.getValue("variable"));
 	}
 
 	@Test
 	public void testWhenWeDeclareVariableInScopeDialogItValueCanUseWithAnotherVariableInencompassingScope() {
 		// declare in scope APPLICATION
-		declaration.declareVariableNew("heure_ouverture", "undefined");
-		declaration.enterScope(); // Enter Scope Document
-		declaration.enterScope(); // Enter Scope Dialog
-		declaration.declareVariableNew("recupHeureOuverture", "new Object();");
-		declaration.enterScope();
+		declaration.declareVariable("heure_ouverture", "undefined", APPLICATION_SCOPE);
+		declaration.declareVariable("recupHeureOuverture", "new Object();", DIALOG_SCOPE);
 
 		declaration.setValue("recupHeureOuverture.hOuverture", "'non'");
-		declaration.setValue("heure_ouverture",
-				"recupHeureOuverture.hOuverture");
+		declaration.setValue("heure_ouverture", "recupHeureOuverture.hOuverture");
 
-		assertEquals("non", ((ScriptableObject) declaration
-				.getValueNew("recupHeureOuverture")).get("hOuverture"));
+		assertEquals("non", ((ScriptableObject) declaration.getValue("recupHeureOuverture")).get("hOuverture"));
 		assertEquals("non", declaration.getValueNew("heure_ouverture"));
 	}
 
 	@Test
 	public void testVariableCanDeclareInAInlineScript() {
 		String script = "var d = 'date'";
-		declaration.enterScope();
-		declaration.enterScope();
-		declaration.enterScope();
-		declaration.evaluateScriptNew(script);
+		declaration.evaluateScript(script, ANONYME_SCOPE);
 
 		assertEquals("date", declaration.getValueNew("d"));
 	}
@@ -160,37 +131,28 @@ public class TestVariableDeclaration {
 	@Test(expected = EcmaError.class)
 	public void testWhenWeExitOneScopeItContainsVariableLose() {
 		String script = "var d = 'date'";
-		declaration.enterScope();
-		declaration.enterScope();
-		declaration.enterScope();
-		declaration.evaluateScriptNew(script);
-		declaration.exitScope();
+		declaration.evaluateScript(script, ANONYME_SCOPE);
+		declaration.resetScopeBinding(ANONYME_SCOPE);
 
 		declaration.enterScope();
 
-		assertEquals("date", declaration.getValueNew("d"));
+		assertEquals("date", declaration.getValue("d"));
 	}
 
 	@Test
 	public void testWhenWeExitOneScopeItContainsVariableLoseAndTheVariablesDeclaredInBiggerScopeIsVisible() {
 		String script = "var d = 'date'";
-		String script1 = "var d1 = 'date'";
-		declaration.enterScope(); // scope document
-		declaration.enterScope(); // scope dialog
-		declaration.evaluateScriptNew(script1);
-		declaration.enterScope(); // Scope anonyme
-		declaration.evaluateScriptNew(script);
-		declaration.exitScope();
-		System.err.println(declaration.getValueNew("d1"));
-		declaration.enterScope();
-
-		assertEquals("date", declaration.getValueNew("d1"));
+		String script1 = "var d = 'date1'";
+		declaration.evaluateScript(script, DIALOG_SCOPE);
+		declaration.evaluateScript(script1, ANONYME_SCOPE);
+		declaration.resetScopeBinding(ANONYME_SCOPE);
+		assertEquals("date", declaration.getValueNew("d"));
 	}
 
 	@Test
 	public void testVariableCanDeclareInAInlineScriptAsANamedScopeCanModify() {
 		String script = "var d = 'date'";
-		declaration.evaluateScriptNew(script);
+		declaration.evaluateScript(script,DOCUMENT_SCOPE);
 
 		declaration.setValue("d", "'date1'");
 
@@ -200,15 +162,12 @@ public class TestVariableDeclaration {
 	@Test
 	public void testVariableCanDeclareInAInlineScriptAsANamedScopeCanModifyUsingAscopeName() {
 		String script = "var d = 'date'";
-		declaration.enterScope();
-		declaration.evaluateScriptNew(script);
+		declaration.evaluateScript(script,DOCUMENT_SCOPE);
 
-		declaration.enterScope();
-		declaration.enterScope();
 		declaration.setValue("dialog.d", "'date1'");
 
-		assertEquals("date1", declaration.getValueNew("d"));
-		assertEquals("date", declaration.getValueNew("document.d"));
+		assertEquals("date1", declaration.getValue("d"));
+		assertEquals("date", declaration.getValue("document.d"));
 	}
 
 	@Test
@@ -216,20 +175,18 @@ public class TestVariableDeclaration {
 		declaration.enterScope();
 		declaration.enterScope();
 		// declaration in dialog scope
-		declaration.declareVariableNew("a656", "undefined");
-		declaration.declareVariableNew("block1", "undefined");
-		declaration.declareVariableNew("block2", "undefined");
+		declaration.declareVariable("a656", "undefined",DIALOG_SCOPE);
+		declaration.declareVariable("block1", "undefined",DIALOG_SCOPE);
+		declaration.declareVariable("block2", "undefined",DIALOG_SCOPE);
 
-		declaration.enterScope();
-		declaration.declareVariableNew("target", "'a656b.txml'");
+		declaration.declareVariable("target", "'a656b.txml'",ANONYME_SCOPE);
 
 		declaration.setValue("a656", "target");
-		declaration.exitScope();
-
+		declaration.resetScopeBinding(DIALOG_SCOPE);
+		
 		InterpreterVariableDeclaration subDeclaration = new InterpreterVariableDeclaration(null);
 
-		subDeclaration.declareVariableNew("a656", "'"
-				+ declaration.evaluateScriptNew("a656") + "'");
+		subDeclaration.declareVariable("a656", "'" + declaration.evaluateScriptNew("a656") + "'",APPLICATION_SCOPE);
 
 		assertEquals("a656b.txml", subDeclaration.getValueNew("a656"));
 	}
@@ -245,13 +202,10 @@ public class TestVariableDeclaration {
 	// sera en bonne uniforme
 	@Test
 	public void globalVariableCantBeAssignInscript() {
-		declaration.declareVariable("nbErreurs", "0",
-				InterpreterVariableDeclaration.APPLICATION_SCOPE);
+		declaration.declareVariable("nbErreurs", "0", InterpreterVariableDeclaration.APPLICATION_SCOPE);
 
-		declaration.evaluateScript("nbErreurs++;",
-				InterpreterVariableDeclaration.DIALOG_SCOPE);
-		declaration
-				.resetScopeBinding(InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.evaluateScript("nbErreurs++;", InterpreterVariableDeclaration.DIALOG_SCOPE);
+		declaration.resetScopeBinding(InterpreterVariableDeclaration.DIALOG_SCOPE);
 
 		Object nbErreurs = declaration.getValue("nbErreurs");
 		Object appNbErreurs = declaration.getValue("application.nbErreurs");
@@ -270,27 +224,22 @@ public class TestVariableDeclaration {
 		Context context = new ContextFactory().enterContext();
 		ScriptableObject sessionScope = context.initStandardObjects();
 
-		ScriptableObject applicationScope = (ScriptableObject) context
-				.newObject(sessionScope);
+		ScriptableObject applicationScope = (ScriptableObject) context.newObject(sessionScope);
 		applicationScope.put("application", applicationScope, applicationScope);
 		applicationScope.setParentScope(sessionScope);
 
-		ScriptableObject documentScope = (ScriptableObject) context
-				.newObject(applicationScope);
+		ScriptableObject documentScope = (ScriptableObject) context.newObject(applicationScope);
 		documentScope.put("document", documentScope, documentScope);
 		documentScope.setParentScope(applicationScope);
 
 		context.evaluateString(applicationScope, "var v = 0", "", 1, null);
 
 		context.evaluateString(documentScope, "v++", "", 1, null);
-		assertEquals(1.0, context.evaluateString(documentScope, "v", "", 1,
-				null));
+		assertEquals(1.0, context.evaluateString(documentScope, "v", "", 1, null));
 
 		context.evaluateString(applicationScope, "v++", "", 1, null);
-		assertEquals(2.0, context.evaluateString(documentScope, "v", "", 1,
-				null));
-		assertEquals(2.0, context.evaluateString(applicationScope, "v", "", 1,
-				null));
+		assertEquals(2.0, context.evaluateString(documentScope, "v", "", 1, null));
+		assertEquals(2.0, context.evaluateString(applicationScope, "v", "", 1, null));
 
 	}
 

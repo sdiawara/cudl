@@ -596,16 +596,25 @@ public class InterpreterTest {
 		assertEquals(1, interpreter.getLogs().size());
 		assertEquals("return_value", interpreter.getLogs().get(0));
 	}
-	
+
 	@Test
-	public void sessionVariableInConstructor() throws IOException, SAXException, ParserConfigurationException{
-		String sessionVariables ="test = {variable: 'value'}";
-		
+	public void sessionVariableInConstructor() throws IOException, SAXException, ParserConfigurationException {
+		String sessionVariables = "test = {variable: 'value'}";
+
 		Interpreter interpreter = new Interpreter(url + "sessionVariablesLogger.vxml", sessionVariables);
 		interpreter.start();
-		
 
 		assertEquals(1, interpreter.getLogs().size());
 		assertEquals("value", interpreter.getLogs().get(0));
 	}
+
+	//trouver un autre moyen de test
+//	@Test
+//	public void subdialogNamelistIsSubmitedToServer() throws ParserConfigurationException, SAXException,
+//			IOException {
+//		Interpreter interpreter = new Interpreter(url + "subdialogNamelist.vxml");
+//		interpreter.start();
+//	
+//		assertEquals("pass", interpreter.getPrompts().get(0).tts);
+//	}
 }
