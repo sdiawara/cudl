@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+      <form> 
+      <subdialog name="f1" src="subdialogReturnArray.vxml">
+       </subdialog>
+       <block>
+       		<log><value expr="f1.result.length"/></log>
+       		<if cond="f1.result.length == 1">
+       			<prompt>pass</prompt>
+       			<else/>
+       			<prompt>fail</prompt>
+       		</if>
+       </block>
+    </form>
+ </vxml>

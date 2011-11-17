@@ -16,7 +16,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Undefined;
-import org.mozilla.javascript.ast.Yield;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -52,8 +51,7 @@ abstract class VoiceXmlNode {
 	protected boolean checkCond(Node node, InterpreterContext context) throws IOException {
 		String cond = getNodeAttributeValue(node, "cond");
 		return cond == null
-				|| Boolean.valueOf(context.getDeclaration().evaluateScript(cond,
-						InterpreterVariableDeclaration.ANONYME_SCOPE)
+				|| Boolean.valueOf(context.getDeclaration().evaluateScript(cond, InterpreterVariableDeclaration.ANONYME_SCOPE)
 						+ "");
 	}
 
@@ -84,8 +82,8 @@ abstract class VoiceXmlNode {
 		}
 	}
 
-	abstract Object interpret(InterpreterContext context) throws InterpreterException, IOException,
-			SAXException, ParserConfigurationException;
+	abstract Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException,
+			ParserConfigurationException;
 }
 
 class FormTag extends VoiceXmlNode {
@@ -210,8 +208,7 @@ class FormTag extends VoiceXmlNode {
 			node = Utils.searchItemByName(context.getCurrentDialog(), context.getNextItemToVisit());
 			context.setNextItemToVisit(null);
 		} else {
-			for (Iterator<Entry<Node, String>> iterator = context.getFormItemNames().entrySet().iterator(); iterator
-					.hasNext();) {
+			for (Iterator<Entry<Node, String>> iterator = context.getFormItemNames().entrySet().iterator(); iterator.hasNext();) {
 				Entry<Node, String> next = iterator.next();
 				Node nextToVisit = next.getKey();
 				String name = next.getValue();
@@ -686,8 +683,8 @@ class GotoTag extends VoiceXmlNode {
 			System.err.println("BADFETCH ERROR DURING GOTO : goto must define once of nextitem or expritem");
 			throw new EventException("error.badfetch");
 		} else {
-			nextItem = nextItemTmp != null ? nextItemTmp : exprItemTmp != null ? context.getDeclaration()
-					.getValue(exprItemTmp) + "" : null;
+			nextItem = nextItemTmp != null ? nextItemTmp : exprItemTmp != null ? context.getDeclaration().getValue(exprItemTmp)
+					+ "" : null;
 		}
 
 		if (nextItem != null) {
@@ -917,13 +914,11 @@ class ScriptTag extends VoiceXmlNode {
 			throw new EventException("error.badfetch");
 
 		if (src == null) {
-			context.getDeclaration().evaluateScript(node.getTextContent(),
-					InterpreterVariableDeclaration.DIALOG_SCOPE);
+			context.getDeclaration().evaluateScript(node.getTextContent(), InterpreterVariableDeclaration.DIALOG_SCOPE);
 		} else {
 			try {
 				System.err.println("====>"
-						+ context.getDeclaration().evaluateFileScript(src,
-								InterpreterVariableDeclaration.DIALOG_SCOPE));
+						+ context.getDeclaration().evaluateFileScript(src, InterpreterVariableDeclaration.DIALOG_SCOPE));
 			} catch (FileNotFoundException e) {
 				throw new EventException("error.badfetch");
 			}
@@ -981,23 +976,21 @@ class SubdialogTag extends VoiceXmlNode {
 			context.getLogs().addAll(internalInterpreter.getContext().getLogs());
 			context.getPrompts().addAll(internalInterpreter.getContext().getPrompts());
 		}
-		context.getDeclaration().evaluateScript(formItemName + "=new Object();",
-				InterpreterVariableDeclaration.DIALOG_SCOPE);
+		context.getDeclaration().evaluateScript(formItemName + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
 
 		if (internalInterpreter != null) {
 			String[] returnValue = internalInterpreter.getContext().getReturnValue();
 
-			System.err.println("return value *" + returnValue[0] + "* *" + returnValue[1] + "*  *"
-					+ returnValue[2] + "*");
+			System.err.println("return value *" + returnValue[0] + "* *" + returnValue[1] + "*  *" + returnValue[2] + "*");
 			String namelist = returnValue[2];
 			if (namelist != null) {
 				StringTokenizer tokenizer = new StringTokenizer(namelist);
+				InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext().getDeclaration();
 				while (tokenizer.hasMoreElements()) {
 					String variable = tokenizer.nextToken();
-					InterpreterVariableDeclaration declaration2 = internalInterpreter.getContext()
-							.getDeclaration();
+
 					context.getDeclaration().evaluateScript(
-							formItemName + "." + variable + "='" + declaration2.getValue(variable) + "'",
+							formItemName + "." + variable + "=" + cudl.script.Utils.scriptableObjectToString(declaration2.getValue(variable)) + "",
 							InterpreterVariableDeclaration.ANONYME_SCOPE);
 				}
 			} else if (returnValue[0] != null) {
@@ -1015,8 +1008,7 @@ class SubdialogTag extends VoiceXmlNode {
 		return null;
 	}
 
-	private void declareParams(InternalInterpreter internalInterpreter, NodeList childNodes,
-			InterpreterContext context) {
+	private void declareParams(InternalInterpreter internalInterpreter, NodeList childNodes, InterpreterContext context) {
 		for (int i = 0; i < childNodes.getLength(); i++) {
 			Node item = childNodes.item(i);
 			if (item.getNodeName().equals("param")) {
@@ -1024,8 +1016,7 @@ class SubdialogTag extends VoiceXmlNode {
 				String value = getNodeAttributeValue(item, "expr");
 				internalInterpreter.getContext().addParam(name);
 				Object evaluateScript = context.getDeclaration().evaluateScript(value, 50);
-				internalInterpreter.getContext().getDeclaration()
-						.declareVariable(name, "'" + evaluateScript + "'", 50);
+				internalInterpreter.getContext().getDeclaration().declareVariable(name, "'" + evaluateScript + "'", 50);
 			}
 		}
 	}
@@ -1040,9 +1031,7 @@ class TransferTag extends VoiceXmlNode {
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException {
 		String dest = getNodeAttributeValue(node, "dest");
 		String destExpr = getNodeAttributeValue(node, "destexpr");
-		context.setTransfertDestination((dest != null) ? dest : context.getDeclaration().evaluateScript(
-				destExpr, 50)
-				+ "");
+		context.setTransfertDestination((dest != null) ? dest : context.getDeclaration().evaluateScript(destExpr, 50) + "");
 		throw new TransferException();
 	}
 }
@@ -1060,8 +1049,7 @@ class FieldTag extends VoiceXmlNode {
 		for (VoiceXmlNode tag : childs) {
 			if (tag instanceof PromptTag) {
 				String count = getNodeAttributeValue(tag.node, "count");
-				if (!(count == null || Integer.valueOf(count) == context.getPromptCounter(context
-						.getSelectedFormItem()))) {
+				if (!(count == null || Integer.valueOf(count) == context.getPromptCounter(context.getSelectedFormItem()))) {
 					continue;
 				}
 			}

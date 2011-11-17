@@ -1,5 +1,10 @@
 package cudl;
 
+import static cudl.script.InterpreterVariableDeclaration.ANONYME_SCOPE;
+import static cudl.script.InterpreterVariableDeclaration.APPLICATION_SCOPE;
+import static cudl.script.InterpreterVariableDeclaration.DIALOG_SCOPE;
+import static cudl.script.InterpreterVariableDeclaration.DOCUMENT_SCOPE;
+import static cudl.script.InterpreterVariableDeclaration.SESSION_SCOPE;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -12,7 +17,6 @@ import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.ScriptableObject;
 
 import cudl.script.InterpreterVariableDeclaration;
-import static cudl.script.InterpreterVariableDeclaration.*;
 
 public class TestVariableDeclaration {
 
@@ -41,8 +45,8 @@ public class TestVariableDeclaration {
 
 		// assertEquals("",
 		// declaration.evaluateScript("session.variableSession",SESSION_SCOPE));
-		assertEquals("blabla", ((ScriptableObject) declaration.evaluateScript("session.variableSession",
-				SESSION_SCOPE)).get("toto"));
+		assertEquals("blabla",
+				((ScriptableObject) declaration.evaluateScript("session.variableSession", SESSION_SCOPE)).get("toto"));
 	}
 
 	@Test(expected = EcmaError.class)
@@ -152,7 +156,7 @@ public class TestVariableDeclaration {
 	@Test
 	public void testVariableCanDeclareInAInlineScriptAsANamedScopeCanModify() {
 		String script = "var d = 'date'";
-		declaration.evaluateScript(script,DOCUMENT_SCOPE);
+		declaration.evaluateScript(script, DOCUMENT_SCOPE);
 
 		declaration.setValue("d", "'date1'");
 
@@ -162,7 +166,7 @@ public class TestVariableDeclaration {
 	@Test
 	public void testVariableCanDeclareInAInlineScriptAsANamedScopeCanModifyUsingAscopeName() {
 		String script = "var d = 'date'";
-		declaration.evaluateScript(script,DOCUMENT_SCOPE);
+		declaration.evaluateScript(script, DOCUMENT_SCOPE);
 
 		declaration.setValue("dialog.d", "'date1'");
 
@@ -175,18 +179,18 @@ public class TestVariableDeclaration {
 		declaration.enterScope();
 		declaration.enterScope();
 		// declaration in dialog scope
-		declaration.declareVariable("a656", "undefined",DIALOG_SCOPE);
-		declaration.declareVariable("block1", "undefined",DIALOG_SCOPE);
-		declaration.declareVariable("block2", "undefined",DIALOG_SCOPE);
+		declaration.declareVariable("a656", "undefined", DIALOG_SCOPE);
+		declaration.declareVariable("block1", "undefined", DIALOG_SCOPE);
+		declaration.declareVariable("block2", "undefined", DIALOG_SCOPE);
 
-		declaration.declareVariable("target", "'a656b.txml'",ANONYME_SCOPE);
+		declaration.declareVariable("target", "'a656b.txml'", ANONYME_SCOPE);
 
 		declaration.setValue("a656", "target");
 		declaration.resetScopeBinding(DIALOG_SCOPE);
-		
+
 		InterpreterVariableDeclaration subDeclaration = new InterpreterVariableDeclaration(null);
 
-		subDeclaration.declareVariable("a656", "'" + declaration.evaluateScriptNew("a656") + "'",APPLICATION_SCOPE);
+		subDeclaration.declareVariable("a656", "'" + declaration.evaluateScriptNew("a656") + "'", APPLICATION_SCOPE);
 
 		assertEquals("a656b.txml", subDeclaration.getValueNew("a656"));
 	}

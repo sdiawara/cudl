@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+      <form> 
+       <script>var result =[ {'id' : 245, 'name' : 'bal selenium'} ] ;</script>
+       <block>
+       		<return namelist="result"/>
+       </block>
+    </form>
+ </vxml>
