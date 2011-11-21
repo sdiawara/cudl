@@ -310,12 +310,13 @@ class VarTag extends VoiceXmlNode {
 		String name = getName();
 		String[] split = name.split("\\.");
 		if (Utils.scopeNames().contains(split[0]) && split.length > 1) {
-			throw new EventException("error.semantic");
+			throw new EventException("error.semantic",
+					"Aucune declaration possible avec les noms de porté : [session application document dialog]");
 		}
 		if (!context.getParams().contains(name)) {
 			String expr = getExpr();
 			context.getDeclaration().declareVariable(name, expr == null ? "undefined" : expr,
-					InterpreterVariableDeclaration.ANONYME_SCOPE);
+					node.getParentNode().getNodeName().equals("form") ? 60 : 50);
 		}
 		return null;
 	}
@@ -346,7 +347,7 @@ class AssignTag extends VoiceXmlNode {
 			// check variable declaration
 			context.getDeclaration().setValue(name, expr);
 		} catch (EcmaError error) {
-			throw new EventException("error.semantic");
+			throw new EventException("error.semantic", "La variable " + name + " n'est pas declaré");
 		}
 		return null;
 	}
@@ -519,7 +520,7 @@ class ExitTag extends VoiceXmlNode {
 	@Override
 	public Object interpret(InterpreterContext context) throws ExitException, EventException {
 		if (node.getAttributes().getLength() > 1)
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch", "La balise exit doit avoir exactement un attribut.");
 		context.setHangup(true);
 		throw new ExitException();
 	}
@@ -550,7 +551,7 @@ class ClearTag extends VoiceXmlNode {
 				try {
 					context.getDeclaration().getValue(name);
 				} catch (Exception e) {
-					throw new EventException("error.semantic");
+					throw new EventException("error.semantic", "La variable " + name + " n'est pas declaré");
 				}
 				context.getDeclaration().setValue(name, "undefined");
 			}
@@ -680,15 +681,13 @@ class GotoTag extends VoiceXmlNode {
 
 		String nextItem;
 		if (nextItemTmp != null && exprItemTmp != null) {
-			System.err.println("BADFETCH ERROR DURING GOTO : goto must define once of nextitem or expritem");
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch", "La balise goto doit un seul attribut parmi : nextitem et expritem");
 		} else {
 			nextItem = nextItemTmp != null ? nextItemTmp : exprItemTmp != null ? context.getDeclaration().getValue(exprItemTmp)
 					+ "" : null;
 		}
 
 		if (nextItem != null) {
-			System.err.println("GOTO " + nextItem);
 			throw new GotoException(null, nextItem);
 		}
 
@@ -697,12 +696,10 @@ class GotoTag extends VoiceXmlNode {
 
 		String next;
 		if (nextTmp != null && exprTmp != null) {
-			System.err.println("BADFETCH ERROR DURING GOTO : goto must define once of next or expr");
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch", "La balise goto doit un seul attribut parmi : next et expr");
 		} else {
 			next = nextTmp != null ? nextTmp : context.getDeclaration().getValue(exprTmp) + "";
 		}
-		System.err.println("GOTO " + next);
 		throw new GotoException(next, null);
 	}
 
@@ -762,8 +759,8 @@ class SubmitTag extends VoiceXmlNode {
 		String next = getNext();
 		String expr = getExpr();
 		if (next != null && expr != null) {
-			System.err.println("Badfecth during submit");
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch",
+					"La balise submit doit avoir exactement une des deux attributs: next ou expr");
 		}
 
 		next = next != null ? next : context.getDeclaration().getValue(expr) + "";
@@ -831,7 +828,8 @@ class ReturnTag extends VoiceXmlNode {
 		String event = getEvent();
 		String eventexpr = getEventExpr();
 		if ((namelist != null && (event != null || eventexpr != null)) || (event != null && eventexpr != null))
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch",
+					"La balise submit doit avoir exactement une des attributs: namelist, event ou eventexpr");
 		// TODO: check parent is an subdialog ==> throw semantic error
 		throw new ReturnException(event, eventexpr, namelist);
 	}
@@ -896,7 +894,8 @@ class ThrowTag extends VoiceXmlNode {
 	public Object interpret(InterpreterContext context) throws InterpreterException {
 		NamedNodeMap attributes = node.getAttributes();
 		if (attributes.getNamedItem("event") != null && attributes.getNamedItem("eventexpr") != null) {
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch",
+					"La balise Throw doit avoir exactement une des deux attributs: event ou event expr");
 		}
 		throw new EventException(getNodeAttributeValue(node, "event"));
 	}
@@ -911,16 +910,16 @@ class ScriptTag extends VoiceXmlNode {
 	public Object interpret(InterpreterContext context) throws IOException, InterpreterException {
 		String src = getNodeAttributeValue(node, "src");
 		if (src != null && node.hasChildNodes())
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch",
+					"La balise script ne peut avoir de contenue lorsque il definit un attribut src");
 
 		if (src == null) {
 			context.getDeclaration().evaluateScript(node.getTextContent(), InterpreterVariableDeclaration.DIALOG_SCOPE);
 		} else {
 			try {
-				System.err.println("====>"
-						+ context.getDeclaration().evaluateFileScript(src, InterpreterVariableDeclaration.DIALOG_SCOPE));
+				context.getDeclaration().evaluateFileScript(src, InterpreterVariableDeclaration.DIALOG_SCOPE);
 			} catch (FileNotFoundException e) {
-				throw new EventException("error.badfetch");
+				throw new EventException("error.badfetch", "aucun fichier de ce type :" + src);
 			}
 
 		}
@@ -943,7 +942,8 @@ class SubdialogTag extends VoiceXmlNode {
 		String srcexpr = getNodeAttributeValue(node, "srcexpr");
 
 		if (src != null && srcexpr != null) {
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch",
+					"La balise subdialog doit avoir exactement une des deux attributs: src et srcexpr");
 		}
 		if (src == null && srcexpr != null) {
 			src = context.getDeclaration().evaluateScript(srcexpr, 50) + "";
@@ -981,7 +981,6 @@ class SubdialogTag extends VoiceXmlNode {
 		if (internalInterpreter != null) {
 			String[] returnValue = internalInterpreter.getContext().getReturnValue();
 
-			System.err.println("return value *" + returnValue[0] + "* *" + returnValue[1] + "*  *" + returnValue[2] + "*");
 			String namelist = returnValue[2];
 			if (namelist != null) {
 				StringTokenizer tokenizer = new StringTokenizer(namelist);
@@ -990,7 +989,8 @@ class SubdialogTag extends VoiceXmlNode {
 					String variable = tokenizer.nextToken();
 
 					context.getDeclaration().evaluateScript(
-							formItemName + "." + variable + "=" + cudl.script.Utils.scriptableObjectToString(declaration2.getValue(variable)) + "",
+							formItemName + "." + variable + "="
+									+ cudl.script.Utils.scriptableObjectToString(declaration2.getValue(variable)) + "",
 							InterpreterVariableDeclaration.ANONYME_SCOPE);
 				}
 			} else if (returnValue[0] != null) {
@@ -1076,7 +1076,8 @@ class AudioTag extends VoiceXmlNode {
 		String expr = getNodeAttributeValue(node, "expr");
 
 		if ((src == null && expr == null) || (src != null && expr != null)) {
-			throw new EventException("error.badfetch");
+			throw new EventException("error.badfetch",
+					"La balise audio doit avoir exactement une des deux attributs: src ou expr");
 		}
 
 		p.audio = (src == null) ? context.getDeclaration().evaluateScript(expr, 50) + "" : src;

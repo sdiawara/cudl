@@ -28,9 +28,15 @@ class GotoException extends InterpreterException {
 
 class EventException extends InterpreterException {
 	String type;
+	String message;
 
 	EventException(String type) {
 		this.type = type;
+	}
+
+	public EventException(String type, String message) {
+		this.type = type;
+		this.message = message;
 	}
 }
 

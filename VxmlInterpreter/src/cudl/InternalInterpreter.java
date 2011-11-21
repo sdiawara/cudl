@@ -38,14 +38,13 @@ class InternalInterpreter {
 		ieh = new InterpreterEventHandler(context);
 	}
 
-	void interpret(int action, String arg) throws IOException, SAXException, ParserConfigurationException {
+	void interpret(int action, Object arg) throws IOException, SAXException, ParserConfigurationException {
 		Node node = context.getCurrentDialog();
 
 		try {
 			VoiceXmlNode dialog;
 			switch (action) {
 			case START:
-				// System.err.println(node);
 				dialog = TagInterpreterFactory.getTagInterpreter(node);
 				if (test) {
 					((FormTag) dialog).setInitVar(false);
@@ -54,7 +53,7 @@ class InternalInterpreter {
 				try {
 					dialog.interpret(context);
 				} catch (EcmaError e) {
-					throw new EventException("error.semantic");
+					throw new EventException("error.semantic", e.getMessage());
 				}
 				break;
 			case EVENT:
@@ -62,7 +61,7 @@ class InternalInterpreter {
 				break;
 			case BLIND_TRANSFER_SUCCESSSS:
 				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '0'", InterpreterVariableDeclaration.SESSION_SCOPE);
-				ieh.doEvent("connection.disconnect.transfer");
+				ieh.doEvent(new EventException("connection.disconnect.transfer"));
 				break;
 			case NOANSWER:
 				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '2'", InterpreterVariableDeclaration.SESSION_SCOPE);
@@ -87,10 +86,10 @@ class InternalInterpreter {
 				interpret(1, null);
 				break;
 			case TALK:
-				utterance(arg, "'voice'");
+				utterance(arg+"", "'voice'");
 				break;
 			case DTMF:
-				utterance(arg, "'dtmf'");
+				utterance(arg+"", "'dtmf'");
 				break;
 			}
 		} catch (GotoException e) {
@@ -114,7 +113,7 @@ class InternalInterpreter {
 			interpret(1, null);
 		} catch (FilledException e) {
 		} catch (EventException e) {
-			interpret(EVENT, e.type);
+			interpret(EVENT, e);
 		} catch (TransferException e) {
 			ieh.resetEventCounter();
 		} catch (ReturnException e) {

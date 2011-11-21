@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+      <form> 
+      <subdialog name="f1" src="subdialogReturnArray.vxml">
+       </subdialog>
+       <block>
+       		<if cond="f1.result.length == 1">
+       			<goto nextitem="champs"/>
+       			<else/>
+       			<prompt>fail</prompt>
+       		</if>
+       </block>
+     
+       <field name="champs">
+       	
+      		 	<prompt><value expr="f1.result.length;"/></prompt>
+       		
+       		<filled>
+       		</filled>
+       </field>
+    </form>
+ </vxml>

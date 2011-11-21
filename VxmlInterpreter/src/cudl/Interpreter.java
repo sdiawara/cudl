@@ -46,15 +46,15 @@ public class Interpreter {
 	}
 
 	public void noInput() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(EVENT, "noinput");
+		internalInterpreter.interpret(EVENT, new EventException("noinput"));
 	}
 
 	public void noMatch() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(EVENT, "nomatch");
+		internalInterpreter.interpret(EVENT, new EventException("nomatch"));
 	}
 
 	public void disconnect() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(EVENT, "connection.disconnect.hangup");
+		internalInterpreter.interpret(EVENT, new EventException("connection.disconnect.hangup"));
 	}
 
 	public void blindTransferSuccess() throws IOException, SAXException, ParserConfigurationException {

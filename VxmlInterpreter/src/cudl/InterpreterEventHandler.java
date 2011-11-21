@@ -45,17 +45,18 @@ class InterpreterEventHandler {
 		// reset to 0 ?
 	}
 
-	public void doEvent(String eventType) throws IOException, SAXException, InterpreterException, ParserConfigurationException {
-		int counter = (eventCounter.get(eventType) == null) ? 1 : eventCounter.get(eventType) + 1;
+	public void doEvent(Object eventException) throws IOException, SAXException, InterpreterException, ParserConfigurationException {
+		String arg = ((EventException)eventException).type;
+		int counter = (eventCounter.get(arg) == null) ? 1 : eventCounter.get(arg) + 1;
 		//System.err.println(context.getSelectedFormItem() + "********************");
-		eventCounter.put(eventType, counter);
-		Node node = searchEventHandlers(eventType, counter, context.getSelectedFormItem());
+		eventCounter.put(arg, counter);
+		Node node = searchEventHandlers(arg, counter, context.getSelectedFormItem());
 		Document rootDoc = context.getRootDocument();
-		node = (node == null && rootDoc != null) ? searchEventHandlers(eventType, counter, rootDoc.getElementsByTagName("vxml").item(0)) : node;
+		node = (node == null && rootDoc != null) ? searchEventHandlers(arg, counter, rootDoc.getElementsByTagName("vxml").item(0)) : node;
 
 		if (node == null) {
 			// FIXME what are we supposed to do here ? Check the spec...
-			throw new RuntimeException("No event handler found for event " + eventType);
+			throw new RuntimeException(((EventException)eventException).message);
 		}
 		TagInterpreterFactory.getTagInterpreter(node).interpret(context);
 	}

@@ -3,6 +3,7 @@ package cudl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -600,6 +601,38 @@ public class InterpreterTest {
 
 		assertEquals("1.0", interpreter.getLogs().get(0));
 		assertEquals("pass", interpreter.getPrompts().get(0).tts);
+	}
+
+	@Test
+	public void errorOccuredInInterpreterReturnAnExpliciteMessage() throws IOException, ParserConfigurationException,
+			SAXException {
+
+		Interpreter interpreter = new Interpreter(url + "errorJavaScript.vxml");
+		try {
+			interpreter.start();
+			fail("no error occur");
+		} catch (RuntimeException exception) {
+			System.err.println(exception.getMessage());
+			assertEquals("La variable x n'est pas declaré", exception.getMessage());
+		}
+	}
+
+	@Test
+	public void subdialogCantReturnAnyObjectTypeAndItValueIsVisibleInItOwnerForm() throws IOException, SAXException,
+			ParserConfigurationException {
+
+		Interpreter interpreter = new Interpreter(url + "subdialogCantReturnAnyObjectTypeAndItValueIsVisibleInItOwnerForm.vxml");
+		interpreter.start();
+
+		//interpreter.submitDtmf("2");
+
+		List<String> logs = interpreter.getLogs();
+		List<Prompt> prompts = interpreter.getPrompts();
+
+		System.err.println("logs " + logs);
+		System.err.println("prompts " + prompts);
+
+		assertEquals("1.0", prompts.get(0).tts);
 	}
 
 	// trouver un autre moyen de test

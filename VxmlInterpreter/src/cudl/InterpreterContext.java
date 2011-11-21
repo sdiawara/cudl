@@ -69,8 +69,6 @@ class InterpreterContext {
 	void buildDocument(String fileName) throws IOException, SAXException {
 		String url = Utils.tackWeelFormedUrl(location, fileName);
 		System.err.println(url);
-		// System.err.println("build " + location + " + " + fileName + " url" +
-		// url);
 		URLConnection connection = new URL(url).openConnection();
 		if (cookies != null)
 			connection.setRequestProperty("Cookie", cookies);
@@ -115,7 +113,6 @@ class InterpreterContext {
 
 	private void declareRootScopeVariableIfNeeded(String textContent) throws IOException {
 		if (!textContent.equals(currentRootFileName)) {
-			System.err.println("ko");
 			NodeList childNodes = rootDocument.getDocumentElement().getChildNodes();
 			declaration.resetScopeBinding(InterpreterVariableDeclaration.APPLICATION_SCOPE);
 			declareVariable(childNodes, InterpreterVariableDeclaration.APPLICATION_SCOPE);
