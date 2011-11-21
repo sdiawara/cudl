@@ -46,6 +46,7 @@ class InterpreterContext {
 	private List<Prompt> prompts = new ArrayList<Prompt>();
 	private Map<Node, Integer> promptCounter = new Hashtable<Node, Integer>();
 	public String lastChangeEvent = "";
+	private InternalInterpreter internalInterpreter;
 
 	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException,
 			IOException, SAXException {
@@ -263,5 +264,13 @@ class InterpreterContext {
 
 	public int getPromptCounter(Node node) {
 		return promptCounter.get(node);
+	}
+
+	public InternalInterpreter getInternalInterpreter() {
+		return internalInterpreter;		
+	}
+
+	public void setInternalInterpreter(InternalInterpreter internalInterpreter) {
+		this.internalInterpreter = internalInterpreter;
 	}
 }

@@ -48,7 +48,6 @@ class InterpreterEventHandler {
 	public void doEvent(Object eventException) throws IOException, SAXException, InterpreterException, ParserConfigurationException {
 		String arg = ((EventException)eventException).type;
 		int counter = (eventCounter.get(arg) == null) ? 1 : eventCounter.get(arg) + 1;
-		//System.err.println(context.getSelectedFormItem() + "********************");
 		eventCounter.put(arg, counter);
 		Node node = searchEventHandlers(arg, counter, context.getSelectedFormItem());
 		Document rootDoc = context.getRootDocument();
@@ -66,7 +65,6 @@ class InterpreterEventHandler {
 
 		while (parent != null) {
 			NodeList nodeList = parent.getChildNodes();
-			// System.err.println(parent + " parent");
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
 				if (isHandlerForEventType(eventType, node)) {

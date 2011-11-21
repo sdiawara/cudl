@@ -975,6 +975,7 @@ class SubdialogTag extends VoiceXmlNode {
 			internalInterpreter.interpret(1, null);
 			context.getLogs().addAll(internalInterpreter.getContext().getLogs());
 			context.getPrompts().addAll(internalInterpreter.getContext().getPrompts());
+			context.setInternalInterpreter(internalInterpreter);
 		}
 		context.getDeclaration().evaluateScript(formItemName + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
 
@@ -1119,7 +1120,6 @@ class RepromptTag extends VoiceXmlNode {
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException,
 			ParserConfigurationException {
-		System.err.println("REPROMPTS ");
 		context.incrementPromptCounter(context.getSelectedFormItem());
 		return null;
 	}

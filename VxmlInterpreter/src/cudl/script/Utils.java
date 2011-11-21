@@ -10,7 +10,6 @@ import org.mozilla.javascript.NativeObject;
 public class Utils {
 
 	public static String scriptableObjectToString(Object scriptObject) {
-		System.err.println(scriptObject.getClass().getSimpleName());
 		String objectName = scriptObject.getClass().getSimpleName();
 
 		if (objectName.equals("Double") || scriptObject.getClass().getSimpleName().equals("Integer")) {
