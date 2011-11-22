@@ -624,8 +624,6 @@ public class InterpreterTest {
 		Interpreter interpreter = new Interpreter(url + "subdialogCantReturnAnyObjectTypeAndItValueIsVisibleInItOwnerForm.vxml");
 		interpreter.start();
 
-		//interpreter.submitDtmf("2");
-
 		List<String> logs = interpreter.getLogs();
 		List<Prompt> prompts = interpreter.getPrompts();
 
@@ -635,15 +633,47 @@ public class InterpreterTest {
 		assertEquals("1.0", prompts.get(0).tts);
 	}
 
-	// trouver un autre moyen de test
-	// @Test
-	// public void subdialogNamelistIsSubmitedToServer() throws
-	// ParserConfigurationException, SAXException,
-	// IOException {
-	// Interpreter interpreter = new Interpreter(url +
-	// "subdialogNamelist.vxml");
-	// interpreter.start();
-	//
-	// assertEquals("pass", interpreter.getPrompts().get(0).tts);
-	// }
+	@Test
+	public void userInputInsubDialog() throws IOException, ParserConfigurationException, SAXException {
+		Interpreter interpreter = new Interpreter(url + "userInputSubdialog.vxml");
+		interpreter.start();
+
+		interpreter.talk("hello");
+		interpreter.submitDtmf("1");
+		interpreter.talk("blabla");
+		
+		assertEquals("1: you say hello", interpreter.getPrompts().get(0).tts);
+		assertEquals("2: you say 1", interpreter.getPrompts().get(1).tts);
+		assertEquals("3: you say blabla", interpreter.getPrompts().get(2).tts);
+	}
+
+	@Test
+	public void userEventInsubDialog() throws IOException, ParserConfigurationException, SAXException {
+		Interpreter interpreter = new Interpreter(url + "userInputSubdialog.vxml");
+		interpreter.start();
+		
+		interpreter.talk("hello");
+		interpreter.noInput();
+		interpreter.noInput();
+		interpreter.talk("hello");
+		interpreter.noInput();
+	
+		assertEquals("1: you say hello", interpreter.getPrompts().get(0).tts);
+		assertEquals("2: you say nothink", interpreter.getPrompts().get(1).tts);
+		assertEquals("2: you say nothink", interpreter.getPrompts().get(2).tts);
+		assertEquals("2: you say hello", interpreter.getPrompts().get(3).tts);
+		assertEquals("3: you say nothink", interpreter.getPrompts().get(4).tts);
+	}
+	
+	@Test
+	public void fortimItemVariableIsAlwaysVisibleIsubdialog() throws IOException, ParserConfigurationException, SAXException {
+		Interpreter interpreter = new Interpreter(url + "subdialogVariableVisibility.vxml");
+		interpreter.start();
+		
+		interpreter.talk("hello");
+	
+		assertEquals("Input in subdialog", interpreter.getLogs().get(0));
+		assertEquals("Log: hello", interpreter.getLogs().get(1));
+	}
+	
 }

@@ -968,18 +968,28 @@ class SubdialogTag extends VoiceXmlNode {
 
 			// FIXME this is not a viable way to handle subdialogs ;(
 			InterpreterContext subContext = new InterpreterContext(url, context.cookies);
+			subContext.enterSubdialog();
 			internalInterpreter = new InternalInterpreter(subContext);
 			context.cookies = subContext.cookies;
 
 			declareParams(internalInterpreter, node.getChildNodes(), context);
+
+			context.setInternalInterpreter(internalInterpreter);
 			internalInterpreter.interpret(1, null);
 			context.getLogs().addAll(internalInterpreter.getContext().getLogs());
 			context.getPrompts().addAll(internalInterpreter.getContext().getPrompts());
-			context.setInternalInterpreter(internalInterpreter);
 		}
 		context.getDeclaration().evaluateScript(formItemName + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
 
+		setReturnVariable(context, formItemName, internalInterpreter);
+
+		return null;
+	}
+
+	void setReturnVariable(InterpreterContext context, String formItemName, InternalInterpreter internalInterpreter)
+			throws EventException, InterpreterException, IOException, SAXException, ParserConfigurationException {
 		if (internalInterpreter != null) {
+			context.getDeclaration().evaluateScript(formItemName + "=new Object();", InterpreterVariableDeclaration.DIALOG_SCOPE);
 			String[] returnValue = internalInterpreter.getContext().getReturnValue();
 
 			String namelist = returnValue[2];
@@ -989,10 +999,10 @@ class SubdialogTag extends VoiceXmlNode {
 				while (tokenizer.hasMoreElements()) {
 					String variable = tokenizer.nextToken();
 
-					context.getDeclaration().evaluateScript(
-							formItemName + "." + variable + "="
-									+ cudl.script.Utils.scriptableObjectToString(declaration2.getValue(variable)) + "",
-							InterpreterVariableDeclaration.ANONYME_SCOPE);
+					String script = formItemName + "." + variable + "="
+							+ cudl.script.Utils.scriptableObjectToString(declaration2.getValue(variable)) + "";
+					System.err.println(script);
+					context.getDeclaration().evaluateScript(script, InterpreterVariableDeclaration.ANONYME_SCOPE);
 				}
 			} else if (returnValue[0] != null) {
 				throw new EventException(returnValue[0]);
@@ -1005,8 +1015,6 @@ class SubdialogTag extends VoiceXmlNode {
 				tagInterpreter.interpret(context);
 			}
 		}
-
-		return null;
 	}
 
 	private void declareParams(InternalInterpreter internalInterpreter, NodeList childNodes, InterpreterContext context) {
@@ -1169,8 +1177,11 @@ class FilledTag extends ProceduralsTag {
 	@Override
 	public Object interpret(InterpreterContext context) throws InterpreterException, IOException, SAXException,
 			ParserConfigurationException {
-		if (!execute)
+		if (!execute) {
+			System.err.println("wait user input");
 			throw new FilledException(node.getParentNode());
+		}
+
 		return super.interpret(context);
 	}
 

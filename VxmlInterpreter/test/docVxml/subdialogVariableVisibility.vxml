@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+  <subdialog name="f1" src="inputForVariable.vxml">
+  </subdialog>
+       
+   <block>
+   	<log>Log: <value expr="f1.test"/></log>
+   </block>
+   </form>
+</vxml>

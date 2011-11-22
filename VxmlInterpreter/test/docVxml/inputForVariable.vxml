@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+   <block><log>Input in subdialog</log></block>
+   <field name="test">
+	   <filled>
+   			<return namelist="test"/>
+   	   </filled>
+   </field>  
+   </form>
+</vxml>

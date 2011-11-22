@@ -58,4 +58,8 @@ class ReturnException extends InterpreterException {
 		this.eventexpr = eventexpr;
 		this.namelist = namelist;
 	}
+
+	ReturnException(ReturnException e) {
+		this(e.event, e.eventexpr, e.namelist);
+	}
 }

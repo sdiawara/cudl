@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+  <subdialog name="f1" src="input.vxml">
+       </subdialog>
+   </form>
+</vxml>

@@ -45,24 +45,26 @@ class InterpreterEventHandler {
 		// reset to 0 ?
 	}
 
-	public void doEvent(Object eventException) throws IOException, SAXException, InterpreterException, ParserConfigurationException {
-		String arg = ((EventException)eventException).type;
+	public void doEvent(Object eventException) throws IOException, SAXException, InterpreterException,
+			ParserConfigurationException {
+		String arg = ((EventException) eventException).type;
 		int counter = (eventCounter.get(arg) == null) ? 1 : eventCounter.get(arg) + 1;
 		eventCounter.put(arg, counter);
 		Node node = searchEventHandlers(arg, counter, context.getSelectedFormItem());
 		Document rootDoc = context.getRootDocument();
-		node = (node == null && rootDoc != null) ? searchEventHandlers(arg, counter, rootDoc.getElementsByTagName("vxml").item(0)) : node;
+		node = (node == null && rootDoc != null) ? searchEventHandlers(arg, counter, rootDoc.getElementsByTagName("vxml").item(0))
+				: node;
 
 		if (node == null) {
 			// FIXME what are we supposed to do here ? Check the spec...
-			throw new RuntimeException(((EventException)eventException).message);
+			throw new RuntimeException(((EventException) eventException).message);
 		}
 		TagInterpreterFactory.getTagInterpreter(node).interpret(context);
 	}
 
 	private Node searchEventHandlers(String eventType, int eventCounter, Node parent) {
 		List<Node> availableHandler = new ArrayList<Node>();
-
+		System.err.println(parent.getChildNodes().getLength() + "child lengt");
 		while (parent != null) {
 			NodeList nodeList = parent.getChildNodes();
 			for (int i = 0; i < nodeList.getLength(); i++) {
@@ -71,7 +73,8 @@ class InterpreterEventHandler {
 					String countAsString = Utils.getNodeAttributeValue(node, "count");
 					int nodeCount = countAsString == null ? 1 : Integer.parseInt(countAsString);
 					if (nodeCount == eventCounter) {
-						// FIXME we should select the event handler with the count
+						// FIXME we should select the event handler with the
+						// count
 						// closer to counter
 						// here we check only equality
 						return node;

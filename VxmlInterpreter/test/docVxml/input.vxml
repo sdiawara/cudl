@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version = "2.0">
+  <form>
+   <block><log>Input in subdialog</log></block>
+   <field name="test">
+     <noinput>
+   	   		<prompt>1: you say nothink</prompt>
+   	   </noinput>
+	   <filled>
+   			<prompt>1: you say <value expr="test"/></prompt>
+   	   </filled>
+   </field>
+   <field name="test1">
+   <noinput>
+   	   		<prompt>2: you say nothink</prompt>
+   	   </noinput>
+	   <filled>
+   			<prompt>2: you say <value expr="test1"/></prompt>
+   	   </filled>
+   </field>
+  
+   <field name="test2">
+	 <filled>
+   			<prompt>3: you say <value expr="test2"/></prompt>
+   	   </filled>
+   	    <noinput>
+   	   		<prompt>3: you say nothink</prompt>
+   	   </noinput>
+   </field>        
+   </form>
+</vxml>

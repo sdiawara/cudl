@@ -5,7 +5,9 @@ import static cudl.utils.Utils.serachItem;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.swing.text.html.FormSubmitEvent;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.mozilla.javascript.EcmaError;
@@ -38,10 +40,34 @@ class InternalInterpreter {
 		ieh = new InterpreterEventHandler(context);
 	}
 
-	void interpret(int action, Object arg) throws IOException, SAXException, ParserConfigurationException {
+	void interpret(int action, Object arg) throws IOException, SAXException, ParserConfigurationException, FilledException,
+			ReturnException {
 		Node node = context.getCurrentDialog();
 
 		try {
+			InternalInterpreter internalInterpreter = context.getInternalInterpreter();
+			if (internalInterpreter != null) {
+
+				internalInterpreter.interpret(action, arg);
+
+				InterpreterContext subContext = internalInterpreter.getContext();
+				context.getLogs().addAll(subContext.getLogs());
+				context.getPrompts().addAll(subContext.getPrompts());
+				subContext.getLogs().clear();
+				subContext.getPrompts().clear();
+				if (subContext.inSubdialog()) {
+					VoiceXmlNode tagInterpreter = TagInterpreterFactory.getTagInterpreter(subContext.getCurrentDialog());
+					((FormTag) tagInterpreter).setInitVar(false);
+					tagInterpreter.interpret(subContext);
+				}else{
+					Node selectedFormItem = context.getSelectedFormItem();
+					VoiceXmlNode subdialog = TagInterpreterFactory.getTagInterpreter(selectedFormItem);
+					SubdialogTag subdialogTag = (SubdialogTag) subdialog;
+					subdialogTag.setReturnVariable(context, "f1",internalInterpreter);
+					test=true;
+				}
+				action = 1;
+			}
 			VoiceXmlNode dialog;
 			switch (action) {
 			case START:
@@ -60,18 +86,21 @@ class InternalInterpreter {
 				ieh.doEvent(arg);
 				break;
 			case BLIND_TRANSFER_SUCCESSSS:
-				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '0'", InterpreterVariableDeclaration.SESSION_SCOPE);
+				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '0'",
+						InterpreterVariableDeclaration.SESSION_SCOPE);
 				ieh.doEvent(new EventException("connection.disconnect.transfer"));
 				break;
 			case NOANSWER:
-				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '2'", InterpreterVariableDeclaration.SESSION_SCOPE);
+				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '2'",
+						InterpreterVariableDeclaration.SESSION_SCOPE);
 				setTransferResultAndExecute("'noanswer'");
 				break;
 			case CALLER_HUNGUP_DURING_TRANSFER:
 				setTransferResultAndExecute("'near_end_disconnect'");
 				break;
 			case NETWORK_BUSY:
-				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '5'", InterpreterVariableDeclaration.SESSION_SCOPE);
+				context.getDeclaration().evaluateScript("connection.protocol.isdnvn6.transferresult= '5'",
+						InterpreterVariableDeclaration.SESSION_SCOPE);
 				setTransferResultAndExecute("'network_busy'");
 				break;
 			case DESTINATION_BUSY:
@@ -81,15 +110,16 @@ class InternalInterpreter {
 				setTransferResultAndExecute("'maxtime_disconnect'");
 				break;
 			case DESTINATION_HANGUP:
-				context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()), "'far_end_disconnect'");
+				context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()),
+						"'far_end_disconnect'");
 				test = true;
 				interpret(1, null);
 				break;
 			case TALK:
-				utterance(arg+"", "'voice'");
+				utterance(arg + "", "'voice'");
 				break;
 			case DTMF:
-				utterance(arg+"", "'dtmf'");
+				utterance(arg + "", "'dtmf'");
 				break;
 			}
 		} catch (GotoException e) {
@@ -111,22 +141,24 @@ class InternalInterpreter {
 			context.buildDocument(e.next);
 			node = context.getCurrentDialog();
 			interpret(1, null);
-		} catch (FilledException e) {
 		} catch (EventException e) {
 			interpret(EVENT, e);
 		} catch (TransferException e) {
 			ieh.resetEventCounter();
 		} catch (ReturnException e) {
 			context.setReturnValue(e.event, e.eventexpr, e.namelist);
+			context.exitSubdialog();
 		} catch (InterpreterException e) {
-			System.err.println(e);
+			if (e instanceof FilledException)
+				throw new FilledException(null);
 		}
 	}
 
 	private void setTransferResultAndExecute(String transferResult) throws InterpreterException, IOException, SAXException,
 			ParserConfigurationException {
 		context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()), transferResult);
-		FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context.getSelectedFormItem(), "filled"));
+		FilledTag filled = (FilledTag) TagInterpreterFactory
+				.getTagInterpreter(serachItem(context.getSelectedFormItem(), "filled"));
 		filled.setExecute(true);
 		filled.interpret(context); // FIXME raise disconnect event instead to be
 		// closer to OMS buggy interpretation.
@@ -146,7 +178,8 @@ class InternalInterpreter {
 		properties.put(getNodeAttributeValue(node, "name"), getNodeAttributeValue(node, "value"));
 	}
 
-	void utterance(String utterance, String utteranceType) throws IOException, SAXException, ParserConfigurationException, InterpreterException {
+	void utterance(String utterance, String utteranceType) throws IOException, SAXException, ParserConfigurationException,
+			InterpreterException {
 		Node currentDialog = context.getCurrentDialog();
 		if (currentDialog.getNodeName().equals("form")) {
 			context.getDeclaration().evaluateScript("lastresult$[0].utterance =" + utterance,
@@ -154,7 +187,8 @@ class InternalInterpreter {
 			context.getDeclaration().evaluateScript("lastresult$[0].inputmode =" + utteranceType,
 					InterpreterVariableDeclaration.APPLICATION_SCOPE);
 			context.getDeclaration().setValue(context.getFormItemNames().get(context.getSelectedFormItem()), utterance);
-			FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context.getSelectedFormItem(), "filled"));
+			FilledTag filled = (FilledTag) TagInterpreterFactory.getTagInterpreter(serachItem(context.getSelectedFormItem(),
+					"filled"));
 			filled.setExecute(true);
 			filled.interpret(context);
 		} else {

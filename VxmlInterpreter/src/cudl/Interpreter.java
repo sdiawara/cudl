@@ -29,67 +29,114 @@ import cudl.utils.Utils;
 public class Interpreter {
 	private InternalInterpreter internalInterpreter;
 	private InterpreterContext context;
-		
+
 	public Interpreter(String url) throws IOException, ParserConfigurationException, SAXException {
 		context = new InterpreterContext(url);
 		internalInterpreter = new InternalInterpreter(context);
 	}
-	
-	public Interpreter(String url, String sessionVariables) throws IOException,
-			ParserConfigurationException, SAXException {
+
+	public Interpreter(String url, String sessionVariables) throws IOException, ParserConfigurationException, SAXException {
 		context = new InterpreterContext(url, null, sessionVariables);
 		internalInterpreter = new InternalInterpreter(context);
 	}
 
 	public void start() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(START, null);
+		try {
+			internalInterpreter.interpret(START, null);
+		} catch (InterpreterException e) {
+
+		}
 	}
 
 	public void noInput() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(EVENT, new EventException("noinput"));
+		try {
+			internalInterpreter.interpret(EVENT, new EventException("noinput", "no handler for noinput"));
+		} catch (InterpreterException e) {
+			
+		}
 	}
 
 	public void noMatch() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(EVENT, new EventException("nomatch"));
+		try {
+			internalInterpreter.interpret(EVENT, new EventException("nomatch"));
+		} catch (InterpreterException e) {
+
+		}
 	}
 
 	public void disconnect() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(EVENT, new EventException("connection.disconnect.hangup"));
+		try {
+			internalInterpreter.interpret(EVENT, new EventException("connection.disconnect.hangup"));
+		} catch (InterpreterException e) {
+
+		}
 	}
 
 	public void blindTransferSuccess() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(BLIND_TRANSFER_SUCCESSSS, null);
-	}
+		try {
+			internalInterpreter.interpret(BLIND_TRANSFER_SUCCESSSS, null);
+		} catch (InterpreterException e) {
 
+		}
+	}
+ 
 	public void noAnswer() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(NOANSWER, null);
+		try {
+			internalInterpreter.interpret(NOANSWER, null);
+		} catch (InterpreterException e) {
+
+		}
 	}
 
 	public void callerHangupDuringTransfer() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(CALLER_HUNGUP_DURING_TRANSFER, null);
+		try {
+			internalInterpreter.interpret(CALLER_HUNGUP_DURING_TRANSFER, null);
+		} catch (InterpreterException e) {
+
+		}
 	}
 
 	public void networkBusy() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(NETWORK_BUSY, null);
+		try {
+			internalInterpreter.interpret(NETWORK_BUSY, null);
+		} catch (InterpreterException e) {
+
+		}
 	}
 
 	public void destinationBusy() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(DESTINATION_BUSY, null);
+		try {
+			internalInterpreter.interpret(DESTINATION_BUSY, null);
+		} catch (InterpreterException e) {
+
+		}
 	}
 
 	public void transferTimeout() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(MAX_TIME_DISCONNECT, null);
+		try {
+			internalInterpreter.interpret(MAX_TIME_DISCONNECT, null);
+		} catch (InterpreterException e) {
+
+		}
 	}
 
 	public void talk(String sentence) throws UnsupportedEncodingException, IOException, SAXException,
 			ParserConfigurationException {
 		String utterance = "'" + URLEncoder.encode(sentence, "UTF-8").replaceAll("'", "") + "'";
-		internalInterpreter.interpret(TALK, utterance);
+		try {
+			internalInterpreter.interpret(TALK, utterance);
+		} catch (InterpreterException e) {
+			if(e  instanceof ReturnException)
+				internalInterpreter.getContext().setInternalInterpreter(null);
+		}
 	}
 
 	public void submitDtmf(String dtmf) throws IOException, SAXException, ParserConfigurationException {
 		String utterance = "'" + dtmf.replaceAll(" ", "") + "'";
-		internalInterpreter.interpret(DTMF, utterance);
+		try {
+			internalInterpreter.interpret(DTMF, utterance);
+		} catch (InterpreterException e) {
+		}
 	}
 
 	public List<String> getLogsWithLabel(String... label) {
@@ -135,6 +182,10 @@ public class Interpreter {
 	}
 
 	public void destinationHangup() throws IOException, SAXException, ParserConfigurationException {
-		internalInterpreter.interpret(DESTINATION_HANGUP, null);
+		try {
+			internalInterpreter.interpret(DESTINATION_HANGUP, null);
+		} catch (InterpreterException e) {
+
+		}
 	}
 }

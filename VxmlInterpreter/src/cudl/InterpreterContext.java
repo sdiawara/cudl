@@ -47,19 +47,19 @@ class InterpreterContext {
 	private Map<Node, Integer> promptCounter = new Hashtable<Node, Integer>();
 	public String lastChangeEvent = "";
 	private InternalInterpreter internalInterpreter;
+	private boolean inSubdialog;
 
-	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException,
-			IOException, SAXException {
+	InterpreterContext(String location) throws ParserConfigurationException, MalformedURLException, IOException, SAXException {
 		this(location, null, null);
 	}
 
-	InterpreterContext(String location, String cookies) throws ParserConfigurationException,
-			MalformedURLException, IOException, SAXException {
+	InterpreterContext(String location, String cookies) throws ParserConfigurationException, MalformedURLException, IOException,
+			SAXException {
 		this(location, cookies, null);
 	}
 
-	public InterpreterContext(String location, String cookies, String sessionVariables)
-			throws IOException, ParserConfigurationException, SAXException {
+	public InterpreterContext(String location, String cookies, String sessionVariables) throws IOException,
+			ParserConfigurationException, SAXException {
 		this.cookies = cookies;
 		this.location = location;
 		this.declaration = new InterpreterVariableDeclaration(sessionVariables);
@@ -267,10 +267,22 @@ class InterpreterContext {
 	}
 
 	public InternalInterpreter getInternalInterpreter() {
-		return internalInterpreter;		
+		return internalInterpreter;
 	}
 
 	public void setInternalInterpreter(InternalInterpreter internalInterpreter) {
 		this.internalInterpreter = internalInterpreter;
+	}
+
+	public void enterSubdialog() {
+		this.inSubdialog = true;
+	}
+
+	public boolean inSubdialog() {
+		return this.inSubdialog;
+	}
+
+	public void exitSubdialog() {
+		this.inSubdialog = false;
 	}
 }
