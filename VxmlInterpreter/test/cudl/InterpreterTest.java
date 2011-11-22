@@ -676,4 +676,26 @@ public class InterpreterTest {
 		assertEquals("Log: hello", interpreter.getLogs().get(1));
 	}
 	
+	
+	@Test
+	public void gvTest() throws IOException, ParserConfigurationException, SAXException {
+		Interpreter interpreter = new Interpreter("http://sdiawara.dev33.cvf/gv/svi-admin/devinet/devinet-admvocal/target/gv2-admvocal/static/vxml/index-dev.vxml");
+		interpreter.start();
+		
+		interpreter.submitDtmf("5555#");
+		interpreter.submitDtmf("434#");
+		
+		interpreter.getPrompts().clear();
+		
+		interpreter.submitDtmf("5555#");
+		interpreter.submitDtmf("434#");
+		
+		
+		interpreter.submitDtmf("5555#");
+		interpreter.submitDtmf("434#");
+		
+		System.err.println(interpreter.getPrompts());
+		
+	}
+	
 }

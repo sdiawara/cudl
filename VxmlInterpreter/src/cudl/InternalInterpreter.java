@@ -5,9 +5,7 @@ import static cudl.utils.Utils.serachItem;
 
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.swing.text.html.FormSubmitEvent;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.mozilla.javascript.EcmaError;
@@ -59,12 +57,16 @@ class InternalInterpreter {
 					VoiceXmlNode tagInterpreter = TagInterpreterFactory.getTagInterpreter(subContext.getCurrentDialog());
 					((FormTag) tagInterpreter).setInitVar(false);
 					tagInterpreter.interpret(subContext);
-				}else{
+					return;
+				} else {
 					Node selectedFormItem = context.getSelectedFormItem();
-					VoiceXmlNode subdialog = TagInterpreterFactory.getTagInterpreter(selectedFormItem);
-					SubdialogTag subdialogTag = (SubdialogTag) subdialog;
-					subdialogTag.setReturnVariable(context, "f1",internalInterpreter);
-					test=true;
+					if (selectedFormItem.getNodeName().equals("subdialog")) {
+						System.err.println(selectedFormItem);
+						VoiceXmlNode subdialog = TagInterpreterFactory.getTagInterpreter(selectedFormItem);
+						SubdialogTag subdialogTag = (SubdialogTag) subdialog;
+						subdialogTag.setReturnVariable(context, "f1", internalInterpreter);
+						test = true;
+					}
 				}
 				action = 1;
 			}
@@ -123,6 +125,8 @@ class InternalInterpreter {
 				break;
 			}
 		} catch (GotoException e) {
+			System.err.println("goto");
+			
 			// FIXME: this is use to check transition between leaf document and
 			// root document
 			context.lastChangeEvent = "goto";
@@ -134,12 +138,14 @@ class InternalInterpreter {
 				node = context.getCurrentDialog();
 				context.setNextItemToVisit(e.nextItem);
 			}
+			context.setInternalInterpreter(null);
 			interpret(1, null);
 		} catch (SubmitException e) {
 			context.lastChangeEvent = "submit";
 			ieh.resetEventCounter();
 			context.buildDocument(e.next);
 			node = context.getCurrentDialog();
+			context.setInternalInterpreter(null);
 			interpret(1, null);
 		} catch (EventException e) {
 			interpret(EVENT, e);
@@ -147,7 +153,8 @@ class InternalInterpreter {
 			ieh.resetEventCounter();
 		} catch (ReturnException e) {
 			context.setReturnValue(e.event, e.eventexpr, e.namelist);
-			context.exitSubdialog();
+			if(context.inSubdialog())
+				context.exitSubdialog();
 		} catch (InterpreterException e) {
 			if (e instanceof FilledException)
 				throw new FilledException(null);
