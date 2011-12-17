@@ -93,7 +93,7 @@
     </javac>
   </target>
 
-  <target name="test" depends="compile.test" description="Launch unit tests" >
+  <target name="test" depends="compile.test, maven-install" description="Launch unit tests" >
     <junit printsummary="yes" haltonfailure="yes">
       <classpath refid="test.classpath" />
       <formatter type="xml" />
@@ -129,6 +129,7 @@
     <artifact:install file="${jarpath}">
       <pom refid="pom"/>
       </artifact:install>
+     <copy file="${target.dir}/pom.xml" tofile="../pom.xml"/>
   </target>
 
   <target name="maven-deploy" depends="jar,build-pom">
